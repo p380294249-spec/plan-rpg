@@ -1,5 +1,18 @@
 # Plan RPG Version Notes
 
+## v0.3.3 - 2026-05-11
+
+### Goal
+
+Correct the annual goal ownership for INSO and passive-income collection work.
+
+### Main Changes
+
+- Moved `INSO 元器件收入` out of `DFK 公司赚钱`.
+- Kept INSO under `BUSINESS` as its own 2026 goal for元器件客户、RFQ、报价和成交推进.
+- Moved `收款和资金通道` out of DFK and into `PASSIVE INCOME`.
+- Updated migration rules so older local browser data is corrected automatically.
+
 ## v0.3.2 - 2026-05-11
 
 ### Goal
