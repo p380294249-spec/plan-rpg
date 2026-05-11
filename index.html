@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Plan RPG v0.3.3 / 计划 RPG</title>
+  <title>Plan RPG v0.3.4 / 计划 RPG</title>
   <style>
     :root {
       --ink: #111827;
@@ -853,7 +853,7 @@
         <div>
           <h1>计划 RPG</h1>
           <p>把目标变成冒险</p>
-          <span class="version">v0.3.3 本地网页软件</span>
+          <span class="version">v0.3.4 本地网页软件</span>
         </div>
       </div>
 
@@ -904,7 +904,7 @@
         <div class="stats">
           <div class="stat"><b>⚡</b><div><strong id="totalMinutes">0 min</strong><span>本地专注时长</span></div></div>
           <div class="stat"><b>◆</b><div><strong id="gRatio">0%</strong><span>Growth 占比</span></div></div>
-          <div class="stat"><b>Lv</b><div><strong>探索者 28</strong><span>Plan RPG v0.3.3</span></div></div>
+          <div class="stat"><b>Lv</b><div><strong>探索者 28</strong><span>Plan RPG v0.3.4</span></div></div>
         </div>
       </header>
 
@@ -1140,7 +1140,7 @@
   </div>
 
   <script>
-    const appVersion = "0.3.3";
+    const appVersion = "0.3.4";
     const seed = {
       version: appVersion,
       goals2030: [
@@ -1155,10 +1155,15 @@
       ],
       quests: [
         { id: "Q-001", name: "DFK 公司赚钱", type: "Main", goal: "BUSINESS", target: "每月 50 个货柜", description: "2026 年主目标：让 DFK 业务稳定赚钱，逐步做到月 50 个货柜。", nextMove: "选择当前最重要的章节推进", status: "In Progress", gmn: "G", priority: "High", icon: "📦" },
-        { id: "Q-009", parentQuestId: "Q-001", name: "系统优化", type: "Main", goal: "BUSINESS", target: "让业务流程更清楚、更稳定", description: "只放系统、流程、SOP、记录方式相关的优化。", nextMove: "花 20 分钟梳理当前系统最卡的地方", status: "In Progress", gmn: "G", priority: "High", icon: "⚙️" },
-        { id: "Q-010", parentQuestId: "Q-001", name: "客户维护杂事", type: "Habit", goal: "BUSINESS", target: "处理客户日常问题，保持业务不断线", description: "客户消息、订单状态、售后、杂事跟进都放这里。", nextMove: "处理一个客户事项并记录结果", status: "In Progress", gmn: "M", priority: "High", icon: "🧾" },
+        { id: "Q-009", parentQuestId: "Q-001", name: "更新系统", type: "Main", goal: "BUSINESS", target: "让 DFK 业务系统更清楚、更稳定", description: "只放 DFK 的系统、流程、SOP、记录方式相关优化。", nextMove: "花 20 分钟梳理当前系统最卡的地方", status: "In Progress", gmn: "G", priority: "High", icon: "⚙️" },
+        { id: "Q-010", parentQuestId: "Q-001", name: "处理物流琐事", type: "Habit", goal: "BUSINESS", target: "处理物流日常问题，保持交付不断线", description: "物流、发货、资料、状态跟进都放这里。", nextMove: "处理一个物流事项并记录结果", status: "In Progress", gmn: "M", priority: "High", icon: "🚚" },
         { id: "Q-003", name: "INSO 元器件收入", type: "Main", goal: "BUSINESS", target: "元器件业务进账 ≥10万", description: "INSO 是元器件收入模块，单独记录客户线索、RFQ、报价和成交推进。", nextMove: "筛选一批客户或 RFQ", status: "Not Started", gmn: "G", priority: "High", icon: "🔩" },
+        { id: "Q-011", parentQuestId: "Q-003", name: "更新报价", type: "Main", goal: "BUSINESS", target: "检查新询价和采购报价", description: "看有没有新的询价，采购有没有新的报价要给客户。", nextMove: "检查一轮询价和报价状态", status: "In Progress", gmn: "G", priority: "High", icon: "💬" },
+        { id: "Q-012", parentQuestId: "Q-003", name: "开发客户", type: "Main", goal: "BUSINESS", target: "每天开发新客户", description: "每天主动找新客户、新渠道、新机会。", nextMove: "开发一批新客户", status: "In Progress", gmn: "G", priority: "High", icon: "📈" },
+        { id: "Q-013", parentQuestId: "Q-003", name: "联系客户", type: "Habit", goal: "BUSINESS", target: "维护客户关系", description: "跟进已有客户，维护关系和下一步机会。", nextMove: "联系一批已有客户", status: "In Progress", gmn: "M", priority: "High", icon: "🤝" },
         { id: "Q-002", name: "收款和资金通道", type: "Main", goal: "PASSIVE", target: "让被动收入收款更稳定、更快", description: "银行、渠道、汇款方案、限制和费用记录。", nextMove: "联系一个银行或支付渠道", status: "Not Started", gmn: "G", priority: "High", icon: "🏦" },
+        { id: "Q-014", parentQuestId: "Q-002", name: "更新系统", type: "Main", goal: "PASSIVE", target: "把收款规则和记录系统更新清楚", description: "更新收款记录、通道规则、费用、限制和流程。", nextMove: "整理一次收款系统记录", status: "In Progress", gmn: "G", priority: "High", icon: "🧩" },
+        { id: "Q-015", parentQuestId: "Q-002", name: "处理银行业务", type: "Habit", goal: "PASSIVE", target: "处理银行和通道事项", description: "银行沟通、资料、限制、付款/收款问题都放这里。", nextMove: "处理一个银行事项", status: "In Progress", gmn: "M", priority: "High", icon: "🏛️" },
         { id: "Q-004", name: "MEDITATION", type: "Habit", goal: "MINDSET", target: "365次记录", description: "每天短记录：先冷静后行动。", nextMove: "Complete 1 meditation/check-in", status: "Not Started", gmn: "M", priority: "Medium", icon: "🧘" },
         { id: "Q-005", name: "HEALTH", type: "Habit", goal: "HEALTH", target: "体重5KG浮动月数", description: "记录饮食/训练/体重趋势。", nextMove: "Log workout or food", status: "Not Started", gmn: "G", priority: "Medium", icon: "💪" },
         { id: "Q-006", name: "SOCIAL NETWORK", type: "Side", goal: "SOCIAL", target: "1 mentor + key persons", description: "联系/复盘一个有价值的人。", nextMove: "Write 1 contact note", status: "Not Started", gmn: "G", priority: "Medium", icon: "🤝" },
@@ -1169,17 +1174,26 @@
         { id: "T-001", questId: "Q-009", name: "梳理 DFK 当前系统问题", instruction: "写出 DFK 业务里现在最乱、最卡、最影响赚钱的地方。", minutes: 20, standard: "列出至少 3 个系统问题", gmn: "G", skillIds: ["operations", "strategy"], status: "Not Started" },
         { id: "T-002", questId: "Q-009", name: "优化报价和订单流程", instruction: "把报价、客户确认、订单跟进的流程整理成更清楚的一步一步动作。", minutes: 20, standard: "写出一个可执行流程", gmn: "G", skillIds: ["operations", "revenue"], status: "Not Started" },
         { id: "T-003", questId: "Q-009", name: "调整 DFK 业务记录方式", instruction: "把客户、报价、订单、问题记录到一个更容易复盘的位置。", minutes: 20, standard: "完成一次真实业务记录调整", gmn: "G", skillIds: ["operations", "personal-system"], status: "Not Started" },
-        { id: "T-004", questId: "Q-003", name: "筛选RFQ/客户线索", instruction: "按规则筛选一批客户或 RFQ，标记可推进项。", minutes: 20, standard: "输出可推进清单", gmn: "G", skillIds: ["revenue", "market"], status: "Not Started" },
+        { id: "T-004", questId: "Q-011", name: "检查新询价", instruction: "查看有没有新的询价，标记需要回复或报价的项目。", minutes: 20, standard: "更新询价状态", gmn: "G", skillIds: ["revenue", "market"], status: "Not Started" },
         { id: "T-005", questId: "Q-009", name: "培训SOP拆分", instruction: "把推广平台培训拆成3个动作和验收标准。", minutes: 20, standard: "3个动作+标准", gmn: "G", skillIds: ["operations", "leadership"], status: "Not Started" },
-        { id: "T-011", questId: "Q-010", name: "处理客户日常消息", instruction: "回复客户消息，确认当前卡点和下一步。", minutes: 20, standard: "处理并记录一个客户事项", gmn: "M", skillIds: ["communication", "operations"], status: "Not Started" },
-        { id: "T-012", questId: "Q-010", name: "跟进客户杂事清单", instruction: "整理今天必须处理的客户杂事，逐条标记状态。", minutes: 20, standard: "完成客户杂事清单更新", gmn: "M", skillIds: ["operations", "communication"], status: "Not Started" },
-        { id: "T-013", questId: "Q-010", name: "更新客户订单状态", instruction: "检查客户订单、发货、付款或资料状态，写清下一步。", minutes: 20, standard: "更新一批订单/客户状态", gmn: "M", skillIds: ["operations", "communication"], status: "Not Started" },
-        { id: "T-006", questId: "Q-002", name: "联系银行渠道", instruction: "准备问题清单或联系一个银行/渠道。", minutes: 20, standard: "一个联系人或问题清单", gmn: "G", skillIds: ["finance", "communication"], status: "Not Started" },
+        { id: "T-011", questId: "Q-010", name: "处理物流日常事项", instruction: "处理一个物流、发货、资料或状态问题，写清下一步。", minutes: 20, standard: "处理并记录一个物流事项", gmn: "M", skillIds: ["communication", "operations"], status: "Not Started" },
+        { id: "T-012", questId: "Q-010", name: "更新发货/物流状态", instruction: "检查需要跟进的物流状态，更新结果和卡点。", minutes: 20, standard: "更新一批物流状态", gmn: "M", skillIds: ["operations", "communication"], status: "Not Started" },
+        { id: "T-013", questId: "Q-010", name: "整理物流资料", instruction: "整理物流相关文件、费用、状态或客户需要的资料。", minutes: 20, standard: "完成一组物流资料更新", gmn: "M", skillIds: ["operations", "communication"], status: "Not Started" },
+        { id: "T-014", questId: "Q-011", name: "跟进采购报价", instruction: "查看采购有没有新报价，把可以发给客户的内容整理出来。", minutes: 20, standard: "更新采购报价状态", gmn: "G", skillIds: ["revenue", "operations"], status: "Not Started" },
+        { id: "T-015", questId: "Q-011", name: "给客户更新报价", instruction: "把已确认的报价发给客户，并记录客户反馈或下一步。", minutes: 20, standard: "完成一批报价更新", gmn: "G", skillIds: ["revenue", "communication"], status: "Not Started" },
+        { id: "T-016", questId: "Q-012", name: "开发新客户", instruction: "找一批新的元器件客户或联系人，记录可推进对象。", minutes: 20, standard: "新增一批客户线索", gmn: "G", skillIds: ["revenue", "market"], status: "Not Started" },
+        { id: "T-017", questId: "Q-012", name: "发送开发消息", instruction: "给新客户发送开发消息，并记录回复状态。", minutes: 20, standard: "完成一轮客户开发", gmn: "G", skillIds: ["revenue", "communication"], status: "Not Started" },
+        { id: "T-018", questId: "Q-013", name: "联系老客户", instruction: "联系已有客户，维护关系并确认近期需求。", minutes: 20, standard: "完成一批客户联系", gmn: "M", skillIds: ["communication", "revenue"], status: "Not Started" },
+        { id: "T-019", questId: "Q-013", name: "记录客户关系进展", instruction: "把客户状态、关系温度、下一步动作写清楚。", minutes: 20, standard: "更新客户关系记录", gmn: "M", skillIds: ["communication", "personal-system"], status: "Not Started" },
+        { id: "T-006", questId: "Q-015", name: "联系银行渠道", instruction: "准备问题清单或联系一个银行/渠道。", minutes: 20, standard: "一个联系人或问题清单", gmn: "M", skillIds: ["finance", "communication"], status: "Not Started" },
+        { id: "T-020", questId: "Q-014", name: "更新收款系统", instruction: "整理收款通道、费用、到账时间、限制和当前状态。", minutes: 20, standard: "更新一次收款系统记录", gmn: "G", skillIds: ["finance", "operations"], status: "Not Started" },
+        { id: "T-021", questId: "Q-014", name: "整理收款流程", instruction: "把一个收款流程写成清楚步骤，标记卡点。", minutes: 20, standard: "完成一条收款流程更新", gmn: "G", skillIds: ["finance", "operations"], status: "Not Started" },
+        { id: "T-022", questId: "Q-015", name: "处理银行资料", instruction: "处理银行需要的资料、限制、沟通或后续问题。", minutes: 20, standard: "处理一个银行事项", gmn: "M", skillIds: ["finance", "communication"], status: "Not Started" },
         { id: "T-007", questId: "Q-004", name: "冷静行动记录", instruction: "冥想/呼吸后描述场景和感受。", minutes: 10, standard: "写下冥想场景和身体/情绪感受", gmn: "M", skillIds: ["personal-system"], status: "Not Started" },
         { id: "T-008", questId: "Q-005", name: "训练/饮食记录", instruction: "记录今天训练、饮食、身体状态。", minutes: 20, standard: "完成一条健康记录", gmn: "G", skillIds: ["personal-system"], status: "Not Started" },
         { id: "T-009", questId: "Q-006", name: "复盘一个联系人", instruction: "写下一个人能帮什么、你能提供什么、下一步联系。", minutes: 20, standard: "完成联系人卡片", gmn: "G", skillIds: ["communication", "leadership"], status: "Not Started" },
         { id: "T-010", questId: "Q-007", name: "V60/兴趣记录", instruction: "记录一次咖啡/运动体验和改进点。", minutes: 20, standard: "完成一条兴趣日志", gmn: "M", skillIds: ["personal-system"], status: "Not Started" },
-        { id: "T-RND-001", questId: "Q-003", name: "紧急回复重要客户 RFQ", instruction: "突发客户请求，快速判断是否值得推进。", minutes: 20, standard: "完成判断并记录下一步", gmn: "G", skillIds: ["revenue", "communication"], status: "Not Started", is_random_event: true, quest_type: "main", estimated_sessions: 1, reason: "重要客户临时询价，可能影响元器件业务收入。", source: "emergency", linked_goal_id: "BUSINESS", priority: "urgent", pivot_status: "none", original_title: "紧急回复重要客户 RFQ", current_title: "紧急回复重要客户 RFQ", pivot_reason: "", discovery_note: "", generated_task_id: "" }
+        { id: "T-RND-001", questId: "Q-011", name: "紧急回复重要客户 RFQ", instruction: "突发客户请求，快速判断是否值得推进。", minutes: 20, standard: "完成判断并记录下一步", gmn: "G", skillIds: ["revenue", "communication"], status: "Not Started", is_random_event: true, quest_type: "main", estimated_sessions: 1, reason: "重要客户临时询价，可能影响元器件业务收入。", source: "emergency", linked_goal_id: "BUSINESS", priority: "urgent", pivot_status: "none", original_title: "紧急回复重要客户 RFQ", current_title: "紧急回复重要客户 RFQ", pivot_reason: "", discovery_note: "", generated_task_id: "" }
       ],
       skills: [
         { id: "strategy", name: "Strategy / 战略判断", level: 1, xp: 35, maxXp: 100, description: "把长期方向翻译成目标、取舍、优先级和执行路线。", requirements: ["Define and execute long-term strategy", "Translate strategy into measurable operating plans"], unlock: "战略 memo 模板" },
@@ -1195,7 +1209,7 @@
         { id: "L-001", date: "2026-05-10", minutes: 20, gmn: "G", questId: "Q-009", taskId: "T-001", whatDone: "梳理 DFK 当前系统问题", problem: "报价、客户、订单记录分散，复盘成本高", solution: "先集中记录关键流程和卡点", good: "找到了业务系统问题", bad: "流程还不够统一", nextStep: "优化报价和订单流程", skillXp: [{ skillId: "operations", xp: 30 }, { skillId: "strategy", xp: 10 }] },
         { id: "L-002", date: "2026-05-10", minutes: 20, gmn: "G", questId: "Q-009", taskId: "T-002", whatDone: "整理报价和订单流程", problem: "不同客户跟进方式不一致", solution: "先写出标准动作", good: "流程更清楚", bad: "还需要真实订单测试", nextStep: "调整 DFK 业务记录方式", skillXp: [{ skillId: "operations", xp: 30 }, { skillId: "revenue", xp: 10 }] },
         { id: "L-003", date: "2026-05-10", minutes: 10, gmn: "M", questId: "Q-004", taskId: "T-007", whatDone: "安静坐下，做了一次短冥想", problem: "呼吸慢下来后，焦虑感有下降", solution: "", good: "", bad: "", nextStep: "每天做一次短记录", skillXp: [{ skillId: "personal-system", xp: 15 }], is_pivoted: false, original_task_id: "T-007", actual_task_id: "T-007", pivot_note: "" },
-        { id: "L-004", date: "2026-05-10", minutes: 20, gmn: "G", questId: "Q-003", taskId: "T-RND-001", whatDone: "处理客户临时 RFQ，并判断为可推进机会", problem: "规格信息不完整", solution: "先回确认清单", good: "没有把突发事件当成打乱计划，而是归入 main/G", bad: "", nextStep: "等待客户补规格后报价", skillXp: [{ skillId: "revenue", xp: 30 }, { skillId: "communication", xp: 10 }], is_random_event: true, is_pivoted: false, original_task_id: "T-RND-001", actual_task_id: "T-RND-001", pivot_note: "" }
+        { id: "L-004", date: "2026-05-10", minutes: 20, gmn: "G", questId: "Q-011", taskId: "T-RND-001", whatDone: "处理客户临时 RFQ，并判断为可推进机会", problem: "规格信息不完整", solution: "先回确认清单", good: "没有把突发事件当成打乱计划，而是归入 main/G", bad: "", nextStep: "等待客户补规格后报价", skillXp: [{ skillId: "revenue", xp: 30 }, { skillId: "communication", xp: 10 }], is_random_event: true, is_pivoted: false, original_task_id: "T-RND-001", actual_task_id: "T-RND-001", pivot_note: "" }
       ],
       model: [
         ["5-Year", "2030 Goal", "长期方向/人生地图", "Goal ID, 2030 target, unit, achieved, description", "决定哪些时间算真实成长"],
@@ -1312,11 +1326,11 @@
           return {
             ...quest,
             parentQuestId: "Q-001",
-            name: "系统优化",
+            name: "更新系统",
             type: "Main",
             goal: "BUSINESS",
-            target: "让业务流程更清楚、更稳定",
-            description: "只放系统、流程、SOP、记录方式相关的优化。",
+            target: "让 DFK 业务系统更清楚、更稳定",
+            description: "只放 DFK 的系统、流程、SOP、记录方式相关优化。",
             nextMove: "花 20 分钟梳理当前系统最卡的地方",
             status: "In Progress",
             gmn: "G",
@@ -1328,18 +1342,23 @@
           return {
             ...quest,
             parentQuestId: "Q-001",
-            name: "客户维护杂事",
+            name: "处理物流琐事",
             type: "Habit",
             goal: "BUSINESS",
-            target: "处理客户日常问题，保持业务不断线",
-            description: "客户消息、订单状态、售后、杂事跟进都放这里。",
-            nextMove: "处理一个客户事项并记录结果",
+            target: "处理物流日常问题，保持交付不断线",
+            description: "物流、发货、资料、状态跟进都放这里。",
+            nextMove: "处理一个物流事项并记录结果",
             status: "In Progress",
             gmn: "M",
             priority: "High",
-            icon: "🧾"
+            icon: "🚚"
           };
         }
+        if (quest.id === "Q-011") return { ...quest, parentQuestId: "Q-003", name: "更新报价", type: "Main", goal: "BUSINESS", target: "检查新询价和采购报价", description: "看有没有新的询价，采购有没有新的报价要给客户。", nextMove: "检查一轮询价和报价状态", status: "In Progress", gmn: "G", priority: "High", icon: "💬" };
+        if (quest.id === "Q-012") return { ...quest, parentQuestId: "Q-003", name: "开发客户", type: "Main", goal: "BUSINESS", target: "每天开发新客户", description: "每天主动找新客户、新渠道、新机会。", nextMove: "开发一批新客户", status: "In Progress", gmn: "G", priority: "High", icon: "📈" };
+        if (quest.id === "Q-013") return { ...quest, parentQuestId: "Q-003", name: "联系客户", type: "Habit", goal: "BUSINESS", target: "维护客户关系", description: "跟进已有客户，维护关系和下一步机会。", nextMove: "联系一批已有客户", status: "In Progress", gmn: "M", priority: "High", icon: "🤝" };
+        if (quest.id === "Q-014") return { ...quest, parentQuestId: "Q-002", name: "更新系统", type: "Main", goal: "PASSIVE", target: "把收款规则和记录系统更新清楚", description: "更新收款记录、通道规则、费用、限制和流程。", nextMove: "整理一次收款系统记录", status: "In Progress", gmn: "G", priority: "High", icon: "🧩" };
+        if (quest.id === "Q-015") return { ...quest, parentQuestId: "Q-002", name: "处理银行业务", type: "Habit", goal: "PASSIVE", target: "处理银行和通道事项", description: "银行沟通、资料、限制、付款/收款问题都放这里。", nextMove: "处理一个银行事项", status: "In Progress", gmn: "M", priority: "High", icon: "🏛️" };
         return quest;
       });
     }
@@ -1369,7 +1388,7 @@
             standard: "写下冥想场景和身体/情绪感受"
           };
         }
-        if (["T-001", "T-002", "T-003", "T-005", "T-011", "T-012", "T-013"].includes(task.id)) {
+        if (["T-001", "T-002", "T-003", "T-004", "T-005", "T-006", "T-011", "T-012", "T-013", "T-014", "T-015", "T-016", "T-017", "T-018", "T-019", "T-020", "T-021", "T-022"].includes(task.id)) {
           const overrides = {
             "T-001": {
               name: "梳理 DFK 当前系统问题",
@@ -1389,37 +1408,122 @@
               standard: "完成一次真实业务记录调整",
               skillIds: ["operations", "personal-system"]
             },
+            "T-004": {
+              name: "检查新询价",
+              instruction: "查看有没有新的询价，标记需要回复或报价的项目。",
+              standard: "更新询价状态",
+              skillIds: ["revenue", "market"],
+              questId: "Q-011"
+            },
             "T-005": {
               name: "培训SOP拆分",
               instruction: "把推广平台培训拆成3个动作和验收标准。",
               standard: "3个动作+标准",
               skillIds: ["operations", "leadership"]
             },
+            "T-006": {
+              name: "联系银行渠道",
+              instruction: "准备问题清单或联系一个银行/渠道。",
+              standard: "一个联系人或问题清单",
+              skillIds: ["finance", "communication"],
+              gmn: "M",
+              questId: "Q-015",
+              quest_type: "maintenance"
+            },
             "T-011": {
-              name: "处理客户日常消息",
-              instruction: "回复客户消息，确认当前卡点和下一步。",
-              standard: "处理并记录一个客户事项",
+              name: "处理物流日常事项",
+              instruction: "处理一个物流、发货、资料或状态问题，写清下一步。",
+              standard: "处理并记录一个物流事项",
               skillIds: ["communication", "operations"],
               gmn: "M",
               questId: "Q-010",
               quest_type: "maintenance"
             },
             "T-012": {
-              name: "跟进客户杂事清单",
-              instruction: "整理今天必须处理的客户杂事，逐条标记状态。",
-              standard: "完成客户杂事清单更新",
+              name: "更新发货/物流状态",
+              instruction: "检查需要跟进的物流状态，更新结果和卡点。",
+              standard: "更新一批物流状态",
               skillIds: ["operations", "communication"],
               gmn: "M",
               questId: "Q-010",
               quest_type: "maintenance"
             },
             "T-013": {
-              name: "更新客户订单状态",
-              instruction: "检查客户订单、发货、付款或资料状态，写清下一步。",
-              standard: "更新一批订单/客户状态",
+              name: "整理物流资料",
+              instruction: "整理物流相关文件、费用、状态或客户需要的资料。",
+              standard: "完成一组物流资料更新",
               skillIds: ["operations", "communication"],
               gmn: "M",
               questId: "Q-010",
+              quest_type: "maintenance"
+            },
+            "T-014": {
+              name: "跟进采购报价",
+              instruction: "查看采购有没有新报价，把可以发给客户的内容整理出来。",
+              standard: "更新采购报价状态",
+              skillIds: ["revenue", "operations"],
+              questId: "Q-011"
+            },
+            "T-015": {
+              name: "给客户更新报价",
+              instruction: "把已确认的报价发给客户，并记录客户反馈或下一步。",
+              standard: "完成一批报价更新",
+              skillIds: ["revenue", "communication"],
+              questId: "Q-011"
+            },
+            "T-016": {
+              name: "开发新客户",
+              instruction: "找一批新的元器件客户或联系人，记录可推进对象。",
+              standard: "新增一批客户线索",
+              skillIds: ["revenue", "market"],
+              questId: "Q-012"
+            },
+            "T-017": {
+              name: "发送开发消息",
+              instruction: "给新客户发送开发消息，并记录回复状态。",
+              standard: "完成一轮客户开发",
+              skillIds: ["revenue", "communication"],
+              questId: "Q-012"
+            },
+            "T-018": {
+              name: "联系老客户",
+              instruction: "联系已有客户，维护关系并确认近期需求。",
+              standard: "完成一批客户联系",
+              skillIds: ["communication", "revenue"],
+              gmn: "M",
+              questId: "Q-013",
+              quest_type: "maintenance"
+            },
+            "T-019": {
+              name: "记录客户关系进展",
+              instruction: "把客户状态、关系温度、下一步动作写清楚。",
+              standard: "更新客户关系记录",
+              skillIds: ["communication", "personal-system"],
+              gmn: "M",
+              questId: "Q-013",
+              quest_type: "maintenance"
+            },
+            "T-020": {
+              name: "更新收款系统",
+              instruction: "整理收款通道、费用、到账时间、限制和当前状态。",
+              standard: "更新一次收款系统记录",
+              skillIds: ["finance", "operations"],
+              questId: "Q-014"
+            },
+            "T-021": {
+              name: "整理收款流程",
+              instruction: "把一个收款流程写成清楚步骤，标记卡点。",
+              standard: "完成一条收款流程更新",
+              skillIds: ["finance", "operations"],
+              questId: "Q-014"
+            },
+            "T-022": {
+              name: "处理银行资料",
+              instruction: "处理银行需要的资料、限制、沟通或后续问题。",
+              standard: "处理一个银行事项",
+              skillIds: ["finance", "communication"],
+              gmn: "M",
+              questId: "Q-015",
               quest_type: "maintenance"
             }
           }[task.id];
@@ -1732,7 +1836,7 @@
           <button class="primary full" id="detailStart">开始记录：${escapeHtml(selectedTask?.current_title || selectedTask?.name || "当前任务")}</button>
           <div class="custom-task-box">
             <h4>自己写一个任务</h4>
-            <label>任务标题<input id="quickTaskTitle" placeholder="例如：调整 DFK 业务系统优化" /></label>
+            <label>任务标题<input id="quickTaskTitle" placeholder="例如：更新 DFK 系统" /></label>
             <label>记录重点<textarea id="quickTaskNote" placeholder="这次 20 分钟主要做什么？"></textarea></label>
             <div class="form-grid">
               <label>时间<input id="quickTaskMinutes" type="number" min="1" max="180" value="20" /></label>
@@ -1963,7 +2067,7 @@
         <div class="route-item"><div><b>${i + 1}. ${escapeHtml(x.q.name)}</b><br><small>${escapeHtml(x.q.nextMove)}</small></div></div>
       `).join("");
       $("weeklyFocus").innerHTML = `
-        <p style="margin:0 0 8px;color:#cbd5e1;">DFK：系统优化</p>
+        <p style="margin:0 0 8px;color:#cbd5e1;">DFK：更新系统</p>
         <div class="bar"><div class="fill" style="--value:${computedQuestProgress(questById("Q-009"))}%"></div></div>
       `;
     }

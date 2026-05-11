@@ -1,5 +1,26 @@
 # Plan RPG Version Notes
 
+## v0.3.4 - 2026-05-11
+
+### Goal
+
+Make the daily work entrances under INSO, DFK, and passive-income collection match the user's real workflow.
+
+### Main Changes
+
+- INSO now has three work entrances:
+  - `更新报价`
+  - `开发客户`
+  - `联系客户`
+- DFK now has two work entrances:
+  - `更新系统`
+  - `处理物流琐事`
+- `收款和资金通道` now has two work entrances:
+  - `更新系统`
+  - `处理银行业务`
+- Added matching 20-minute preset tasks for each entrance.
+- Updated migration rules so older local browser data moves into the new entrances.
+
 ## v0.3.3 - 2026-05-11
 
 ### Goal
