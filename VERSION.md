@@ -1,5 +1,23 @@
 # Plan RPG Version Notes
 
+## v0.3.2 - 2026-05-11
+
+### Goal
+
+Make `DFK 公司赚钱` work like a real annual goal with several parallel chapters, instead of forcing every business action into `系统优化`.
+
+### Main Changes
+
+- Renamed the DFK chapter from `第一章：优化公司系统` to `系统优化`.
+- Added `客户维护杂事` as a separate chapter under `DFK 公司赚钱`.
+- Moved `客户开发与报价` and `收款和资金通道` under `DFK 公司赚钱`.
+- Added preset customer maintenance actions:
+  - `处理客户日常消息`
+  - `跟进客户杂事清单`
+  - `更新客户订单状态`
+- Moved `培训SOP拆分` into `系统优化`.
+- Updated migration rules so existing local browser data is normalized into the new chapter structure.
+
 ## v0.3.1 - 2026-05-11
 
 ### Goal
