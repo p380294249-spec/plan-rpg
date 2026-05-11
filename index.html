@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Plan RPG v0.3.4 / 计划 RPG</title>
+  <title>Plan RPG v0.3.5 / 计划 RPG</title>
   <style>
     :root {
       --ink: #111827;
@@ -853,7 +853,7 @@
         <div>
           <h1>计划 RPG</h1>
           <p>把目标变成冒险</p>
-          <span class="version">v0.3.4 本地网页软件</span>
+          <span class="version">v0.3.5 本地网页软件</span>
         </div>
       </div>
 
@@ -904,7 +904,7 @@
         <div class="stats">
           <div class="stat"><b>⚡</b><div><strong id="totalMinutes">0 min</strong><span>本地专注时长</span></div></div>
           <div class="stat"><b>◆</b><div><strong id="gRatio">0%</strong><span>Growth 占比</span></div></div>
-          <div class="stat"><b>Lv</b><div><strong>探索者 28</strong><span>Plan RPG v0.3.4</span></div></div>
+          <div class="stat"><b>Lv</b><div><strong>探索者 28</strong><span>Plan RPG v0.3.5</span></div></div>
         </div>
       </header>
 
@@ -1140,7 +1140,7 @@
   </div>
 
   <script>
-    const appVersion = "0.3.4";
+    const appVersion = "0.3.5";
     const seed = {
       version: appVersion,
       goals2030: [
@@ -1237,6 +1237,7 @@
     let seconds = 1200;
     let timerTaskId = selectedTaskId;
     let timer = null;
+    let timerEndsAt = 0;
     let running = false;
     let selectedPivotType = "renamed";
 
@@ -1682,6 +1683,7 @@
       if (force || timerTaskId !== task.id) {
         timerTaskId = task.id;
         seconds = minutes * 60;
+        timerEndsAt = 0;
         if ($("durationInput")) $("durationInput").value = String(Math.max(1, minutes));
       }
     }
@@ -1917,22 +1919,41 @@
       $("timerValue").textContent = `${String(Math.floor(seconds / 60)).padStart(2, "0")}:${String(seconds % 60).padStart(2, "0")}`;
       $("startPauseBtn").textContent = running ? "暂停" : "开始";
     }
-    function toggleTimer() {
-      running = !running;
-      if (running) {
-        timer = setInterval(() => {
-          seconds = Math.max(0, seconds - 1);
-          renderTimer();
-          if (seconds === 0) toggleTimer();
-        }, 1000);
-      } else {
+    function syncTimerWithClock() {
+      if (!running || !timerEndsAt) return;
+      const remainingMs = Math.max(0, timerEndsAt - Date.now());
+      seconds = Math.ceil(remainingMs / 1000);
+      renderTimer();
+      if (remainingMs <= 0) {
+        running = false;
         clearInterval(timer);
+        timer = null;
+        timerEndsAt = 0;
+        seconds = 0;
+        renderTimer();
+      }
+    }
+    function toggleTimer() {
+      if (running) {
+        syncTimerWithClock();
+        running = false;
+        clearInterval(timer);
+        timer = null;
+        timerEndsAt = 0;
+      } else {
+        if (seconds <= 0) seconds = selectedDurationMinutes() * 60;
+        running = true;
+        timerEndsAt = Date.now() + seconds * 1000;
+        syncTimerWithClock();
+        timer = setInterval(syncTimerWithClock, 250);
       }
       renderTimer();
     }
     function resetTimer() {
       running = false;
       clearInterval(timer);
+      timer = null;
+      timerEndsAt = 0;
       seconds = selectedDurationMinutes() * 60;
       renderTimer();
     }
@@ -2438,6 +2459,7 @@
     $("backToMapBtn").addEventListener("click", () => showScreen("map"));
     $("startPauseBtn").addEventListener("click", toggleTimer);
     $("resetBtn").addEventListener("click", resetTimer);
+    document.addEventListener("visibilitychange", syncTimerWithClock);
     $("randomEventBtn").addEventListener("click", openRandomEventModal);
     $("pivotTaskBtn").addEventListener("click", openPivotModal);
     $("saveDraftBtn").addEventListener("click", saveDraft);

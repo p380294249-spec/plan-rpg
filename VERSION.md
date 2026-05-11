@@ -1,5 +1,17 @@
 # Plan RPG Version Notes
 
+## v0.3.5 - 2026-05-11
+
+### Goal
+
+Make the 20-minute timer follow real elapsed time even if the browser tab is hidden, throttled, or briefly freezes.
+
+### Main Changes
+
+- Changed the timer from "subtract 1 every interval" to "calculate remaining time from the real ending timestamp".
+- Added timer sync when the page visibility changes.
+- Prevented browser lag from stretching a 20-minute session longer than 20 real minutes.
+
 ## v0.3.4 - 2026-05-11
 
 ### Goal
