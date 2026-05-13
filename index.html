@@ -1,0 +1,1326 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Plan RPG v0.2 / 计划 RPG</title>
+  <style>
+    :root {
+      --ink: #111827;
+      --muted: #667085;
+      --line: rgba(109, 122, 145, .28);
+      --panel: rgba(246, 248, 252, .9);
+      --paper: rgba(255, 255, 255, .82);
+      --night: #0c1628;
+      --night2: #17243a;
+      --gold: #f3b43f;
+      --violet: #8557e8;
+      --blue: #2f80ed;
+      --green: #20a66a;
+      --red: #dd4c4c;
+      --shadow: 0 24px 60px rgba(20, 31, 52, .2);
+    }
+
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      color: var(--ink);
+      font-family: "Microsoft YaHei", "PingFang SC", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+      background:
+        linear-gradient(125deg, rgba(252, 240, 220, .98), rgba(234, 241, 250, .95) 45%, rgba(214, 225, 244, .98)),
+        #edf2f9;
+    }
+
+    button, input, textarea, select { font: inherit; }
+    button { border: 0; cursor: pointer; }
+    textarea, input, select {
+      width: 100%;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: rgba(255, 255, 255, .88);
+      color: var(--ink);
+      padding: 10px 12px;
+      outline: none;
+    }
+    textarea { min-height: 86px; resize: vertical; line-height: 1.55; }
+    label { display: grid; gap: 6px; font-size: 13px; color: #344054; font-weight: 800; }
+
+    .app {
+      min-height: 100vh;
+      display: grid;
+      grid-template-columns: 264px minmax(0, 1fr);
+    }
+
+    .sidebar {
+      color: #e7edf7;
+      background:
+        linear-gradient(180deg, rgba(255,255,255,.05), transparent 20%),
+        linear-gradient(180deg, #091324, #13243f);
+      border-right: 1px solid rgba(255, 255, 255, .08);
+      padding: 22px 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+    .brand {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      padding-bottom: 18px;
+      border-bottom: 1px solid rgba(255, 255, 255, .09);
+    }
+    .brand-mark {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      color: #0c1628;
+      font-size: 25px;
+      background: conic-gradient(from 30deg, #fef3c7, #38bdf8, #a78bfa, #fef3c7);
+      box-shadow: 0 10px 26px rgba(56, 189, 248, .2);
+    }
+    .brand h1 { margin: 0; font-size: 20px; letter-spacing: 0; }
+    .brand p { margin: 4px 0 0; color: #9fb0c8; font-size: 12px; }
+    .version {
+      display: inline-flex;
+      margin-top: 7px;
+      padding: 3px 8px;
+      border-radius: 999px;
+      color: #fde68a;
+      background: rgba(245, 180, 63, .14);
+      border: 1px solid rgba(245, 180, 63, .24);
+      font-size: 11px;
+      font-weight: 900;
+    }
+
+    .side-card {
+      border: 1px solid rgba(255, 255, 255, .1);
+      background: rgba(255, 255, 255, .048);
+      border-radius: 8px;
+      padding: 14px;
+    }
+    .side-title {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      color: #f8fafc;
+      font-weight: 900;
+      margin-bottom: 12px;
+    }
+    .goal-row, .skill-mini {
+      display: grid;
+      gap: 6px;
+      margin: 11px 0;
+      font-size: 13px;
+    }
+    .goal-head {
+      display: flex;
+      justify-content: space-between;
+      gap: 8px;
+      color: #cbd5e1;
+    }
+    .bar {
+      height: 8px;
+      border-radius: 999px;
+      background: rgba(148, 163, 184, .24);
+      overflow: hidden;
+    }
+    .fill {
+      height: 100%;
+      width: var(--value);
+      background: linear-gradient(90deg, #50c4ff, #a884ff);
+      border-radius: inherit;
+    }
+
+    .nav { display: grid; gap: 8px; }
+    .nav button {
+      min-height: 42px;
+      border-radius: 8px;
+      color: #cbd5e1;
+      background: transparent;
+      text-align: left;
+      padding: 10px 12px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 800;
+    }
+    .nav button.active {
+      color: #fff;
+      background: rgba(133, 87, 232, .24);
+      outline: 1px solid rgba(167, 139, 250, .36);
+    }
+    .quote {
+      margin-top: auto;
+      color: #aab8ce;
+      font-size: 13px;
+      line-height: 1.65;
+    }
+    .utility-actions {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+    .utility-actions button {
+      min-height: 36px;
+      border-radius: 8px;
+      color: #dbeafe;
+      background: rgba(255, 255, 255, .07);
+      border: 1px solid rgba(255, 255, 255, .1);
+      font-size: 12px;
+      font-weight: 900;
+    }
+
+    .main {
+      min-width: 0;
+      display: grid;
+      grid-template-rows: auto 1fr;
+    }
+    .topbar {
+      min-height: 98px;
+      padding: 22px 30px 14px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+    }
+    .title h2 {
+      margin: 0;
+      font-size: clamp(32px, 4vw, 52px);
+      line-height: 1;
+      letter-spacing: 0;
+      font-family: Georgia, "Times New Roman", serif;
+    }
+    .title p { margin: 9px 0 0; color: var(--muted); }
+    .stats {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+    .stat {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      min-width: 138px;
+      border: 1px solid rgba(148, 163, 184, .42);
+      border-radius: 8px;
+      background: rgba(255, 255, 255, .58);
+      padding: 10px 12px;
+    }
+    .stat b { font-size: 18px; }
+    .stat strong { display: block; font-size: 14px; }
+    .stat span { color: var(--muted); font-size: 12px; }
+
+    .screen {
+      display: none;
+      min-height: 0;
+      padding: 12px 30px 28px;
+    }
+    .screen.active { display: block; }
+
+    .map-layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 374px;
+      gap: 18px;
+      height: calc(100vh - 140px);
+      min-height: 660px;
+    }
+    .map-stage {
+      position: relative;
+      overflow: hidden;
+      border-radius: 8px;
+      border: 1px solid rgba(148, 163, 184, .32);
+      background:
+        linear-gradient(180deg, rgba(255, 255, 255, .32), rgba(15, 23, 42, .18)),
+        radial-gradient(circle at 75% 25%, rgba(120, 172, 214, .65), transparent 25%),
+        radial-gradient(circle at 28% 38%, rgba(250, 223, 145, .55), transparent 28%),
+        linear-gradient(135deg, #d8eadb 0%, #e9ddb8 36%, #9fc8d7 68%, #d9e3f3 100%);
+      box-shadow: var(--shadow);
+      padding: 28px;
+    }
+    .map-stage:before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      opacity: .2;
+      background:
+        linear-gradient(128deg, transparent 0 18%, rgba(255,255,255,.85) 18.5% 19%, transparent 19.5% 100%),
+        linear-gradient(45deg, transparent 0 31%, rgba(15,23,42,.12) 31.5% 32%, transparent 32.5% 100%);
+      pointer-events: none;
+    }
+    .map-section-title {
+      position: relative;
+      z-index: 1;
+      margin: 0 0 16px;
+      font-size: 21px;
+      font-weight: 900;
+      color: #162033;
+    }
+    .quest-lane {
+      position: relative;
+      z-index: 1;
+      height: 205px;
+      display: grid;
+      grid-template-columns: repeat(4, minmax(126px, 1fr));
+      align-items: center;
+      gap: 22px;
+    }
+    .quest-lane.side {
+      grid-template-columns: repeat(5, minmax(108px, 1fr));
+      margin-top: 16px;
+    }
+    .quest-lane:before {
+      content: "";
+      position: absolute;
+      left: 6%;
+      right: 7%;
+      top: 50%;
+      border-top: 4px solid rgba(245, 180, 63, .82);
+      box-shadow: 0 0 14px rgba(245, 180, 63, .42);
+      z-index: -1;
+    }
+    .quest-lane.side:before {
+      top: 44%;
+      border-top: 4px dotted rgba(255, 255, 255, .95);
+      box-shadow: none;
+    }
+    .quest-node {
+      display: grid;
+      justify-items: center;
+      gap: 8px;
+      min-width: 0;
+      background: transparent;
+      color: #172033;
+    }
+    .node-icon {
+      width: 76px;
+      height: 76px;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      font-size: 28px;
+      color: #fff;
+      background: linear-gradient(145deg, #334155, #0f172a);
+      border: 4px solid rgba(255, 255, 255, .78);
+      box-shadow: 0 10px 22px rgba(15, 23, 42, .28);
+      transition: transform .18s ease, box-shadow .18s ease;
+    }
+    .quest-node:hover .node-icon { transform: translateY(-3px); }
+    .quest-node.active .node-icon {
+      background: linear-gradient(145deg, #f59e0b, #7c3aed);
+      box-shadow: 0 0 0 6px rgba(245, 158, 11, .22), 0 18px 34px rgba(124, 58, 237, .25);
+    }
+    .quest-node.completed .node-icon { background: linear-gradient(145deg, #0ea5e9, #166534); }
+    .node-name {
+      max-width: 150px;
+      border-radius: 8px;
+      background: rgba(255, 255, 255, .78);
+      border: 1px solid rgba(148, 163, 184, .42);
+      padding: 6px 9px;
+      font-size: 13px;
+      font-weight: 900;
+      text-align: center;
+      box-shadow: 0 4px 12px rgba(15,23,42,.11);
+    }
+    .node-meta { color: #475569; font-size: 12px; font-weight: 800; }
+
+    .map-bottom {
+      position: absolute;
+      left: 26px;
+      right: 26px;
+      bottom: 22px;
+      display: grid;
+      grid-template-columns: 1fr 260px;
+      gap: 12px;
+    }
+    .progress-panel, .week-panel {
+      border-radius: 8px;
+      padding: 18px;
+      color: #e5e7eb;
+      background: rgba(13, 23, 40, .9);
+      box-shadow: 0 16px 35px rgba(15, 23, 42, .28);
+    }
+    .progress-panel strong { display: block; font-size: 34px; margin: 8px 0; }
+    .milestones {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+      margin-top: 14px;
+      color: #cbd5e1;
+      font-size: 12px;
+    }
+
+    .panel, .detail {
+      border-radius: 8px;
+      background: var(--panel);
+      border: 1px solid rgba(148, 163, 184, .38);
+      box-shadow: var(--shadow);
+      padding: 20px;
+    }
+    .detail { overflow: auto; }
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      border-radius: 999px;
+      padding: 5px 9px;
+      font-size: 12px;
+      font-weight: 900;
+      border: 1px solid rgba(148, 163, 184, .42);
+      background: rgba(255, 255, 255, .65);
+      color: #475569;
+    }
+    h3 { margin: 12px 0 8px; font-size: 25px; letter-spacing: 0; }
+    p { color: #475569; line-height: 1.7; }
+    .progress-number {
+      display: flex;
+      justify-content: space-between;
+      color: #334155;
+      font-weight: 900;
+      margin: 16px 0 8px;
+    }
+    .task-list, .route, .log-list, .skill-grid { display: grid; gap: 10px; }
+    .task-card, .route-item, .log-card, .skill-card {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: rgba(255, 255, 255, .72);
+      padding: 12px;
+    }
+    .task-card {
+      display: grid;
+      gap: 7px;
+      text-align: left;
+    }
+    .task-card.selected {
+      outline: 2px solid rgba(133, 87, 232, .45);
+      background: #fff;
+    }
+    .task-head, .row {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      align-items: start;
+    }
+    small { color: var(--muted); line-height: 1.5; }
+    .primary, .secondary, .danger, .ghost {
+      min-height: 42px;
+      border-radius: 8px;
+      padding: 9px 13px;
+      font-weight: 900;
+    }
+    .primary {
+      color: #fff;
+      background: linear-gradient(135deg, #2563eb, #8557e8);
+      box-shadow: 0 13px 24px rgba(79, 70, 229, .22);
+    }
+    .secondary {
+      color: #334155;
+      background: rgba(255, 255, 255, .72);
+      border: 1px solid var(--line);
+    }
+    .danger {
+      color: #fff;
+      background: linear-gradient(135deg, #dc2626, #ef4444);
+    }
+    .ghost {
+      color: #334155;
+      background: transparent;
+      border: 1px solid transparent;
+    }
+    .full { width: 100%; }
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 14px;
+    }
+
+    .focus-grid {
+      display: grid;
+      grid-template-columns: 360px minmax(0, 1fr) 330px;
+      gap: 18px;
+      align-items: start;
+    }
+    .review-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 420px;
+      gap: 18px;
+      align-items: start;
+    }
+    .timer {
+      text-align: center;
+      padding: 18px 0;
+    }
+    .timer-value {
+      font-size: 72px;
+      line-height: 1;
+      color: #172033;
+      font-family: Georgia, "Times New Roman", serif;
+      font-weight: 900;
+    }
+    .timer-actions {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-top: 18px;
+    }
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 14px;
+    }
+    .form-grid label:first-child,
+    .form-grid label:last-child { grid-column: 1 / -1; }
+    .session-result {
+      border: 1px solid rgba(245, 180, 63, .4);
+      background: linear-gradient(135deg, rgba(255, 247, 237, .94), rgba(238, 242, 255, .9));
+    }
+    .reward-line {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      margin: 12px 0;
+    }
+    .reward {
+      border-radius: 8px;
+      border: 1px solid var(--line);
+      background: rgba(255,255,255,.72);
+      padding: 10px;
+    }
+    .reward b { display: block; font-size: 18px; margin-top: 4px; }
+
+    .review-cards {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+    .metric {
+      background: rgba(255, 255, 255, .78);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 14px;
+    }
+    .metric b { display: block; font-size: 28px; margin-top: 7px; }
+    .metric span { color: var(--muted); font-size: 12px; }
+    .log-card {
+      display: grid;
+      gap: 8px;
+    }
+    .log-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      justify-content: flex-end;
+    }
+    .edit-panel {
+      margin-top: 14px;
+      border-top: 1px solid var(--line);
+      padding-top: 14px;
+    }
+
+    .skill-tree {
+      display: grid;
+      grid-template-columns: 330px minmax(0, 1fr);
+      gap: 18px;
+      align-items: start;
+    }
+    .skill-card {
+      display: grid;
+      gap: 8px;
+    }
+    .skill-card.active {
+      outline: 2px solid rgba(133, 87, 232, .45);
+      background: #fff;
+    }
+    .skill-node-row {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 12px;
+      margin-top: 14px;
+    }
+    .skill-node {
+      border-radius: 8px;
+      border: 1px solid var(--line);
+      background: rgba(255,255,255,.72);
+      padding: 14px;
+      min-height: 120px;
+    }
+
+    .table-wrap {
+      overflow: auto;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: rgba(255, 255, 255, .72);
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 760px;
+      font-size: 13px;
+    }
+    th, td {
+      padding: 11px 12px;
+      border-bottom: 1px solid #e2e8f0;
+      text-align: left;
+      vertical-align: top;
+    }
+    th { color: #334155; background: #f8fafc; font-size: 12px; }
+    td { color: #475569; }
+    .hide { display: none !important; }
+
+    @media (max-width: 1180px) {
+      .app { grid-template-columns: 1fr; }
+      .sidebar { display: grid; }
+      .map-layout, .focus-grid, .review-grid, .skill-tree {
+        grid-template-columns: 1fr;
+        height: auto;
+        min-height: 0;
+      }
+      .map-stage { min-height: 790px; }
+      .detail { max-height: none; }
+    }
+    @media (max-width: 760px) {
+      .topbar { align-items: flex-start; flex-direction: column; padding: 20px; }
+      .screen { padding: 8px 16px 24px; }
+      .quest-lane, .quest-lane.side {
+        grid-template-columns: repeat(2, minmax(120px, 1fr));
+        height: auto;
+        gap: 18px;
+        margin-bottom: 22px;
+      }
+      .quest-lane:before { display: none; }
+      .map-bottom { position: static; grid-template-columns: 1fr; margin-top: 16px; }
+      .form-grid, .review-cards, .skill-node-row, .reward-line { grid-template-columns: 1fr; }
+      .timer-value { font-size: 58px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <aside class="sidebar">
+      <div class="brand">
+        <div class="brand-mark">✦</div>
+        <div>
+          <h1>计划 RPG</h1>
+          <p>把目标变成冒险</p>
+          <span class="version">v0.2 本地网页软件</span>
+        </div>
+      </div>
+
+      <div class="side-card">
+        <div class="side-title"><span>年度目标</span><span>2026</span></div>
+        <div id="goalList"></div>
+      </div>
+
+      <nav class="nav">
+        <button class="active" data-screen="map">地图 / Dashboard</button>
+        <button data-screen="focus">20分钟专注</button>
+        <button data-screen="review">日志 / 复盘</button>
+        <button data-screen="skills">CEO 技能树</button>
+        <button data-screen="model">数据模型</button>
+      </nav>
+
+      <div class="side-card">
+        <div class="side-title"><span>当前焦点</span><span>W20</span></div>
+        <div id="weeklyFocus"></div>
+      </div>
+
+      <div class="side-card">
+        <div class="side-title"><span>技能专项</span><span>CEO</span></div>
+        <div id="skillMini"></div>
+      </div>
+
+      <div class="side-card">
+        <div class="side-title"><span>备份/迁移</span><span>JSON</span></div>
+        <div class="utility-actions">
+          <button id="exportDataBtn">导出数据</button>
+          <button id="importDataBtn">导入数据</button>
+        </div>
+        <input class="hide" id="importDataFile" type="file" accept="application/json" />
+      </div>
+
+      <div class="quote">
+        最远的旅程，从今天的 20 分钟开始。<br />
+        每一条日志，都是下周路线的材料。
+      </div>
+    </aside>
+
+    <main class="main">
+      <header class="topbar">
+        <div class="title">
+          <h2>2026 计划地图</h2>
+          <p>2030 方向 → 2026 Quest → 20min Session → Log → Review → Skill XP</p>
+        </div>
+        <div class="stats">
+          <div class="stat"><b>⚡</b><div><strong id="totalMinutes">0 min</strong><span>本地专注时长</span></div></div>
+          <div class="stat"><b>◆</b><div><strong id="gRatio">0%</strong><span>Growth 占比</span></div></div>
+          <div class="stat"><b>Lv</b><div><strong>探索者 28</strong><span>Plan RPG v0.2</span></div></div>
+        </div>
+      </header>
+
+      <section id="map" class="screen active">
+        <div class="map-layout">
+          <div class="map-stage">
+            <h3 class="map-section-title">主线任务</h3>
+            <div id="mainLane" class="quest-lane"></div>
+            <h3 class="map-section-title">支线 / 习惯任务</h3>
+            <div id="sideLane" class="quest-lane side"></div>
+            <div class="map-bottom">
+              <div class="progress-panel">
+                <div>年度探索进度</div>
+                <strong id="annualProgress">0%</strong>
+                <div class="bar"><div class="fill" id="annualFill" style="--value:0%"></div></div>
+                <div class="milestones"><span>Q1 25%</span><span>Q2 50%</span><span>Q3 75%</span><span>Q4 100%</span></div>
+              </div>
+              <div class="week-panel">
+                <b>本周成就</b>
+                <p><span id="weekSessions">0</span> 次 Session</p>
+                <p><span id="weekLogs">0</span> 条执行日志</p>
+              </div>
+            </div>
+          </div>
+          <aside class="detail" id="questDetail"></aside>
+        </div>
+      </section>
+
+      <section id="focus" class="screen">
+        <div class="focus-grid">
+          <div class="panel">
+            <div class="row">
+              <span class="pill">20min Session</span>
+              <button class="ghost" id="backToMapBtn">返回地图</button>
+            </div>
+            <h3 id="focusTaskName">选择一个任务开始</h3>
+            <p id="focusTaskInfo"></p>
+            <label>当前任务<select id="taskSelect"></select></label>
+            <div class="timer">
+              <div class="timer-value" id="timerValue">20:00</div>
+              <div class="timer-actions">
+                <button class="primary" id="startPauseBtn">开始</button>
+                <button class="secondary" id="resetBtn">重置</button>
+              </div>
+            </div>
+            <div id="skillRewardPreview"></div>
+            <div class="actions">
+              <button class="secondary" id="saveDraftBtn">保存草稿</button>
+              <button class="primary" id="saveSessionBtn">完成并结算</button>
+            </div>
+          </div>
+
+          <div class="panel">
+            <h3>战斗记录板</h3>
+            <p>先写关键内容，结束时再补全。保存后可以编辑。</p>
+            <div class="form-grid">
+              <label>做了什么<textarea id="whatDone" placeholder="这 20 分钟具体推进了什么？"></textarea></label>
+              <label>遇到什么问题<textarea id="problem" placeholder="卡点、阻力、情绪、信息缺口..."></textarea></label>
+              <label>怎么解决<textarea id="solution" placeholder="你采取了什么处理方式？"></textarea></label>
+              <label>好的地方<textarea id="good" placeholder="值得保留的动作、判断、节奏..."></textarea></label>
+              <label>不好的地方<textarea id="bad" placeholder="浪费、拖延、误判、流程问题..."></textarea></label>
+              <label>下一步<textarea id="nextStep" placeholder="下一次 20 分钟应该从哪里开始？"></textarea></label>
+            </div>
+          </div>
+
+          <div class="panel session-result" id="sessionResult">
+            <span class="pill">Session 结算</span>
+            <h3>还没有完成本次专注</h3>
+            <p>完成后这里会显示你写了什么、获得了什么、下一步去哪里。</p>
+          </div>
+        </div>
+      </section>
+
+      <section id="review" class="screen">
+        <div class="review-grid">
+          <div class="panel">
+            <span class="pill">Weekly Review</span>
+            <h3>本周自动汇总</h3>
+            <p>这里会汇总本地 Session Log。点击日志可编辑，后续可以交给 AI 做复盘。</p>
+            <div class="review-cards">
+              <div class="metric"><span>Total</span><b id="metricTotal">0</b></div>
+              <div class="metric"><span>Growth</span><b id="metricG">0</b></div>
+              <div class="metric"><span>Maintenance</span><b id="metricM">0</b></div>
+              <div class="metric"><span>Noise</span><b id="metricN">0</b></div>
+            </div>
+            <h4>下周建议路线</h4>
+            <div class="route" id="nextRoute"></div>
+          </div>
+          <div class="panel">
+            <h3>Session Logs</h3>
+            <div class="log-list" id="logList"></div>
+            <div class="edit-panel hide" id="editPanel">
+              <h3>修改日志</h3>
+              <div class="form-grid">
+                <label>GMN<select id="editGmn"><option>G</option><option>M</option><option>N</option></select></label>
+                <label>任务<select id="editTask"></select></label>
+                <label>做了什么<textarea id="editWhat"></textarea></label>
+                <label>问题<textarea id="editProblem"></textarea></label>
+                <label>解决<textarea id="editSolution"></textarea></label>
+                <label>好的地方<textarea id="editGood"></textarea></label>
+                <label>不好的地方<textarea id="editBad"></textarea></label>
+                <label>下一步<textarea id="editNext"></textarea></label>
+              </div>
+              <div class="actions">
+                <button class="primary" id="updateLogBtn">保存修改</button>
+                <button class="secondary" id="cancelEditBtn">取消</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="skills" class="screen">
+        <div class="skill-tree">
+          <div class="panel">
+            <span class="pill">CEO Skill Tree</span>
+            <h3>技能专项</h3>
+            <p>从 CEO / Founder / GM 招聘要求反推学习路线。每次 20 分钟会给相关技能加 XP。</p>
+            <div class="skill-grid" id="skillList"></div>
+          </div>
+          <div class="panel" id="skillDetail"></div>
+        </div>
+      </section>
+
+      <section id="model" class="screen">
+        <div class="panel">
+          <h3>数据模型</h3>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Level</th><th>Entity</th><th>Purpose</th><th>Key Fields</th><th>Why It Exists</th></tr></thead>
+              <tbody id="modelTable"></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script>
+    const appVersion = "0.2.0";
+    const seed = {
+      version: appVersion,
+      goals2030: [
+        { id: "BUSINESS", title: "Business income > 30WRMB", progress: 33, role: "Mainline" },
+        { id: "PASSIVE", title: "Passive income > 20WRMB", progress: 60, role: "Mainline" },
+        { id: "HEALTH", title: "Weight control < 5KG", progress: 42, role: "Habit" },
+        { id: "MINDSET", title: "Reading / Meditation / Doing", progress: 48, role: "Habit" },
+        { id: "SOCIAL", title: "Mentor + key persons", progress: 15, role: "Sideline" },
+        { id: "NEW", title: "First time > 20", progress: 20, role: "Sideline" }
+      ],
+      quests: [
+        { id: "Q-001", name: "推广平台", type: "Main", goal: "BUSINESS", target: "稳定300CBM/月", description: "把培训变成标准 SOP 与销售动作。", nextMove: "Define 3 sales/training tasks", status: "Not Started", gmn: "G", priority: "High", icon: "📣" },
+        { id: "Q-002", name: "提升汇款速度和方案", type: "Main", goal: "BUSINESS/PASSIVE", target: "稳定收款问题", description: "联系银行/渠道，记录方案与限制。", nextMove: "Talk to 1 bank or payment contact", status: "Not Started", gmn: "G", priority: "High", icon: "🏦" },
+        { id: "Q-003", name: "元器件业务进账 ≥10万", type: "Main", goal: "BUSINESS", target: "收入≥100000", description: "新增获客渠道 + RFQ 跟进。", nextMove: "Screen 10 leads or reply RFQs", status: "Not Started", gmn: "G", priority: "High", icon: "🔩" },
+        { id: "Q-009", name: "优化计划与记录方式", type: "Side", goal: "MINDSET/BUSINESS", target: "建立20min log系统", description: "把 Notion 目标变成 RPG 路线和 GMN 日志。", nextMove: "Finish v2 spreadsheet + test 3 sessions", status: "In Progress", gmn: "G", priority: "High", icon: "🧭" },
+        { id: "Q-004", name: "MEDITATION", type: "Habit", goal: "MINDSET", target: "365次记录", description: "每天短记录：先冷静后行动。", nextMove: "Complete 1 meditation/check-in", status: "Not Started", gmn: "M", priority: "Medium", icon: "🧘" },
+        { id: "Q-005", name: "HEALTH", type: "Habit", goal: "HEALTH", target: "体重5KG浮动月数", description: "记录饮食/训练/体重趋势。", nextMove: "Log workout or food", status: "Not Started", gmn: "G", priority: "Medium", icon: "💪" },
+        { id: "Q-006", name: "SOCIAL NETWORK", type: "Side", goal: "SOCIAL", target: "1 mentor + key persons", description: "联系/复盘一个有价值的人。", nextMove: "Write 1 contact note", status: "Not Started", gmn: "G", priority: "Medium", icon: "🤝" },
+        { id: "Q-007", name: "INTERESTS", type: "Side", goal: "INTERESTS", target: "尝试新习惯/兴趣", description: "V60咖啡、运动、体验。", nextMove: "Record 1 meaningful interest activity", status: "Not Started", gmn: "M", priority: "Low", icon: "☕" },
+        { id: "Q-008", name: "NEW THINGS", type: "Side", goal: "NEW", target: "First time >20", description: "体验新事物并记录。", nextMove: "Log 1 new experience", status: "Not Started", gmn: "M", priority: "Low", icon: "✨" }
+      ],
+      tasks: [
+        { id: "T-001", questId: "Q-009", name: "列出当前记录入口", instruction: "写出 Notion/ChatGPT/微信/Excel 等入口及问题。", minutes: 20, standard: "至少5个入口+每个问题", gmn: "G", skillIds: ["personal-system", "strategy"], status: "Not Started" },
+        { id: "T-002", questId: "Q-009", name: "定义GMN分类", instruction: "写清楚 G/M/N 分别代表什么，举10个例子。", minutes: 20, standard: "完成GMN定义表", gmn: "G", skillIds: ["personal-system", "strategy"], status: "Not Started" },
+        { id: "T-003", questId: "Q-009", name: "测试20min执行日志", instruction: "完成一次真实20分钟任务并记录全过程。", minutes: 20, standard: "填完Session Log一行", gmn: "G", skillIds: ["personal-system", "operations"], status: "Not Started" },
+        { id: "T-004", questId: "Q-003", name: "筛选RFQ/客户线索", instruction: "按规则筛选一批客户或 RFQ，标记可推进项。", minutes: 20, standard: "输出可推进清单", gmn: "G", skillIds: ["revenue", "market"], status: "Not Started" },
+        { id: "T-005", questId: "Q-001", name: "培训SOP拆分", instruction: "把推广平台培训拆成3个动作和验收标准。", minutes: 20, standard: "3个动作+标准", gmn: "G", skillIds: ["operations", "leadership"], status: "Not Started" },
+        { id: "T-006", questId: "Q-002", name: "联系银行渠道", instruction: "准备问题清单或联系一个银行/渠道。", minutes: 20, standard: "一个联系人或问题清单", gmn: "G", skillIds: ["finance", "communication"], status: "Not Started" },
+        { id: "T-007", questId: "Q-004", name: "冷静行动记录", instruction: "冥想/呼吸后写一句今天的行动判断。", minutes: 20, standard: "完成一条M记录", gmn: "M", skillIds: ["personal-system"], status: "Not Started" },
+        { id: "T-008", questId: "Q-005", name: "训练/饮食记录", instruction: "记录今天训练、饮食、身体状态。", minutes: 20, standard: "完成一条健康记录", gmn: "G", skillIds: ["personal-system"], status: "Not Started" },
+        { id: "T-009", questId: "Q-006", name: "复盘一个联系人", instruction: "写下一个人能帮什么、你能提供什么、下一步联系。", minutes: 20, standard: "完成联系人卡片", gmn: "G", skillIds: ["communication", "leadership"], status: "Not Started" },
+        { id: "T-010", questId: "Q-007", name: "V60/兴趣记录", instruction: "记录一次咖啡/运动体验和改进点。", minutes: 20, standard: "完成一条兴趣日志", gmn: "M", skillIds: ["personal-system"], status: "Not Started" }
+      ],
+      skills: [
+        { id: "strategy", name: "Strategy / 战略判断", level: 1, xp: 35, maxXp: 100, description: "把长期方向翻译成目标、取舍、优先级和执行路线。", requirements: ["Define and execute long-term strategy", "Translate strategy into measurable operating plans"], unlock: "战略 memo 模板" },
+        { id: "revenue", name: "Revenue / 增长与销售", level: 1, xp: 20, maxXp: 100, description: "客户开发、GTM、销售流程、渠道和 pipeline。", requirements: ["Own revenue generation", "Build sales playbook and customer acquisition strategy"], unlock: "客户开发地图" },
+        { id: "finance", name: "Finance / 财务与资本", level: 1, xp: 12, maxXp: 100, description: "现金流、预算、财务模型、融资和银行/投资人沟通。", requirements: ["Lead capital raising", "Financial planning and scenario analysis"], unlock: "现金流仪表盘" },
+        { id: "operations", name: "Operations / 运营系统", level: 1, xp: 42, maxXp: 100, description: "SOP、KPI、流程优化、跨部门协同。", requirements: ["Build scalable operating model", "Monitor KPIs and remove bottlenecks"], unlock: "SOP 任务工坊" },
+        { id: "leadership", name: "Leadership / 团队领导", level: 1, xp: 16, maxXp: 100, description: "组织设计、招聘、绩效、沟通、责任感。", requirements: ["Build and lead high-caliber teams", "Create accountability and alignment"], unlock: "团队任务面板" },
+        { id: "communication", name: "Communication / 影响力表达", level: 1, xp: 25, maxXp: 100, description: "pitch、决策文档、board update、LinkedIn 内容。", requirements: ["Serve as external face", "Write strategic memos and investor updates"], unlock: "Pitch 训练场" },
+        { id: "market", name: "Market Insight / 市场洞察", level: 1, xp: 18, maxXp: 100, description: "竞品、客户需求、行业趋势、市场进入。", requirements: ["Market entry and partnerships", "Use customer and market data for decisions"], unlock: "市场侦察地图" },
+        { id: "personal-system", name: "Personal System / 自我系统", level: 2, xp: 65, maxXp: 120, description: "精力、专注、GMN 判断、复盘、稳定执行。", requirements: ["Prioritize what gets done now vs later", "Unblock execution and follow-through"], unlock: "AI 周复盘" }
+      ],
+      logs: [
+        { id: "L-001", date: "2026-05-10", minutes: 20, gmn: "G", questId: "Q-009", taskId: "T-001", whatDone: "列出当前记录入口", problem: "入口分散，复盘成本高", solution: "集中成 Session Log", good: "找到了系统问题", bad: "工具切换多", nextStep: "定义 GMN 分类", skillXp: [{ skillId: "personal-system", xp: 30 }, { skillId: "strategy", xp: 10 }] },
+        { id: "L-002", date: "2026-05-10", minutes: 20, gmn: "G", questId: "Q-009", taskId: "T-002", whatDone: "定义 GMN 分类", problem: "G/M 边界容易混", solution: "用是否累积未来能力来判断", good: "分类更清楚", bad: "例子还不够多", nextStep: "测试一次真实日志", skillXp: [{ skillId: "personal-system", xp: 30 }, { skillId: "strategy", xp: 10 }] },
+        { id: "L-003", date: "2026-05-10", minutes: 20, gmn: "M", questId: "Q-004", taskId: "T-007", whatDone: "冷静行动记录", problem: "焦虑时容易立刻行动", solution: "先记录再决定", good: "节奏慢下来", bad: "还不稳定", nextStep: "每天做一次短记录", skillXp: [{ skillId: "personal-system", xp: 15 }] }
+      ],
+      model: [
+        ["5-Year", "2030 Goal", "长期方向/人生地图", "Goal ID, 2030 target, unit, achieved, description", "决定哪些时间算真实成长"],
+        ["Annual", "2026 Goal/KR", "今年关键结果", "Goal ID, Type, target, current, Next Move", "把长期目标落到今年"],
+        ["Weekly", "Quest", "本周主线/支线", "Quest ID, linked goal, objective, next move, GMN default", "像游戏关卡一样推进"],
+        ["Session", "20min Task", "一次可启动小战斗", "Task ID, output standard, skillIds", "降低启动成本，并映射到技能 XP"],
+        ["Log", "Session Log", "真实执行过程记录", "GMN, content, problem, solution, good/bad, next action", "为周复盘和 AI 分析提供数据"],
+        ["Skill", "CEO Skill", "专项能力成长", "skillId, level, xp, requirements, unlock", "把执行任务转化成长期职业技能"],
+        ["Review", "Weekly Review", "复盘并生成下周路线", "G/M/N占比、输出、问题、下一步", "形成计划-执行-复盘闭环"]
+      ]
+    };
+
+    const storageKey = "plan-rpg-local-mvp-v2";
+    const legacyKey = "plan-rpg-local-mvp-v1";
+    let data = loadData();
+    let selectedQuestId = "Q-009";
+    let selectedTaskId = "T-003";
+    let selectedSkillId = "personal-system";
+    let editingLogId = null;
+    let lastSession = null;
+    let seconds = 1200;
+    let timer = null;
+    let running = false;
+
+    const $ = (id) => document.getElementById(id);
+    const questById = (id) => data.quests.find(q => q.id === id);
+    const taskById = (id) => data.tasks.find(t => t.id === id);
+    const skillById = (id) => data.skills.find(s => s.id === id);
+    const tasksForQuest = (id) => data.tasks.filter(t => t.questId === id);
+    const pct = (n) => Math.round(n) + "%";
+    const escapeHtml = (value = "") => String(value).replace(/[&<>"']/g, ch => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[ch]));
+
+    function loadData() {
+      const current = JSON.parse(localStorage.getItem(storageKey) || "null");
+      if (current) return normalizeData(current);
+      const legacy = JSON.parse(localStorage.getItem(legacyKey) || "null");
+      if (!legacy) return structuredClone(seed);
+      const migrated = structuredClone(seed);
+      if (Array.isArray(legacy.logs)) migrated.logs = legacy.logs.map((log, index) => normalizeLog(log, index));
+      return migrated;
+    }
+    function normalizeData(raw) {
+      const merged = { ...structuredClone(seed), ...raw };
+      merged.logs = (merged.logs || []).map((log, index) => normalizeLog(log, index));
+      return merged;
+    }
+    function normalizeLog(log, index) {
+      const task = taskByIdFromSeed(log.taskId);
+      return {
+        id: log.id || `L-${String(index + 1).padStart(3, "0")}`,
+        date: log.date || new Date().toISOString().slice(0, 10),
+        minutes: Number(log.minutes || 20),
+        gmn: log.gmn || task?.gmn || "G",
+        questId: log.questId || task?.questId || "Q-009",
+        taskId: log.taskId || "T-003",
+        whatDone: log.whatDone || "",
+        problem: log.problem || "",
+        solution: log.solution || "",
+        good: log.good || "",
+        bad: log.bad || "",
+        nextStep: log.nextStep || "",
+        skillXp: log.skillXp || buildSkillXp(task || seed.tasks[2])
+      };
+    }
+    function taskByIdFromSeed(id) {
+      return seed.tasks.find(t => t.id === id);
+    }
+    function save() {
+      data.version = appVersion;
+      localStorage.setItem(storageKey, JSON.stringify(data));
+    }
+    function newId(prefix) {
+      return `${prefix}-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 6)}`;
+    }
+    function computedQuestProgress(q) {
+      const tasks = tasksForQuest(q.id);
+      if (!tasks.length) return q.status === "In Progress" ? 35 : 8;
+      const done = data.logs.filter(l => l.questId === q.id).length;
+      return Math.min(100, Math.round((done / Math.max(tasks.length, 1)) * 100));
+    }
+    function buildSkillXp(task) {
+      const base = task.gmn === "G" ? 30 : task.gmn === "M" ? 15 : 0;
+      return (task.skillIds || ["personal-system"]).map((skillId, index) => ({ skillId, xp: index === 0 ? base : Math.max(5, Math.round(base / 3)) }));
+    }
+
+    function renderGoals() {
+      $("goalList").innerHTML = data.goals2030.map(g => `
+        <div class="goal-row">
+          <div class="goal-head"><span>${escapeHtml(g.id)}</span><span>${g.progress}%</span></div>
+          <div class="bar"><div class="fill" style="--value:${g.progress}%"></div></div>
+        </div>
+      `).join("");
+    }
+    function renderSkillMini() {
+      $("skillMini").innerHTML = data.skills.slice(0, 4).map(s => `
+        <div class="skill-mini">
+          <div class="goal-head"><span>${escapeHtml(s.name.split(" / ")[0])}</span><span>Lv.${s.level}</span></div>
+          <div class="bar"><div class="fill" style="--value:${Math.min(100, s.xp / s.maxXp * 100)}%"></div></div>
+        </div>
+      `).join("");
+    }
+    function renderMap() {
+      const main = data.quests.filter(q => q.type === "Main");
+      const side = data.quests.filter(q => q.type !== "Main");
+      $("mainLane").innerHTML = main.map(nodeHtml).join("");
+      $("sideLane").innerHTML = side.map(nodeHtml).join("");
+      document.querySelectorAll(".quest-node").forEach(btn => {
+        btn.addEventListener("click", () => {
+          selectedQuestId = btn.dataset.quest;
+          const firstTask = tasksForQuest(selectedQuestId)[0];
+          if (firstTask) selectedTaskId = firstTask.id;
+          renderAll();
+        });
+      });
+      const avg = data.quests.reduce((s, q) => s + computedQuestProgress(q), 0) / data.quests.length;
+      $("annualProgress").textContent = pct(avg);
+      $("annualFill").style.setProperty("--value", pct(avg));
+      $("weekSessions").textContent = data.logs.length;
+      $("weekLogs").textContent = data.logs.length;
+    }
+    function nodeHtml(q) {
+      const progress = computedQuestProgress(q);
+      const state = q.id === selectedQuestId ? "active" : progress >= 100 ? "completed" : "";
+      return `
+        <button class="quest-node ${state}" data-quest="${q.id}">
+          <span class="node-icon">${q.icon}</span>
+          <span class="node-name">${escapeHtml(q.name)}</span>
+          <span class="node-meta">${q.id} · ${progress}% · ${q.gmn}</span>
+        </button>
+      `;
+    }
+    function renderDetail() {
+      const q = questById(selectedQuestId);
+      const progress = computedQuestProgress(q);
+      const tasks = tasksForQuest(q.id);
+      $("questDetail").innerHTML = `
+        <span class="pill">${q.type} Quest · ${q.priority} · ${q.gmn}</span>
+        <h3>${escapeHtml(q.name)}</h3>
+        <p>${escapeHtml(q.description)}</p>
+        <div class="progress-number"><span>当前进度</span><span>${progress}%</span></div>
+        <div class="bar"><div class="fill" style="--value:${progress}%"></div></div>
+        <p><b>目标：</b>${escapeHtml(q.target)}</p>
+        <p><b>下一步：</b>${escapeHtml(q.nextMove)}</p>
+        <div class="task-list">
+          ${tasks.map(t => `
+            <button class="task-card ${t.id === selectedTaskId ? "selected" : ""}" data-task="${t.id}">
+              <div class="task-head"><span>${escapeHtml(t.name)}</span><span class="pill">${t.gmn}</span></div>
+              <small>${escapeHtml(t.instruction)}</small>
+              <small>完成标准：${escapeHtml(t.standard)}</small>
+            </button>
+          `).join("")}
+        </div>
+        <button class="primary full" id="detailStart">开始 20 分钟</button>
+      `;
+      document.querySelectorAll(".task-card").forEach(btn => {
+        btn.addEventListener("click", () => {
+          selectedTaskId = btn.dataset.task;
+          renderAll();
+        });
+      });
+      $("detailStart").addEventListener("click", () => showScreen("focus"));
+    }
+    function renderFocus() {
+      $("taskSelect").innerHTML = data.tasks.map(t => {
+        const q = questById(t.questId);
+        return `<option value="${t.id}" ${t.id === selectedTaskId ? "selected" : ""}>${t.id} · ${escapeHtml(q.name)} · ${escapeHtml(t.name)}</option>`;
+      }).join("");
+      const t = taskById(selectedTaskId);
+      const q = questById(t.questId);
+      selectedQuestId = q.id;
+      $("focusTaskName").textContent = t.name;
+      $("focusTaskInfo").textContent = `${q.name} / ${t.instruction} 完成标准：${t.standard}`;
+      $("skillRewardPreview").innerHTML = `
+        <div class="reward-line">
+          ${buildSkillXp(t).map(x => `<div class="reward"><span>${escapeHtml(skillById(x.skillId).name.split(" / ")[0])}</span><b>+${x.xp} XP</b></div>`).join("")}
+          <div class="reward"><span>GMN</span><b>${t.gmn}</b></div>
+        </div>
+      `;
+      $("taskSelect").onchange = (e) => {
+        selectedTaskId = e.target.value;
+        selectedQuestId = taskById(selectedTaskId).questId;
+        renderAll();
+      };
+      renderTimer();
+    }
+    function renderTimer() {
+      $("timerValue").textContent = `${String(Math.floor(seconds / 60)).padStart(2, "0")}:${String(seconds % 60).padStart(2, "0")}`;
+      $("startPauseBtn").textContent = running ? "暂停" : "开始";
+    }
+    function toggleTimer() {
+      running = !running;
+      if (running) {
+        timer = setInterval(() => {
+          seconds = Math.max(0, seconds - 1);
+          renderTimer();
+          if (seconds === 0) toggleTimer();
+        }, 1000);
+      } else {
+        clearInterval(timer);
+      }
+      renderTimer();
+    }
+    function resetTimer() {
+      running = false;
+      clearInterval(timer);
+      seconds = 1200;
+      renderTimer();
+    }
+    function readForm() {
+      const t = taskById(selectedTaskId);
+      const q = questById(t.questId);
+      return {
+        id: newId("L"),
+        date: new Date().toISOString().slice(0, 10),
+        minutes: 20,
+        gmn: t.gmn,
+        questId: q.id,
+        taskId: t.id,
+        whatDone: $("whatDone").value.trim() || t.name,
+        problem: $("problem").value.trim(),
+        solution: $("solution").value.trim(),
+        good: $("good").value.trim(),
+        bad: $("bad").value.trim(),
+        nextStep: $("nextStep").value.trim() || q.nextMove,
+        skillXp: buildSkillXp(t)
+      };
+    }
+    function clearForm() {
+      ["whatDone", "problem", "solution", "good", "bad", "nextStep"].forEach(id => $(id).value = "");
+    }
+    function saveDraft() {
+      localStorage.setItem("plan-rpg-focus-draft", JSON.stringify({ taskId: selectedTaskId, ...readForm() }));
+      $("sessionResult").innerHTML = `<span class="pill">草稿已保存</span><h3>可以先离开</h3><p>当前记录已暂存在本机浏览器，完成后再结算。</p>`;
+    }
+    function saveSession() {
+      const log = readForm();
+      data.logs.unshift(log);
+      applySkillXp(log.skillXp);
+      lastSession = log;
+      save();
+      clearForm();
+      resetTimer();
+      renderAll();
+      renderSessionResult(log);
+    }
+    function applySkillXp(events) {
+      events.forEach(event => {
+        const skill = skillById(event.skillId);
+        if (!skill) return;
+        skill.xp += event.xp;
+        while (skill.xp >= skill.maxXp) {
+          skill.xp -= skill.maxXp;
+          skill.level += 1;
+          skill.maxXp = Math.round(skill.maxXp * 1.25);
+        }
+      });
+    }
+    function renderSessionResult(log) {
+      const q = questById(log.questId);
+      const t = taskById(log.taskId);
+      $("sessionResult").innerHTML = `
+        <span class="pill">Session 结算完成</span>
+        <h3>${escapeHtml(t.name)}</h3>
+        <div class="reward-line">
+          <div class="reward"><span>专注时长</span><b>+${log.minutes} min</b></div>
+          <div class="reward"><span>GMN</span><b>${log.gmn}</b></div>
+          <div class="reward"><span>Quest</span><b>${computedQuestProgress(q)}%</b></div>
+        </div>
+        <p><b>做了什么：</b>${escapeHtml(log.whatDone)}</p>
+        <p><b>问题：</b>${escapeHtml(log.problem || "未填写")}</p>
+        <p><b>下一步：</b>${escapeHtml(log.nextStep || "未填写")}</p>
+        <div class="actions">
+          <button class="secondary" id="editLastBtn">修改记录</button>
+          <button class="secondary" id="continueBtn">继续 20 分钟</button>
+          <button class="primary" id="resultMapBtn">返回地图</button>
+          <button class="secondary" id="resultReviewBtn">查看复盘</button>
+        </div>
+      `;
+      $("editLastBtn").onclick = () => editLog(log.id);
+      $("continueBtn").onclick = () => showScreen("focus");
+      $("resultMapBtn").onclick = () => showScreen("map");
+      $("resultReviewBtn").onclick = () => showScreen("review");
+    }
+    function renderReview() {
+      const logs = data.logs;
+      const total = logs.length;
+      const g = logs.filter(l => l.gmn === "G").length;
+      const m = logs.filter(l => l.gmn === "M").length;
+      const n = logs.filter(l => l.gmn === "N").length;
+      $("metricTotal").textContent = total;
+      $("metricG").textContent = g;
+      $("metricM").textContent = m;
+      $("metricN").textContent = n;
+      $("totalMinutes").textContent = `${logs.reduce((s, l) => s + Number(l.minutes || 0), 0)} min`;
+      $("gRatio").textContent = total ? pct(g / total * 100) : "0%";
+      $("logList").innerHTML = logs.map(logCard).join("") || `<p>还没有日志。先开始一次 20 分钟。</p>`;
+      document.querySelectorAll("[data-edit-log]").forEach(btn => btn.onclick = () => editLog(btn.dataset.editLog));
+      document.querySelectorAll("[data-delete-log]").forEach(btn => btn.onclick = () => deleteLog(btn.dataset.deleteLog));
+      const active = data.quests
+        .map(q => ({ q, progress: computedQuestProgress(q) }))
+        .filter(x => x.progress < 100)
+        .sort((a, b) => (a.q.priority === "High" ? -1 : 1) - (b.q.priority === "High" ? -1 : 1))
+        .slice(0, 4);
+      $("nextRoute").innerHTML = active.map((x, i) => `
+        <div class="route-item"><div><b>${i + 1}. ${escapeHtml(x.q.name)}</b><br><small>${escapeHtml(x.q.nextMove)}</small></div></div>
+      `).join("");
+      $("weeklyFocus").innerHTML = `
+        <p style="margin:0 0 8px;color:#cbd5e1;">优化计划与记录方式</p>
+        <div class="bar"><div class="fill" style="--value:${computedQuestProgress(questById("Q-009"))}%"></div></div>
+      `;
+    }
+    function logCard(log) {
+      const q = questById(log.questId);
+      const t = taskById(log.taskId);
+      return `
+        <div class="log-card">
+          <div class="row"><span class="pill">${log.date} · ${log.gmn}</span><small>${escapeHtml(q?.name || log.questId)} / ${escapeHtml(t?.name || log.taskId)}</small></div>
+          <p><b>做了什么：</b>${escapeHtml(log.whatDone || "未填写")}</p>
+          <p><b>问题：</b>${escapeHtml(log.problem || "未填写")} <br><b>下一步：</b>${escapeHtml(log.nextStep || "未填写")}</p>
+          <div class="log-actions">
+            <button class="secondary" data-edit-log="${log.id}">查看/修改</button>
+            <button class="danger" data-delete-log="${log.id}">删除</button>
+          </div>
+        </div>
+      `;
+    }
+    function editLog(id) {
+      const log = data.logs.find(l => l.id === id);
+      if (!log) return;
+      editingLogId = id;
+      $("editPanel").classList.remove("hide");
+      $("editTask").innerHTML = data.tasks.map(t => `<option value="${t.id}" ${t.id === log.taskId ? "selected" : ""}>${t.id} · ${escapeHtml(t.name)}</option>`).join("");
+      $("editGmn").value = log.gmn;
+      $("editWhat").value = log.whatDone || "";
+      $("editProblem").value = log.problem || "";
+      $("editSolution").value = log.solution || "";
+      $("editGood").value = log.good || "";
+      $("editBad").value = log.bad || "";
+      $("editNext").value = log.nextStep || "";
+      showScreen("review");
+      $("editPanel").scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+    function updateLog() {
+      const index = data.logs.findIndex(l => l.id === editingLogId);
+      if (index < 0) return;
+      const task = taskById($("editTask").value);
+      data.logs[index] = {
+        ...data.logs[index],
+        gmn: $("editGmn").value,
+        taskId: task.id,
+        questId: task.questId,
+        whatDone: $("editWhat").value.trim(),
+        problem: $("editProblem").value.trim(),
+        solution: $("editSolution").value.trim(),
+        good: $("editGood").value.trim(),
+        bad: $("editBad").value.trim(),
+        nextStep: $("editNext").value.trim()
+      };
+      editingLogId = null;
+      $("editPanel").classList.add("hide");
+      save();
+      renderAll();
+    }
+    function deleteLog(id) {
+      if (!confirm("确定删除这条日志吗？")) return;
+      data.logs = data.logs.filter(l => l.id !== id);
+      save();
+      renderAll();
+    }
+    function renderSkills() {
+      $("skillList").innerHTML = data.skills.map(s => `
+        <button class="skill-card ${s.id === selectedSkillId ? "active" : ""}" data-skill="${s.id}">
+          <div class="row"><b>${escapeHtml(s.name)}</b><span class="pill">Lv.${s.level}</span></div>
+          <div class="bar"><div class="fill" style="--value:${Math.min(100, s.xp / s.maxXp * 100)}%"></div></div>
+          <small>${s.xp} / ${s.maxXp} XP</small>
+        </button>
+      `).join("");
+      document.querySelectorAll("[data-skill]").forEach(btn => btn.onclick = () => {
+        selectedSkillId = btn.dataset.skill;
+        renderSkills();
+      });
+      const s = skillById(selectedSkillId);
+      const relatedTasks = data.tasks.filter(t => (t.skillIds || []).includes(s.id));
+      $("skillDetail").innerHTML = `
+        <span class="pill">CEO Skill · Lv.${s.level}</span>
+        <h3>${escapeHtml(s.name)}</h3>
+        <p>${escapeHtml(s.description)}</p>
+        <div class="progress-number"><span>技能经验</span><span>${s.xp} / ${s.maxXp}</span></div>
+        <div class="bar"><div class="fill" style="--value:${Math.min(100, s.xp / s.maxXp * 100)}%"></div></div>
+        <h4>LinkedIn CEO 要求映射</h4>
+        <div class="skill-node-row">
+          ${s.requirements.map(r => `<div class="skill-node"><b>Requirement</b><p>${escapeHtml(r)}</p></div>`).join("")}
+          <div class="skill-node"><b>解锁奖励</b><p>${escapeHtml(s.unlock)}</p></div>
+        </div>
+        <h4>训练任务</h4>
+        <div class="task-list">
+          ${relatedTasks.map(t => `<button class="task-card" data-skill-task="${t.id}"><div class="task-head"><span>${escapeHtml(t.name)}</span><span class="pill">${t.gmn}</span></div><small>${escapeHtml(t.instruction)}</small></button>`).join("")}
+        </div>
+      `;
+      document.querySelectorAll("[data-skill-task]").forEach(btn => btn.onclick = () => {
+        selectedTaskId = btn.dataset.skillTask;
+        selectedQuestId = taskById(selectedTaskId).questId;
+        showScreen("focus");
+      });
+    }
+    function renderModel() {
+      $("modelTable").innerHTML = data.model.map(r => `<tr>${r.map(c => `<td>${escapeHtml(c)}</td>`).join("")}</tr>`).join("");
+    }
+    function showScreen(id) {
+      document.querySelectorAll(".screen").forEach(s => s.classList.toggle("active", s.id === id));
+      document.querySelectorAll(".nav button").forEach(b => b.classList.toggle("active", b.dataset.screen === id));
+      if (id === "focus") renderFocus();
+      if (id === "review") renderReview();
+      if (id === "skills") renderSkills();
+    }
+    function renderAll() {
+      renderGoals();
+      renderSkillMini();
+      renderMap();
+      renderDetail();
+      renderFocus();
+      renderReview();
+      renderSkills();
+      renderModel();
+      save();
+    }
+
+    document.querySelectorAll(".nav button").forEach(btn => btn.addEventListener("click", () => showScreen(btn.dataset.screen)));
+    $("backToMapBtn").addEventListener("click", () => showScreen("map"));
+    $("startPauseBtn").addEventListener("click", toggleTimer);
+    $("resetBtn").addEventListener("click", resetTimer);
+    $("saveDraftBtn").addEventListener("click", saveDraft);
+    $("saveSessionBtn").addEventListener("click", saveSession);
+    $("updateLogBtn").addEventListener("click", updateLog);
+    $("cancelEditBtn").addEventListener("click", () => {
+      editingLogId = null;
+      $("editPanel").classList.add("hide");
+    });
+    $("exportDataBtn").addEventListener("click", exportData);
+    $("importDataBtn").addEventListener("click", () => $("importDataFile").click());
+    $("importDataFile").addEventListener("change", importData);
+    renderAll();
+
+    function exportData() {
+      const payload = JSON.stringify({ exportedAt: new Date().toISOString(), app: "Plan RPG", version: appVersion, data }, null, 2);
+      const blob = new Blob([payload], { type: "application/json" });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = `plan-rpg-backup-${new Date().toISOString().slice(0, 10)}.json`;
+      link.click();
+      URL.revokeObjectURL(url);
+    }
+    function importData(event) {
+      const file = event.target.files && event.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = () => {
+        try {
+          const parsed = JSON.parse(reader.result);
+          const imported = parsed.data || parsed;
+          data = normalizeData(imported);
+          save();
+          renderAll();
+          alert("导入完成。");
+        } catch (error) {
+          alert("导入失败：JSON 文件格式不正确。");
+        } finally {
+          event.target.value = "";
+        }
+      };
+      reader.readAsText(file, "utf-8");
+    }
+  </script>
+</body>
+</html>
