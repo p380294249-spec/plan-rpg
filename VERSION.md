@@ -1,5 +1,21 @@
 # Plan RPG Version Notes
 
+## v0.3.6 - 2026-05-13
+
+### Goal
+
+Correct the displayed goals and progress so the map matches the user's Excel source instead of hand-written placeholder progress.
+
+### Main Changes
+
+- Replaced the incorrect `DFK 公司赚钱 / 每月 50 个货柜` annual campaign with the Excel-based 2026 goal `推广平台 / 稳定 300 CBM / 月`.
+- Added `重复出货物流客户` as its own 2026 annual campaign with `3 / 7` progress.
+- Kept `元器件业务进账 ≥10万` as a separate 2026 annual campaign with `900 / 100000` progress.
+- Updated `提升汇款速度和方案` to use `0 / 150000` and link to both `BUSINESS` and `PASSIVE`.
+- Updated `MEDITATION` and `HEALTH` to use explicit current/target values.
+- Added computed progress from `currentValue / targetValue`; progress is no longer manually hard-coded for these goals.
+- Added normalization so old browser localStorage data is corrected when the page opens.
+
 ## v0.3.5 - 2026-05-11
 
 ### Goal

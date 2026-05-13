@@ -1140,40 +1140,41 @@
   </div>
 
   <script>
-    const appVersion = "0.3.5";
+    const appVersion = "0.3.6";
     const seed = {
       version: appVersion,
       goals2030: [
-        { id: "BUSINESS", title: "Business income > 30WRMB", progress: 33, role: "Mainline" },
-        { id: "PASSIVE", title: "Passive income > 20WRMB", progress: 60, role: "Mainline", displayTitle: "PASSIVE INCOME" },
-        { id: "HEALTH", title: "Weight control < 5KG", progress: 42, role: "Habit" },
-        { id: "MINDSET", title: "Reading / Meditation / Doing", progress: 48, role: "Habit" },
-        { id: "FAMILY", title: "Family relationship quality", progress: 25, role: "Life" },
-        { id: "SOCIAL", title: "Mentor + key persons", progress: 15, role: "Sideline", displayTitle: "SOCIAL NETWORK" },
-        { id: "INTERESTS", title: "Interests and personal taste", progress: 28, role: "Sideline" },
-        { id: "NEW", title: "First time > 20", progress: 20, role: "Sideline", displayTitle: "NEW THINGS" }
+        { id: "BUSINESS", title: "Business income > 30WRMB", currentValue: 100000, targetValue: 300000, unit: "RMB", role: "Mainline" },
+        { id: "PASSIVE", title: "Passive income > 20WRMB", currentValue: 120000, targetValue: 200000, unit: "RMB/年", role: "Mainline", displayTitle: "PASSIVE INCOME" },
+        { id: "HEALTH", title: "Weight control < 5KG", currentValue: 0, targetValue: 15, unit: "月", role: "Habit" },
+        { id: "MINDSET", title: "Reading / Meditation / Doing", currentValue: 30, targetValue: 35, unit: "年", role: "Habit" },
+        { id: "FAMILY", title: "Family relationship quality", currentValue: 1, targetValue: 1, unit: "人", role: "Life" },
+        { id: "SOCIAL", title: "Mentor + key persons", currentValue: 0, targetValue: 1, unit: "人", role: "Sideline", displayTitle: "SOCIAL NETWORK" },
+        { id: "INTERESTS", title: "Interests and personal taste", currentValue: 1, targetValue: 1, unit: "个", role: "Sideline" },
+        { id: "NEW", title: "First time > 20", currentValue: 1, targetValue: 1, unit: "次", role: "Sideline", displayTitle: "NEW THINGS" }
       ],
       quests: [
-        { id: "Q-001", name: "DFK 公司赚钱", type: "Main", goal: "BUSINESS", target: "每月 50 个货柜", description: "2026 年主目标：让 DFK 业务稳定赚钱，逐步做到月 50 个货柜。", nextMove: "选择当前最重要的章节推进", status: "In Progress", gmn: "G", priority: "High", icon: "📦" },
-        { id: "Q-009", parentQuestId: "Q-001", name: "更新系统", type: "Main", goal: "BUSINESS", target: "让 DFK 业务系统更清楚、更稳定", description: "只放 DFK 的系统、流程、SOP、记录方式相关优化。", nextMove: "花 20 分钟梳理当前系统最卡的地方", status: "In Progress", gmn: "G", priority: "High", icon: "⚙️" },
-        { id: "Q-010", parentQuestId: "Q-001", name: "处理物流琐事", type: "Habit", goal: "BUSINESS", target: "处理物流日常问题，保持交付不断线", description: "物流、发货、资料、状态跟进都放这里。", nextMove: "处理一个物流事项并记录结果", status: "In Progress", gmn: "M", priority: "High", icon: "🚚" },
-        { id: "Q-003", name: "INSO 元器件收入", type: "Main", goal: "BUSINESS", target: "元器件业务进账 ≥10万", description: "INSO 是元器件收入模块，单独记录客户线索、RFQ、报价和成交推进。", nextMove: "筛选一批客户或 RFQ", status: "Not Started", gmn: "G", priority: "High", icon: "🔩" },
+        { id: "Q-001", name: "推广平台", type: "Main", goal: "BUSINESS", target: "稳定 300 CBM / 月", currentValue: 0, targetValue: 300, unit: "CBM/月", description: "通过自己的努力稳定做到 300CBM 每月，把培训、推广和销售动作标准化。", nextMove: "培训 / SOP / 销售动作拆分", status: "Not Started", gmn: "G", priority: "High", icon: "📣" },
+        { id: "Q-009", parentQuestId: "Q-001", name: "培训与推广系统", type: "Main", goal: "BUSINESS", target: "把推广平台培训拆成可执行 SOP", description: "只放推广平台的培训、SOP、销售动作和记录方式相关优化。", nextMove: "花 20 分钟拆一个培训或销售动作", status: "In Progress", gmn: "G", priority: "High", icon: "⚙️" },
+        { id: "Q-016", name: "重复出货物流客户", type: "Main", goal: "BUSINESS", target: "半年内拥有 10 家重复出货物流客户（2026 阶段：7 家）", currentValue: 3, targetValue: 7, unit: "家", description: "了解全流程、获取报价客户、首票签约、出货，并稳定重复客户。", nextMove: "推进一个物流客户从报价到出货或复购", status: "In Progress", gmn: "G", priority: "High", icon: "🚚" },
+        { id: "Q-010", parentQuestId: "Q-016", name: "处理物流琐事", type: "Habit", goal: "BUSINESS", target: "处理物流日常问题，保持交付不断线", description: "物流、发货、资料、状态跟进都放这里。", nextMove: "处理一个物流事项并记录结果", status: "In Progress", gmn: "M", priority: "High", icon: "🚚" },
+        { id: "Q-003", name: "元器件业务进账 ≥10万", type: "Main", goal: "BUSINESS", target: "2026 进账 100000 RMB", currentValue: 900, targetValue: 100000, unit: "RMB", description: "新增获客渠道，保持客户回复、RFQ、报价和成交推进。", nextMove: "筛选一批客户或 RFQ", status: "In Progress", gmn: "G", priority: "High", icon: "🔩" },
         { id: "Q-011", parentQuestId: "Q-003", name: "更新报价", type: "Main", goal: "BUSINESS", target: "检查新询价和采购报价", description: "看有没有新的询价，采购有没有新的报价要给客户。", nextMove: "检查一轮询价和报价状态", status: "In Progress", gmn: "G", priority: "High", icon: "💬" },
         { id: "Q-012", parentQuestId: "Q-003", name: "开发客户", type: "Main", goal: "BUSINESS", target: "每天开发新客户", description: "每天主动找新客户、新渠道、新机会。", nextMove: "开发一批新客户", status: "In Progress", gmn: "G", priority: "High", icon: "📈" },
         { id: "Q-013", parentQuestId: "Q-003", name: "联系客户", type: "Habit", goal: "BUSINESS", target: "维护客户关系", description: "跟进已有客户，维护关系和下一步机会。", nextMove: "联系一批已有客户", status: "In Progress", gmn: "M", priority: "High", icon: "🤝" },
-        { id: "Q-002", name: "收款和资金通道", type: "Main", goal: "PASSIVE", target: "让被动收入收款更稳定、更快", description: "银行、渠道、汇款方案、限制和费用记录。", nextMove: "联系一个银行或支付渠道", status: "Not Started", gmn: "G", priority: "High", icon: "🏦" },
-        { id: "Q-014", parentQuestId: "Q-002", name: "更新系统", type: "Main", goal: "PASSIVE", target: "把收款规则和记录系统更新清楚", description: "更新收款记录、通道规则、费用、限制和流程。", nextMove: "整理一次收款系统记录", status: "In Progress", gmn: "G", priority: "High", icon: "🧩" },
-        { id: "Q-015", parentQuestId: "Q-002", name: "处理银行业务", type: "Habit", goal: "PASSIVE", target: "处理银行和通道事项", description: "银行沟通、资料、限制、付款/收款问题都放这里。", nextMove: "处理一个银行事项", status: "In Progress", gmn: "M", priority: "High", icon: "🏛️" },
-        { id: "Q-004", name: "MEDITATION", type: "Habit", goal: "MINDSET", target: "365次记录", description: "每天短记录：先冷静后行动。", nextMove: "Complete 1 meditation/check-in", status: "Not Started", gmn: "M", priority: "Medium", icon: "🧘" },
-        { id: "Q-005", name: "HEALTH", type: "Habit", goal: "HEALTH", target: "体重5KG浮动月数", description: "记录饮食/训练/体重趋势。", nextMove: "Log workout or food", status: "Not Started", gmn: "G", priority: "Medium", icon: "💪" },
+        { id: "Q-002", name: "提升汇款速度和方案", type: "Main", goal: "BUSINESS/PASSIVE", target: "稳定收款问题 / 150000 RMB", currentValue: 0, targetValue: 150000, unit: "RMB", description: "与更多银行或支付渠道沟通，记录到账速度、费用、限制和可用方案。", nextMove: "与更多银行聊，整理一个方案限制", status: "Not Started", gmn: "G", priority: "High", icon: "🏦" },
+        { id: "Q-014", parentQuestId: "Q-002", name: "更新系统", type: "Main", goal: "BUSINESS/PASSIVE", target: "把收款规则和记录系统更新清楚", description: "更新收款记录、通道规则、费用、限制和流程。", nextMove: "整理一次收款系统记录", status: "In Progress", gmn: "G", priority: "High", icon: "🧩" },
+        { id: "Q-015", parentQuestId: "Q-002", name: "处理银行业务", type: "Habit", goal: "BUSINESS/PASSIVE", target: "处理银行和通道事项", description: "银行沟通、资料、限制、付款/收款问题都放这里。", nextMove: "处理一个银行事项", status: "In Progress", gmn: "M", priority: "High", icon: "🏛️" },
+        { id: "Q-004", name: "MEDITATION", type: "Habit", goal: "MINDSET", target: "365 次冷静行动记录", currentValue: 0, targetValue: 365, unit: "次", description: "先冷静后行动且思考，避免焦虑。", nextMove: "完成 1 次 meditation/check-in", status: "Not Started", gmn: "M", priority: "Medium", icon: "🧘" },
+        { id: "Q-005", name: "HEALTH", type: "Habit", goal: "HEALTH", target: "体重保持 5KG 浮动 10 个月", currentValue: 0, targetValue: 10, unit: "月", description: "记录饮食、训练、体重趋势和身体状态。", nextMove: "记录一次训练、饮食或体重", status: "Not Started", gmn: "G", priority: "Medium", icon: "💪" },
         { id: "Q-006", name: "SOCIAL NETWORK", type: "Side", goal: "SOCIAL", target: "1 mentor + key persons", description: "联系/复盘一个有价值的人。", nextMove: "Write 1 contact note", status: "Not Started", gmn: "G", priority: "Medium", icon: "🤝" },
         { id: "Q-007", name: "INTERESTS", type: "Side", goal: "INTERESTS", target: "尝试新习惯/兴趣", description: "V60咖啡、运动、体验。", nextMove: "Record 1 meaningful interest activity", status: "Not Started", gmn: "M", priority: "Low", icon: "☕" },
         { id: "Q-008", name: "NEW THINGS", type: "Side", goal: "NEW", target: "First time >20", description: "体验新事物并记录。", nextMove: "Log 1 new experience", status: "Not Started", gmn: "M", priority: "Low", icon: "✨" }
       ],
       tasks: [
-        { id: "T-001", questId: "Q-009", name: "梳理 DFK 当前系统问题", instruction: "写出 DFK 业务里现在最乱、最卡、最影响赚钱的地方。", minutes: 20, standard: "列出至少 3 个系统问题", gmn: "G", skillIds: ["operations", "strategy"], status: "Not Started" },
-        { id: "T-002", questId: "Q-009", name: "优化报价和订单流程", instruction: "把报价、客户确认、订单跟进的流程整理成更清楚的一步一步动作。", minutes: 20, standard: "写出一个可执行流程", gmn: "G", skillIds: ["operations", "revenue"], status: "Not Started" },
-        { id: "T-003", questId: "Q-009", name: "调整 DFK 业务记录方式", instruction: "把客户、报价、订单、问题记录到一个更容易复盘的位置。", minutes: 20, standard: "完成一次真实业务记录调整", gmn: "G", skillIds: ["operations", "personal-system"], status: "Not Started" },
+        { id: "T-001", questId: "Q-009", name: "拆分推广平台培训入口", instruction: "把推广平台培训拆成 3 个动作和验收标准。", minutes: 20, standard: "3 个动作 + 标准", gmn: "G", skillIds: ["operations", "strategy"], status: "Not Started" },
+        { id: "T-002", questId: "Q-009", name: "整理销售动作 SOP", instruction: "把客户触达、报价、跟进和复盘写成清楚步骤。", minutes: 20, standard: "写出一个可执行销售动作流程", gmn: "G", skillIds: ["operations", "revenue"], status: "Not Started" },
+        { id: "T-003", questId: "Q-009", name: "优化推广记录方式", instruction: "把推广动作、客户反馈、下一步集中记录到一个更容易复盘的位置。", minutes: 20, standard: "完成一次真实推广记录调整", gmn: "G", skillIds: ["operations", "personal-system"], status: "Not Started" },
         { id: "T-004", questId: "Q-011", name: "检查新询价", instruction: "查看有没有新的询价，标记需要回复或报价的项目。", minutes: 20, standard: "更新询价状态", gmn: "G", skillIds: ["revenue", "market"], status: "Not Started" },
         { id: "T-005", questId: "Q-009", name: "培训SOP拆分", instruction: "把推广平台培训拆成3个动作和验收标准。", minutes: 20, standard: "3个动作+标准", gmn: "G", skillIds: ["operations", "leadership"], status: "Not Started" },
         { id: "T-011", questId: "Q-010", name: "处理物流日常事项", instruction: "处理一个物流、发货、资料或状态问题，写清下一步。", minutes: 20, standard: "处理并记录一个物流事项", gmn: "M", skillIds: ["communication", "operations"], status: "Not Started" },
@@ -1261,7 +1262,7 @@
     }
     function normalizeData(raw) {
       const merged = { ...structuredClone(seed), ...raw };
-      merged.goals2030 = mergeById(seed.goals2030, merged.goals2030 || []);
+      merged.goals2030 = normalizeGoals(mergeById(seed.goals2030, merged.goals2030 || []));
       merged.quests = normalizeQuests(mergeById(seed.quests, merged.quests || []));
       merged.tasks = normalizeTasks(mergeById(seed.tasks, merged.tasks || []));
       merged.logs = (merged.logs || []).map((log, index) => normalizeLog(log, index, merged.tasks));
@@ -1276,33 +1277,45 @@
       });
       return rows;
     }
+    function normalizeGoals(goals) {
+      return goals.map(goal => {
+        const fixed = seed.goals2030.find(item => item.id === goal.id);
+        return fixed ? { ...goal, ...fixed } : goal;
+      });
+    }
     function normalizeQuests(quests) {
       return quests.map(quest => {
         if (quest.id === "Q-001") {
           return {
             ...quest,
-            name: "DFK 公司赚钱",
+            name: "推广平台",
             type: "Main",
             goal: "BUSINESS",
-            target: "每月 50 个货柜",
-            description: "2026 年主目标：让 DFK 业务稳定赚钱，逐步做到月 50 个货柜。",
-            nextMove: "选择当前最重要的章节推进",
-            status: "In Progress",
+            target: "稳定 300 CBM / 月",
+            currentValue: 0,
+            targetValue: 300,
+            unit: "CBM/月",
+            description: "通过自己的努力稳定做到 300CBM 每月，把培训、推广和销售动作标准化。",
+            nextMove: "培训 / SOP / 销售动作拆分",
+            status: "Not Started",
             gmn: "G",
             priority: "High",
-            icon: "📦"
+            icon: "📣"
           };
         }
         if (quest.id === "Q-002") {
           return {
             ...quest,
             parentQuestId: "",
-            name: "收款和资金通道",
+            name: "提升汇款速度和方案",
             type: "Main",
-            goal: "PASSIVE",
-            target: "让被动收入收款更稳定、更快",
-            description: "银行、渠道、汇款方案、限制和费用记录。",
-            nextMove: "联系一个银行或支付渠道",
+            goal: "BUSINESS/PASSIVE",
+            target: "稳定收款问题 / 150000 RMB",
+            currentValue: 0,
+            targetValue: 150000,
+            unit: "RMB",
+            description: "与更多银行或支付渠道沟通，记录到账速度、费用、限制和可用方案。",
+            nextMove: "与更多银行聊，整理一个方案限制",
             gmn: "G",
             priority: "High",
             icon: "🏦"
@@ -1312,12 +1325,16 @@
           return {
             ...quest,
             parentQuestId: "",
-            name: "INSO 元器件收入",
+            name: "元器件业务进账 ≥10万",
             type: "Main",
             goal: "BUSINESS",
-            target: "元器件业务进账 ≥10万",
-            description: "INSO 是元器件收入模块，单独记录客户线索、RFQ、报价和成交推进。",
+            target: "2026 进账 100000 RMB",
+            currentValue: 900,
+            targetValue: 100000,
+            unit: "RMB",
+            description: "新增获客渠道，保持客户回复、RFQ、报价和成交推进。",
             nextMove: "筛选一批客户或 RFQ",
+            status: "In Progress",
             gmn: "G",
             priority: "High",
             icon: "🔩"
@@ -1327,22 +1344,41 @@
           return {
             ...quest,
             parentQuestId: "Q-001",
-            name: "更新系统",
+            name: "培训与推广系统",
             type: "Main",
             goal: "BUSINESS",
-            target: "让 DFK 业务系统更清楚、更稳定",
-            description: "只放 DFK 的系统、流程、SOP、记录方式相关优化。",
-            nextMove: "花 20 分钟梳理当前系统最卡的地方",
+            target: "把推广平台培训拆成可执行 SOP",
+            description: "只放推广平台的培训、SOP、销售动作和记录方式相关优化。",
+            nextMove: "花 20 分钟拆一个培训或销售动作",
             status: "In Progress",
             gmn: "G",
             priority: "High",
             icon: "⚙️"
           };
         }
+        if (quest.id === "Q-016") {
+          return {
+            ...quest,
+            parentQuestId: "",
+            name: "重复出货物流客户",
+            type: "Main",
+            goal: "BUSINESS",
+            target: "半年内拥有 10 家重复出货物流客户（2026 阶段：7 家）",
+            currentValue: 3,
+            targetValue: 7,
+            unit: "家",
+            description: "了解全流程、获取报价客户、首票签约、出货，并稳定重复客户。",
+            nextMove: "推进一个物流客户从报价到出货或复购",
+            status: "In Progress",
+            gmn: "G",
+            priority: "High",
+            icon: "🚚"
+          };
+        }
         if (quest.id === "Q-010") {
           return {
             ...quest,
-            parentQuestId: "Q-001",
+            parentQuestId: "Q-016",
             name: "处理物流琐事",
             type: "Habit",
             goal: "BUSINESS",
@@ -1358,8 +1394,10 @@
         if (quest.id === "Q-011") return { ...quest, parentQuestId: "Q-003", name: "更新报价", type: "Main", goal: "BUSINESS", target: "检查新询价和采购报价", description: "看有没有新的询价，采购有没有新的报价要给客户。", nextMove: "检查一轮询价和报价状态", status: "In Progress", gmn: "G", priority: "High", icon: "💬" };
         if (quest.id === "Q-012") return { ...quest, parentQuestId: "Q-003", name: "开发客户", type: "Main", goal: "BUSINESS", target: "每天开发新客户", description: "每天主动找新客户、新渠道、新机会。", nextMove: "开发一批新客户", status: "In Progress", gmn: "G", priority: "High", icon: "📈" };
         if (quest.id === "Q-013") return { ...quest, parentQuestId: "Q-003", name: "联系客户", type: "Habit", goal: "BUSINESS", target: "维护客户关系", description: "跟进已有客户，维护关系和下一步机会。", nextMove: "联系一批已有客户", status: "In Progress", gmn: "M", priority: "High", icon: "🤝" };
-        if (quest.id === "Q-014") return { ...quest, parentQuestId: "Q-002", name: "更新系统", type: "Main", goal: "PASSIVE", target: "把收款规则和记录系统更新清楚", description: "更新收款记录、通道规则、费用、限制和流程。", nextMove: "整理一次收款系统记录", status: "In Progress", gmn: "G", priority: "High", icon: "🧩" };
-        if (quest.id === "Q-015") return { ...quest, parentQuestId: "Q-002", name: "处理银行业务", type: "Habit", goal: "PASSIVE", target: "处理银行和通道事项", description: "银行沟通、资料、限制、付款/收款问题都放这里。", nextMove: "处理一个银行事项", status: "In Progress", gmn: "M", priority: "High", icon: "🏛️" };
+        if (quest.id === "Q-014") return { ...quest, parentQuestId: "Q-002", name: "更新系统", type: "Main", goal: "BUSINESS/PASSIVE", target: "把收款规则和记录系统更新清楚", description: "更新收款记录、通道规则、费用、限制和流程。", nextMove: "整理一次收款系统记录", status: "In Progress", gmn: "G", priority: "High", icon: "🧩" };
+        if (quest.id === "Q-015") return { ...quest, parentQuestId: "Q-002", name: "处理银行业务", type: "Habit", goal: "BUSINESS/PASSIVE", target: "处理银行和通道事项", description: "银行沟通、资料、限制、付款/收款问题都放这里。", nextMove: "处理一个银行事项", status: "In Progress", gmn: "M", priority: "High", icon: "🏛️" };
+        if (quest.id === "Q-004") return { ...quest, name: "MEDITATION", type: "Habit", goal: "MINDSET", target: "365 次冷静行动记录", currentValue: 0, targetValue: 365, unit: "次", description: "先冷静后行动且思考，避免焦虑。", nextMove: "完成 1 次 meditation/check-in", status: "Not Started", gmn: "M", priority: "Medium", icon: "🧘" };
+        if (quest.id === "Q-005") return { ...quest, name: "HEALTH", type: "Habit", goal: "HEALTH", target: "体重保持 5KG 浮动 10 个月", currentValue: 0, targetValue: 10, unit: "月", description: "记录饮食、训练、体重趋势和身体状态。", nextMove: "记录一次训练、饮食或体重", status: "Not Started", gmn: "G", priority: "Medium", icon: "💪" };
         return quest;
       });
     }
@@ -1392,21 +1430,21 @@
         if (["T-001", "T-002", "T-003", "T-004", "T-005", "T-006", "T-011", "T-012", "T-013", "T-014", "T-015", "T-016", "T-017", "T-018", "T-019", "T-020", "T-021", "T-022"].includes(task.id)) {
           const overrides = {
             "T-001": {
-              name: "梳理 DFK 当前系统问题",
-              instruction: "写出 DFK 业务里现在最乱、最卡、最影响赚钱的地方。",
-              standard: "列出至少 3 个系统问题",
+              name: "拆分推广平台培训入口",
+              instruction: "把推广平台培训拆成 3 个动作和验收标准。",
+              standard: "3 个动作 + 标准",
               skillIds: ["operations", "strategy"]
             },
             "T-002": {
-              name: "优化报价和订单流程",
-              instruction: "把报价、客户确认、订单跟进的流程整理成更清楚的一步一步动作。",
-              standard: "写出一个可执行流程",
+              name: "整理销售动作 SOP",
+              instruction: "把客户触达、报价、跟进和复盘写成清楚步骤。",
+              standard: "写出一个可执行销售动作流程",
               skillIds: ["operations", "revenue"]
             },
             "T-003": {
-              name: "调整 DFK 业务记录方式",
-              instruction: "把客户、报价、订单、问题记录到一个更容易复盘的位置。",
-              standard: "完成一次真实业务记录调整",
+              name: "优化推广记录方式",
+              instruction: "把推广动作、客户反馈、下一步集中记录到一个更容易复盘的位置。",
+              standard: "完成一次真实推广记录调整",
               skillIds: ["operations", "personal-system"]
             },
             "T-004": {
@@ -1579,7 +1617,33 @@
     function newId(prefix) {
       return `${prefix}-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 6)}`;
     }
+    function valueProgress(row) {
+      const target = Number(row?.targetValue || 0);
+      if (!target) return null;
+      return Math.max(0, Math.min(100, Math.round((Number(row.currentValue || 0) / target) * 100)));
+    }
+    function displayProgress(row) {
+      const valueBased = valueProgress(row);
+      return valueBased === null ? Number(row?.progress || 0) : valueBased;
+    }
+    function goalProgress(goal) {
+      const campaigns = campaignQuestsForGoal(goal.id);
+      const metricCampaigns = campaigns.filter(q => valueProgress(q) !== null);
+      if (metricCampaigns.length) {
+        return Math.round(metricCampaigns.reduce((sum, q) => sum + valueProgress(q), 0) / metricCampaigns.length);
+      }
+      return displayProgress(goal);
+    }
+    function overallAnnualProgress() {
+      const topLevel = data.quests.filter(q => !q.parentQuestId && valueProgress(q) !== null);
+      if (topLevel.length) {
+        return Math.round(topLevel.reduce((sum, q) => sum + valueProgress(q), 0) / topLevel.length);
+      }
+      return data.quests.reduce((s, q) => s + computedQuestProgress(q), 0) / data.quests.length;
+    }
     function computedQuestProgress(q) {
+      const valueBased = valueProgress(q);
+      if (valueBased !== null) return valueBased;
       const tasks = tasksForQuest(q.id);
       if (!tasks.length) return q.status === "In Progress" ? 35 : 8;
       const done = data.logs.filter(l => l.questId === q.id).length;
@@ -1691,8 +1755,8 @@
     function renderGoals() {
       $("goalList").innerHTML = data.goals2030.map(g => `
         <div class="goal-row">
-          <div class="goal-head"><span>${escapeHtml(g.id)}</span><span>${g.progress}%</span></div>
-          <div class="bar"><div class="fill" style="--value:${g.progress}%"></div></div>
+          <div class="goal-head"><span>${escapeHtml(g.id)}</span><span>${goalProgress(g)}%</span></div>
+          <div class="bar"><div class="fill" style="--value:${goalProgress(g)}%"></div></div>
         </div>
       `).join("");
     }
@@ -1709,7 +1773,7 @@
       renderCampaignGrid();
       renderWeeklyMap();
       renderTaskRail();
-      const avg = data.quests.reduce((s, q) => s + computedQuestProgress(q), 0) / data.quests.length;
+      const avg = overallAnnualProgress();
       $("annualProgress").textContent = pct(avg);
       $("annualFill").style.setProperty("--value", pct(avg));
       $("weekSessions").textContent = data.logs.length;
@@ -1719,8 +1783,8 @@
       $("lifeGrid").innerHTML = data.goals2030.map(goal => `
         <button class="life-cell ${goal.id === selectedGoalId ? "active" : ""}" data-goal="${goal.id}">
           <span class="node-title">${escapeHtml(goalLabel(goal))}</span>
-          <span class="node-compact"><span class="type-badge">${escapeHtml(roleBadge(goal.role))}</span><span>${goal.progress}%</span></span>
-          <div class="bar"><div class="fill" style="--value:${goal.progress}%"></div></div>
+          <span class="node-compact"><span class="type-badge">${escapeHtml(roleBadge(goal.role))}</span><span>${goalProgress(goal)}%</span></span>
+          <div class="bar"><div class="fill" style="--value:${goalProgress(goal)}%"></div></div>
         </button>
       `).join("");
       document.querySelectorAll("[data-goal]").forEach(btn => btn.onclick = () => {
@@ -1740,7 +1804,7 @@
       const campaigns = campaignQuestsForGoal(selectedGoalId);
       $("campaignGrid").innerHTML = campaigns.map(q => {
         const children = chapterQuestsForCampaign(q.id);
-        const progress = children.reduce((sum, child) => sum + computedQuestProgress(child), 0) / Math.max(children.length, 1);
+        const progress = computedQuestProgress(q);
         const type = questTypeForQuest(q);
         return `
           <button class="campaign-card ${typeClass(type)} ${gmnClass(q.gmn)} ${q.id === selectedCampaignId ? "active" : ""} ${progress >= 100 ? "state-done" : "state-todo"}" data-campaign="${q.id}">
