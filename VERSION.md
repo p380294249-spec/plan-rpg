@@ -1,5 +1,32 @@
 # Plan RPG Version Notes
 
+## v0.3.7 - 2026-05-13
+
+### Goal
+
+Let the user update real goal progress inside the app and capture loose todos as today/later reminders before converting them into 20-minute tasks.
+
+### Main Changes
+
+- Added goal progress editing in the quest detail panel for metric-based goals.
+  - Users can update `currentValue` and `targetValue`.
+  - Progress is recalculated from `currentValue / targetValue`.
+- Added `待办 / 今日提醒` page.
+  - New todos can be captured without starting a session immediately.
+  - Todos have title, note, due date, priority, GMN, and quest classification.
+  - Due today or overdue todos appear under `今日提醒`.
+  - Future todos appear under `晚点做`.
+- Added simple auto-classification for todos.
+  - Bank/payment keywords route to `提升汇款速度和方案`.
+  - RFQ/quote/component keywords route to `更新报价`.
+  - Logistics keywords route to `处理物流琐事`.
+  - SOP/system/promotion keywords route to `培训与推广系统`.
+  - Health/meditation/customer keywords route to matching quests.
+- Added `开始20分钟` on todo cards.
+  - Converts a todo into a 20-minute task.
+  - Opens the Focus page with the generated task selected.
+- Added `Todo Reminder` to the data model notes.
+
 ## v0.3.6 - 2026-05-13
 
 ### Goal

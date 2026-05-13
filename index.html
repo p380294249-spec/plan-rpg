@@ -853,7 +853,7 @@
         <div>
           <h1>计划 RPG</h1>
           <p>把目标变成冒险</p>
-          <span class="version">v0.3.5 本地网页软件</span>
+          <span class="version">v0.3.7 本地网页软件</span>
         </div>
       </div>
 
@@ -865,6 +865,7 @@
       <nav class="nav">
         <button class="active" data-screen="map">地图 / Dashboard</button>
         <button data-screen="focus">20分钟专注</button>
+        <button data-screen="todos">待办 / 今日提醒</button>
         <button data-screen="review">日志 / 复盘</button>
         <button data-screen="skills">CEO 技能树</button>
         <button data-screen="model">数据模型</button>
@@ -904,7 +905,7 @@
         <div class="stats">
           <div class="stat"><b>⚡</b><div><strong id="totalMinutes">0 min</strong><span>本地专注时长</span></div></div>
           <div class="stat"><b>◆</b><div><strong id="gRatio">0%</strong><span>Growth 占比</span></div></div>
-          <div class="stat"><b>Lv</b><div><strong>探索者 28</strong><span>Plan RPG v0.3.5</span></div></div>
+          <div class="stat"><b>Lv</b><div><strong>探索者 28</strong><span>Plan RPG v0.3.7</span></div></div>
         </div>
       </header>
 
@@ -1003,6 +1004,39 @@
             <span class="pill">Session 结算</span>
             <h3>还没有完成本次专注</h3>
             <p>完成后这里会显示你写了什么、获得了什么、下一步去哪里。</p>
+          </div>
+        </div>
+      </section>
+
+      <section id="todos" class="screen">
+        <div class="review-grid">
+          <div class="panel">
+            <span class="pill">Todo Inbox</span>
+            <h3>待办收件箱</h3>
+            <p>先把事情丢进来。系统会按关键词给一个归类建议，你也可以手动改。到期日是今天的会进入今日提醒。</p>
+            <div class="form-grid">
+              <label>待办事项<input id="todoTitle" placeholder="例如：明天联系银行确认收款限制" /></label>
+              <label>到期日<input id="todoDueDate" type="date" /></label>
+              <label>优先级<select id="todoPriority"><option value="medium">medium</option><option value="high">high</option><option value="urgent">urgent</option><option value="low">low</option></select></label>
+              <label>GMN<select id="todoGmn"><option>G</option><option>M</option><option>N</option></select></label>
+              <label>归类到<select id="todoQuest"></select></label>
+              <label>备注<textarea id="todoNote" placeholder="背景、链接、等待什么、下一步是什么..."></textarea></label>
+            </div>
+            <div class="route-item" id="todoSuggestion">
+              <b>自动归类建议</b>
+              <p>输入待办后会显示建议。</p>
+            </div>
+            <div class="actions">
+              <button class="secondary" id="autoClassifyTodoBtn">自动归类</button>
+              <button class="primary" id="addTodoBtn">加入待办</button>
+            </div>
+          </div>
+          <div class="panel">
+            <span class="pill">Today</span>
+            <h3>今日提醒</h3>
+            <div class="log-list" id="todayTodoList"></div>
+            <h3>晚点做</h3>
+            <div class="log-list" id="laterTodoList"></div>
           </div>
         </div>
       </section>
@@ -1140,7 +1174,7 @@
   </div>
 
   <script>
-    const appVersion = "0.3.6";
+    const appVersion = "0.3.7";
     const seed = {
       version: appVersion,
       goals2030: [
@@ -1212,6 +1246,7 @@
         { id: "L-003", date: "2026-05-10", minutes: 10, gmn: "M", questId: "Q-004", taskId: "T-007", whatDone: "安静坐下，做了一次短冥想", problem: "呼吸慢下来后，焦虑感有下降", solution: "", good: "", bad: "", nextStep: "每天做一次短记录", skillXp: [{ skillId: "personal-system", xp: 15 }], is_pivoted: false, original_task_id: "T-007", actual_task_id: "T-007", pivot_note: "" },
         { id: "L-004", date: "2026-05-10", minutes: 20, gmn: "G", questId: "Q-011", taskId: "T-RND-001", whatDone: "处理客户临时 RFQ，并判断为可推进机会", problem: "规格信息不完整", solution: "先回确认清单", good: "没有把突发事件当成打乱计划，而是归入 main/G", bad: "", nextStep: "等待客户补规格后报价", skillXp: [{ skillId: "revenue", xp: 30 }, { skillId: "communication", xp: 10 }], is_random_event: true, is_pivoted: false, original_task_id: "T-RND-001", actual_task_id: "T-RND-001", pivot_note: "" }
       ],
+      todos: [],
       model: [
         ["5-Year", "2030 Goal", "长期方向/人生地图", "Goal ID, 2030 target, unit, achieved, description", "决定哪些时间算真实成长"],
         ["Annual", "2026 Goal/KR", "今年关键结果", "Goal ID, Type, target, current, Next Move", "把长期目标落到今年"],
@@ -1220,6 +1255,7 @@
         ["Log", "Session Log", "真实执行过程记录", "GMN, content, problem, solution, good/bad, next action", "为周复盘和 AI 分析提供数据"],
         ["Skill", "CEO Skill", "专项能力成长", "skillId, level, xp, requirements, unlock", "把执行任务转化成长期职业技能"],
         ["Review", "Weekly Review", "复盘并生成下周路线", "G/M/N占比、输出、问题、下一步", "形成计划-执行-复盘闭环"],
+        ["Inbox", "Todo Reminder", "待办收件箱和今日提醒", "title, dueDate, questId, gmn, priority, convertedTaskId", "先收集事情，自动/手动归类，晚点再转成 20min Task"],
         ["Dynamic", "Random Event", "突发任务收编", "quest_type, gmn_type, source, reason, priority", "把临时事件判断为机会、风险、维护或噪音"],
         ["Dynamic", "Task Pivot", "任务转向轨迹", "pivot_status, original_task_id, actual_task_id, pivot_note", "保留探索过程，不覆盖历史"]
       ]
@@ -1250,6 +1286,9 @@
     const pct = (n) => Math.round(n) + "%";
     const escapeHtml = (value = "") => String(value).replace(/[&<>"']/g, ch => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[ch]));
     const goalLabel = (goal) => goal?.displayTitle || goal?.id || "";
+    function todayISO() {
+      return new Date().toISOString().slice(0, 10);
+    }
 
     function loadData() {
       const current = JSON.parse(localStorage.getItem(storageKey) || "null");
@@ -1266,6 +1305,7 @@
       merged.quests = normalizeQuests(mergeById(seed.quests, merged.quests || []));
       merged.tasks = normalizeTasks(mergeById(seed.tasks, merged.tasks || []));
       merged.logs = (merged.logs || []).map((log, index) => normalizeLog(log, index, merged.tasks));
+      merged.todos = normalizeTodos(merged.todos || []);
       return merged;
     }
     function mergeById(defaultRows, savedRows) {
@@ -1281,6 +1321,23 @@
       return goals.map(goal => {
         const fixed = seed.goals2030.find(item => item.id === goal.id);
         return fixed ? { ...goal, ...fixed } : goal;
+      });
+    }
+    function normalizeTodos(todos) {
+      return todos.map((todo, index) => {
+        const suggestion = classifyTodo(`${todo.title || ""} ${todo.note || ""}`);
+        return {
+          id: todo.id || `TODO-${index + 1}`,
+          title: todo.title || "",
+          note: todo.note || "",
+          dueDate: todo.dueDate || todayISO(),
+          priority: todo.priority || "medium",
+          status: todo.status || "open",
+          questId: todo.questId || suggestion.questId,
+          gmn: todo.gmn || suggestion.gmn,
+          createdAt: todo.createdAt || new Date().toISOString(),
+          convertedTaskId: todo.convertedTaskId || ""
+        };
       });
     }
     function normalizeQuests(quests) {
@@ -1890,6 +1947,17 @@
           <p>${escapeHtml(q.description)}</p>
           <div class="progress-number"><span>完成情况</span><span>${tasks.filter(t => computedTaskProgress(t) >= 100).length}/${tasks.length}</span></div>
           <div class="bar"><div class="fill" style="--value:${computedQuestProgress(q)}%"></div></div>
+          ${valueProgress(q) !== null ? `
+          <div class="custom-task-box">
+            <h4>更新目标进度</h4>
+            <div class="form-grid">
+              <label>当前值<input id="metricCurrent" type="number" step="0.01" value="${Number(q.currentValue || 0)}" /></label>
+              <label>目标值<input id="metricTarget" type="number" step="0.01" value="${Number(q.targetValue || 0)}" /></label>
+            </div>
+            <small>单位：${escapeHtml(q.unit || "")}。保存后进度会按 当前值 / 目标值 自动计算。</small>
+            <button class="secondary full" id="saveMetricBtn">保存进度</button>
+          </div>
+          ` : ""}
           <h4>预设任务</h4>
           <div class="task-list">
           ${tasks.map(t => `
@@ -1925,6 +1993,7 @@
           renderAll();
         });
       });
+      if ($("saveMetricBtn")) $("saveMetricBtn").onclick = () => updateQuestMetric(q.id);
       $("detailStart").addEventListener("click", () => showScreen("focus"));
       $("quickTaskStart").addEventListener("click", createQuickTask);
       document.querySelectorAll("[data-classify-random]").forEach(btn => btn.onclick = () => classifyRandomEvent(selectedTask.id, btn.dataset.classifyRandom));
@@ -2253,6 +2322,156 @@
       $("randomEventModal").classList.remove("hide");
       $("randomTitle").focus();
     }
+    function classifyTodo(text) {
+      const value = String(text || "").toLowerCase();
+      const has = (...words) => words.some(word => value.includes(word.toLowerCase()));
+      if (has("银行", "汇款", "收款", "付款", "通道", "bank", "payment")) return { questId: "Q-002", gmn: "G", reason: "资金/收款相关" };
+      if (has("rfq", "报价", "询价", "采购", "元器件", "ic", "bom", "客户线索")) return { questId: "Q-011", gmn: "G", reason: "元器件报价/客户机会" };
+      if (has("开发客户", "新客户", "linkedin", "whatsapp", "邮件开发", "销售")) return { questId: "Q-012", gmn: "G", reason: "客户开发/增长" };
+      if (has("联系客户", "老客户", "跟进客户", "客户关系")) return { questId: "Q-013", gmn: "M", reason: "客户维护" };
+      if (has("物流", "发货", "货柜", "船", "资料", "报关", "仓库")) return { questId: "Q-010", gmn: "M", reason: "物流维护/交付" };
+      if (has("推广", "培训", "sop", "系统", "流程", "记录")) return { questId: "Q-009", gmn: "G", reason: "推广平台/系统优化" };
+      if (has("冥想", "焦虑", "呼吸", "冷静")) return { questId: "Q-004", gmn: "M", reason: "心态维护" };
+      if (has("健康", "体重", "训练", "饮食", "健身")) return { questId: "Q-005", gmn: "G", reason: "健康系统" };
+      if (has("咖啡", "兴趣", "体验", "第一次")) return { questId: "Q-007", gmn: "M", reason: "兴趣/新体验" };
+      return { questId: "Q-009", gmn: "M", reason: "默认进入计划系统，稍后手动归类" };
+    }
+    function populateTodoQuestSelect() {
+      $("todoQuest").innerHTML = data.quests.map(q => `<option value="${q.id}">${q.id} · ${escapeHtml(q.name)}</option>`).join("");
+    }
+    function updateTodoSuggestion() {
+      const text = `${$("todoTitle").value} ${$("todoNote").value}`;
+      const suggestion = classifyTodo(text);
+      const quest = questById(suggestion.questId);
+      $("todoQuest").value = suggestion.questId;
+      $("todoGmn").value = suggestion.gmn;
+      $("todoSuggestion").innerHTML = `<b>自动归类建议</b><p>${escapeHtml(quest?.name || suggestion.questId)} · ${suggestion.gmn} · ${escapeHtml(suggestion.reason)}</p>`;
+    }
+    function createTodo() {
+      const title = $("todoTitle").value.trim();
+      if (!title) {
+        alert("先写一个待办事项。");
+        return;
+      }
+      const todo = {
+        id: newId("TODO"),
+        title,
+        note: $("todoNote").value.trim(),
+        dueDate: $("todoDueDate").value || todayISO(),
+        priority: $("todoPriority").value,
+        status: "open",
+        questId: $("todoQuest").value,
+        gmn: $("todoGmn").value,
+        createdAt: new Date().toISOString(),
+        convertedTaskId: ""
+      };
+      data.todos.unshift(todo);
+      clearTodoForm();
+      save();
+      renderAll();
+      showScreen("todos");
+    }
+    function clearTodoForm() {
+      $("todoTitle").value = "";
+      $("todoNote").value = "";
+      $("todoDueDate").value = todayISO();
+      $("todoPriority").value = "medium";
+      updateTodoSuggestion();
+    }
+    function renderTodos() {
+      populateTodoQuestSelect();
+      if (!$("todoDueDate").value) $("todoDueDate").value = todayISO();
+      const openTodos = data.todos.filter(todo => todo.status !== "done" && todo.status !== "deleted");
+      const today = openTodos.filter(todo => todo.dueDate <= todayISO());
+      const later = openTodos.filter(todo => todo.dueDate > todayISO());
+      $("todayTodoList").innerHTML = today.map(todoCard).join("") || `<p>今天没有提醒。可以先把事情丢进待办收件箱。</p>`;
+      $("laterTodoList").innerHTML = later.map(todoCard).join("") || `<p>晚点做列表为空。</p>`;
+      document.querySelectorAll("[data-todo-start]").forEach(btn => btn.onclick = () => startTodo(btn.dataset.todoStart));
+      document.querySelectorAll("[data-todo-done]").forEach(btn => btn.onclick = () => finishTodo(btn.dataset.todoDone));
+      document.querySelectorAll("[data-todo-later]").forEach(btn => btn.onclick = () => moveTodoLater(btn.dataset.todoLater));
+      document.querySelectorAll("[data-todo-delete]").forEach(btn => btn.onclick = () => deleteTodo(btn.dataset.todoDelete));
+    }
+    function todoCard(todo) {
+      const quest = questById(todo.questId);
+      return `
+        <div class="log-card">
+          <div class="row"><span class="pill">${escapeHtml(todo.dueDate)} · ${escapeHtml(todo.priority)} · ${todo.gmn}</span><small>${escapeHtml(quest?.name || todo.questId)}</small></div>
+          <p><b>${escapeHtml(todo.title)}</b></p>
+          ${todo.note ? `<p>${escapeHtml(todo.note)}</p>` : ""}
+          <div class="log-actions">
+            <button class="primary" data-todo-start="${todo.id}">开始20分钟</button>
+            <button class="secondary" data-todo-later="${todo.id}">明天提醒</button>
+            <button class="secondary" data-todo-done="${todo.id}">完成</button>
+            <button class="danger" data-todo-delete="${todo.id}">删除</button>
+          </div>
+        </div>
+      `;
+    }
+    function startTodo(todoId) {
+      const todo = data.todos.find(item => item.id === todoId);
+      if (!todo) return;
+      let task = todo.convertedTaskId ? taskById(todo.convertedTaskId) : null;
+      if (!task) {
+        task = {
+          id: newId("T-TODO"),
+          questId: todo.questId,
+          name: todo.title,
+          current_title: todo.title,
+          original_title: todo.title,
+          instruction: todo.note || todo.title,
+          minutes: 20,
+          standard: "完成并记录这条待办",
+          gmn: todo.gmn,
+          skillIds: todo.gmn === "G" ? ["operations", "strategy"] : ["personal-system"],
+          status: "Not Started",
+          is_random_event: false,
+          quest_type: questTypeFromQuestId(todo.questId),
+          estimated_sessions: 1,
+          reason: "待办收件箱",
+          source: "todo",
+          linked_goal_id: questGoalIds(questById(todo.questId))[0] || selectedGoalId,
+          priority: todo.priority,
+          pivot_status: "none",
+          pivot_reason: "",
+          discovery_note: "",
+          generated_task_id: "",
+          source_todo_id: todo.id
+        };
+        data.tasks.unshift(task);
+        todo.convertedTaskId = task.id;
+      }
+      todo.status = "started";
+      selectedTaskId = task.id;
+      selectedQuestId = task.questId;
+      syncGoalForQuest(selectedQuestId);
+      save();
+      renderAll();
+      showScreen("focus");
+    }
+    function finishTodo(todoId) {
+      const todo = data.todos.find(item => item.id === todoId);
+      if (!todo) return;
+      todo.status = "done";
+      save();
+      renderAll();
+    }
+    function moveTodoLater(todoId) {
+      const todo = data.todos.find(item => item.id === todoId);
+      if (!todo) return;
+      const date = new Date();
+      date.setDate(date.getDate() + 1);
+      todo.dueDate = date.toISOString().slice(0, 10);
+      todo.status = "open";
+      save();
+      renderAll();
+    }
+    function deleteTodo(todoId) {
+      const todo = data.todos.find(item => item.id === todoId);
+      if (!todo || !confirm("确定删除这条待办吗？")) return;
+      todo.status = "deleted";
+      save();
+      renderAll();
+    }
     function createRandomEvent(startNow = false) {
       const title = $("randomTitle").value.trim();
       const reason = $("randomReason").value.trim();
@@ -2337,6 +2556,20 @@
       save();
       renderAll();
       showScreen("focus");
+    }
+    function updateQuestMetric(questId) {
+      const quest = questById(questId);
+      if (!quest) return;
+      const current = Number($("metricCurrent").value || 0);
+      const target = Number($("metricTarget").value || 0);
+      if (target <= 0) {
+        alert("目标值必须大于 0。");
+        return;
+      }
+      quest.currentValue = current;
+      quest.targetValue = target;
+      save();
+      renderAll();
     }
     function classifyRandomEvent(taskId, type) {
       const task = taskById(taskId);
@@ -2504,6 +2737,7 @@
       document.querySelectorAll(".screen").forEach(s => s.classList.toggle("active", s.id === id));
       document.querySelectorAll(".nav button").forEach(b => b.classList.toggle("active", b.dataset.screen === id));
       if (id === "focus") renderFocus();
+      if (id === "todos") renderTodos();
       if (id === "review") renderReview();
       if (id === "skills") renderSkills();
     }
@@ -2513,6 +2747,7 @@
       renderMap();
       renderDetail();
       renderFocus();
+      renderTodos();
       renderReview();
       renderSkills();
       renderModel();
@@ -2525,6 +2760,10 @@
     $("resetBtn").addEventListener("click", resetTimer);
     document.addEventListener("visibilitychange", syncTimerWithClock);
     $("randomEventBtn").addEventListener("click", openRandomEventModal);
+    $("todoTitle").addEventListener("input", updateTodoSuggestion);
+    $("todoNote").addEventListener("input", updateTodoSuggestion);
+    $("autoClassifyTodoBtn").addEventListener("click", updateTodoSuggestion);
+    $("addTodoBtn").addEventListener("click", createTodo);
     $("pivotTaskBtn").addEventListener("click", openPivotModal);
     $("saveDraftBtn").addEventListener("click", saveDraft);
     $("saveSessionBtn").addEventListener("click", saveSession);
