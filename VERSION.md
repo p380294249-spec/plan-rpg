@@ -1,5 +1,18 @@
 # Plan RPG Version Notes
 
+## v0.3.23 - 2026-05-14
+
+### Goal
+
+Stop the bottom progress panel from overlapping the map content.
+
+### Main Changes
+
+- Changed the annual progress / weekly achievement panel from absolute positioning to normal page flow.
+- Removed the extra reserved bottom padding that made the dark panel appear between map sections.
+- Kept the active timer return panel separate as a fixed floating card.
+- Updated visible version labels to `v0.3.23`.
+
 ## v0.3.22 - 2026-05-14
 
 ### Goal

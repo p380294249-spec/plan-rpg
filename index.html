@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Plan RPG v0.3.22 / 计划 RPG</title>
+  <title>Plan RPG v0.3.23 / 计划 RPG</title>
   <style>
     :root {
       --ink: #111827;
@@ -334,7 +334,6 @@
       z-index: 1;
       display: grid;
       gap: 18px;
-      padding-bottom: 176px;
     }
     .map-layer {
       border-radius: 8px;
@@ -524,13 +523,12 @@
     }
 
     .map-bottom {
-      position: absolute;
-      left: 26px;
-      right: 26px;
-      bottom: 22px;
+      position: relative;
+      z-index: 1;
       display: grid;
       grid-template-columns: 1fr 260px;
       gap: 12px;
+      margin-top: 18px;
     }
     .progress-panel, .week-panel {
       border-radius: 8px;
@@ -882,7 +880,7 @@
         <div>
           <h1>计划 RPG</h1>
           <p>把目标变成冒险</p>
-          <span class="version">v0.3.22 在线网页软件</span>
+          <span class="version">v0.3.23 在线网页软件</span>
         </div>
       </div>
 
@@ -946,7 +944,7 @@
         <div class="stats">
           <div class="stat"><b>⚡</b><div><strong id="totalMinutes">0 min</strong><span>同步专注时长</span></div></div>
           <div class="stat"><b>◆</b><div><strong id="gRatio">0%</strong><span>Growth 占比</span></div></div>
-          <div class="stat"><b>Lv</b><div><strong>探索者 28</strong><span>Plan RPG v0.3.22</span></div></div>
+          <div class="stat"><b>Lv</b><div><strong>探索者 28</strong><span>Plan RPG v0.3.23</span></div></div>
         </div>
       </header>
 
@@ -1223,7 +1221,7 @@
   </div>
 
   <script>
-    const appVersion = "0.3.22";
+    const appVersion = "0.3.23";
     const seed = {
       version: appVersion,
       goals2030: [
