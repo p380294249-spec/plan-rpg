@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Plan RPG v0.3.15 / 计划 RPG</title>
+  <title>Plan RPG v0.3.17 / 计划 RPG</title>
   <style>
     :root {
       --ink: #111827;
@@ -853,7 +853,7 @@
         <div>
           <h1>计划 RPG</h1>
           <p>把目标变成冒险</p>
-          <span class="version">v0.3.15 本地网页软件</span>
+          <span class="version">v0.3.17 本地网页软件</span>
         </div>
       </div>
 
@@ -890,6 +890,17 @@
         <input class="hide" id="importDataFile" type="file" accept="application/json" />
       </div>
 
+      <div class="side-card">
+        <div class="side-title"><span>Google Sheet 同步</span><span id="sheetSyncBadge">未配置</span></div>
+        <label>Apps Script URL<input id="sheetSyncUrl" placeholder="https://script.google.com/macros/s/..." /></label>
+        <label>同步 Token<input id="sheetSyncToken" placeholder="自己设置一个口令" /></label>
+        <div class="utility-actions">
+          <button id="saveSheetSyncBtn">保存同步设置</button>
+          <button id="testSheetSyncBtn">测试</button>
+        </div>
+        <small id="sheetSyncStatus">完成专注后会自动写入 Session_Logs。</small>
+      </div>
+
       <div class="quote">
         最远的旅程，从今天的 20 分钟开始。<br />
         每一条日志，都是下周路线的材料。
@@ -905,7 +916,7 @@
         <div class="stats">
           <div class="stat"><b>⚡</b><div><strong id="totalMinutes">0 min</strong><span>本地专注时长</span></div></div>
           <div class="stat"><b>◆</b><div><strong id="gRatio">0%</strong><span>Growth 占比</span></div></div>
-          <div class="stat"><b>Lv</b><div><strong>探索者 28</strong><span>Plan RPG v0.3.15</span></div></div>
+          <div class="stat"><b>Lv</b><div><strong>探索者 28</strong><span>Plan RPG v0.3.17</span></div></div>
         </div>
       </header>
 
@@ -1182,7 +1193,7 @@
   </div>
 
   <script>
-    const appVersion = "0.3.15";
+    const appVersion = "0.3.17";
     const seed = {
       version: appVersion,
       goals2030: [
@@ -1291,6 +1302,7 @@
 
     const storageKey = "plan-rpg-local-mvp-v2";
     const legacyKey = "plan-rpg-local-mvp-v1";
+    const sheetSyncConfigKey = "plan-rpg-sheet-sync-config-v1";
     let data = loadData();
     let selectedCampaignId = "Q-001";
     let selectedQuestId = "Q-009";
@@ -1315,6 +1327,24 @@
     const pct = (n) => Math.round(n) + "%";
     const escapeHtml = (value = "") => String(value).replace(/[&<>"']/g, ch => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[ch]));
     const goalLabel = (goal) => goal?.displayTitle || goal?.id || "";
+    function sheetSyncConfig() {
+      return JSON.parse(localStorage.getItem(sheetSyncConfigKey) || "{}");
+    }
+    function saveSheetSyncConfig() {
+      const config = {
+        url: $("sheetSyncUrl").value.trim(),
+        token: $("sheetSyncToken").value.trim()
+      };
+      localStorage.setItem(sheetSyncConfigKey, JSON.stringify(config));
+      renderSheetSyncConfig();
+    }
+    function renderSheetSyncConfig(message = "") {
+      const config = sheetSyncConfig();
+      if ($("sheetSyncUrl")) $("sheetSyncUrl").value = config.url || "";
+      if ($("sheetSyncToken")) $("sheetSyncToken").value = config.token || "";
+      if ($("sheetSyncBadge")) $("sheetSyncBadge").textContent = config.url ? "已配置" : "未配置";
+      if ($("sheetSyncStatus")) $("sheetSyncStatus").textContent = message || (config.url ? "完成专注后会自动写入 Session_Logs。" : "先部署 Apps Script，再填 URL 和 Token。");
+    }
     function todayISO() {
       return new Date().toISOString().slice(0, 10);
     }
@@ -1952,6 +1982,70 @@
         pivot_note: ""
       };
     }
+    function logToSheetRow(log) {
+      const quest = questById(log.questId) || {};
+      return {
+        log_id: log.id,
+        date: log.date,
+        user: "38029",
+        device: navigator.userAgent || "browser",
+        goal_id: quest.goal || "",
+        quest_id: log.questId,
+        task_id: log.actual_task_id || log.taskId,
+        gmn: log.gmn,
+        minutes: log.minutes,
+        what_done: log.whatDone,
+        problem: log.problem,
+        solution: log.solution,
+        good: log.good,
+        bad: log.bad,
+        next_step: log.nextStep,
+        skill_xp_json: JSON.stringify(log.skillXp || []),
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString()
+      };
+    }
+    async function syncSessionLogToSheet(log) {
+      const config = sheetSyncConfig();
+      if (!config.url) {
+        renderSheetSyncConfig("未配置 Google Sheet 同步；本次只保存到当前浏览器。");
+        return;
+      }
+      const payload = {
+        token: config.token || "",
+        action: "append_session_log",
+        module: "Session_Logs",
+        row: logToSheetRow(log)
+      };
+      try {
+        await fetch(config.url, {
+          method: "POST",
+          mode: "no-cors",
+          headers: { "Content-Type": "text/plain;charset=utf-8" },
+          body: JSON.stringify(payload)
+        });
+        renderSheetSyncConfig("已发送到 Google Sheet。刷新表格后查看 Session_Logs。");
+      } catch (error) {
+        const pending = JSON.parse(localStorage.getItem("plan-rpg-sheet-sync-pending-v1") || "[]");
+        pending.push(payload);
+        localStorage.setItem("plan-rpg-sheet-sync-pending-v1", JSON.stringify(pending));
+        renderSheetSyncConfig("同步失败，已暂存到本机待重试队列。");
+      }
+    }
+    async function testSheetSync() {
+      const config = sheetSyncConfig();
+      if (!config.url) {
+        renderSheetSyncConfig("先填写 Apps Script URL。");
+        return;
+      }
+      const payload = { token: config.token || "", action: "ping", module: "Settings", created_at: new Date().toISOString() };
+      try {
+        await fetch(config.url, { method: "POST", mode: "no-cors", headers: { "Content-Type": "text/plain;charset=utf-8" }, body: JSON.stringify(payload) });
+        renderSheetSyncConfig("测试请求已发送。去 Google Sheet 的 Settings 查看 sync_ping。");
+      } catch (error) {
+        renderSheetSyncConfig("测试失败，请检查 URL。");
+      }
+    }
     function clearForm() {
       ["whatDone", "problem", "solution", "good", "bad", "nextStep"].forEach(id => $(id).value = "");
     }
@@ -1971,6 +2065,7 @@
       resetTimer();
       renderAll();
       renderSessionResult(log);
+      syncSessionLogToSheet(log);
     }
     function applySkillXp(events) {
       events.forEach(event => {
@@ -2659,6 +2754,7 @@
       renderReview();
       renderSkills();
       renderModel();
+      renderSheetSyncConfig();
       save();
     }
 
@@ -2684,6 +2780,8 @@
     $("exportDataBtn").addEventListener("click", exportData);
     $("importDataBtn").addEventListener("click", () => $("importDataFile").click());
     $("importDataFile").addEventListener("change", importData);
+    $("saveSheetSyncBtn").addEventListener("click", saveSheetSyncConfig);
+    $("testSheetSyncBtn").addEventListener("click", testSheetSync);
     $("createRandomStartBtn").addEventListener("click", () => createRandomEvent(true));
     $("createRandomBtn").addEventListener("click", () => createRandomEvent(false));
     $("applyPivotBtn").addEventListener("click", applyPivot);

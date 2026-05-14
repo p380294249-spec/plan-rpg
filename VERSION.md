@@ -1,5 +1,52 @@
 # Plan RPG Version Notes
 
+## v0.3.17 - 2026-05-14
+
+### Goal
+
+Automatically send completed focus session logs to Google Sheet.
+
+### Main Changes
+
+- Added a sidebar `Google Sheet 同步` configuration panel.
+  - Stores Apps Script Web App URL in localStorage.
+  - Stores a lightweight sync token in localStorage.
+- Added automatic `Session_Logs` POST after `完成并结算`.
+- Added a fire-and-forget `no-cors` sync path suitable for GitHub Pages + Apps Script MVP.
+- Added local pending queue fallback when the sync request throws.
+- Added `google-apps-script/Code.gs` as the Apps Script backend template.
+- Documented the Apps Script payload in `docs/data-modules.md`.
+
+## v0.3.16 - 2026-05-14
+
+### Goal
+
+Create the Google Sheet data layer skeleton for the online map system.
+
+### Main Changes
+
+- Created Google Sheet `Plan RPG Map Data`.
+- Added module tabs:
+  - `Module_Index`
+  - `Goals`
+  - `Quests`
+  - `Tasks`
+  - `Session_Logs`
+  - `Todos`
+  - `Skills`
+  - `Settings`
+- Added first-row field headers for each module.
+- Added `docs/data-modules.md` so future AI agents can locate data boundaries without reading the full app.
+- Updated README with the Google Sheet link and module instructions.
+- Imported the local backup `plan-rpg-backup-2026-05-14.json` into a data-filled Google Sheet:
+  - `Plan RPG Map Data - Imported 2026-05-14`
+  - Goals: 8
+  - Quests: 26
+  - Tasks: 33
+  - Session logs: 4
+  - Todos: 0
+  - Skills: 8
+
 ## v0.3.15 - 2026-05-14
 
 ### Goal

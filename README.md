@@ -2,7 +2,7 @@
 
 本项目是一个本地网页软件 MVP，用来把年度计划、每周计划、主线任务、支线任务、20 分钟专注、执行日志、奖励、技能成长和每周复盘串成一个游戏化系统。
 
-当前版本：`v0.3.15`
+当前版本：`v0.3.17`
 
 ## 文件说明
 
@@ -82,6 +82,37 @@ https://p380294249-spec.github.io/plan-rpg/
 ```
 
 注意：GitHub Pages 上的网页本身是公开入口。真实业务数据不要写死在 `index.html` 里；后续建议把 INSO 客户、订单、报价、维护记录等数据接到 Google Sheet。
+
+## Google Sheet 数据层
+
+地图系统的共享数据层已经开始搭建：
+
+```txt
+Plan RPG Map Data - Imported 2026-05-14
+https://docs.google.com/spreadsheets/d/1Yz-RswNvBxJ9GFWfcU2KDAFh23NCWLS-HS2_g_07rAg/edit
+```
+
+模块说明在：
+
+```txt
+docs/data-modules.md
+```
+
+后续让 AI 修改数据同步逻辑时，先让它读 `docs/data-modules.md`，再按模块改，不需要一上来读取整个 `index.html`。
+
+### 专注记录自动同步
+
+当前网页已支持在完成专注后自动发送到 Google Sheet 的 `Session_Logs`。
+
+需要先部署 Apps Script：
+
+```txt
+google-apps-script/Code.gs
+```
+
+部署后，把 Web App URL 和同一个 token 填到网页左侧 `Google Sheet 同步` 区域。
+
+注意：GitHub Pages 是静态公开网页，Apps Script URL 和 token 属于轻量保护，不适合直接同步敏感客户资料。当前阶段只用于地图系统的专注记录。
 
 ## 重要：数据保存在哪里
 
