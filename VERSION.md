@@ -1,5 +1,67 @@
 # Plan RPG Version Notes
 
+## v0.3.15 - 2026-05-14
+
+### Goal
+
+Prepare the local Plan RPG app for GitHub Pages publishing.
+
+### Main Changes
+
+- Added `.nojekyll` so GitHub Pages serves the static files without Jekyll processing.
+- Added GitHub Pages setup notes to `README.md`.
+- Documented the expected public URL: `https://p380294249-spec.github.io/plan-rpg/`.
+- Added a privacy reminder that GitHub Pages is a public webpage and real INSO/customer data should move to a protected Google Sheet data layer.
+
+## v0.3.14 - 2026-05-14
+
+### Goal
+
+Make GMN editable for chapter-level map nodes and remove GMN from annual goal cards.
+
+### Main Changes
+
+- Removed GMN badges and GMN color class from the `2026 目标` cards.
+- Added `修改章节 GMN` in the map detail panel.
+- Kept `修改当前任务 GMN` for 20-minute actions.
+- Chapter and task GMN choices now both save immediately and refresh the map.
+
+## v0.3.13 - 2026-05-14
+
+### Goal
+
+Make the Business / INSO map clearer for review, and keep active timers visible after returning to the map.
+
+### Main Changes
+
+- Compressed INSO into three review branches:
+  - `订单跟进`: orders, RFQ, quotes, deal progress, and related review.
+  - `客户开发`: new customer development from 麦穗, LinkedIn, email, Google search, and similar sources.
+  - `客户维护`: old-customer contact, relationship maintenance, regular interaction, and customer status observation.
+- Updated the matching INSO preset tasks and Todo Inbox classification keywords.
+- Added a `正在专注` module on the map when a timer is running or paused.
+  - Shows remaining time, timer state, and current task.
+  - Adds `返回计时` to jump back to the active focus session.
+
+## v0.3.12 - 2026-05-14
+
+### Goal
+
+Add AI work automation as the main 2026 direction under `NEW THINGS`.
+
+### Main Changes
+
+- Changed `NEW THINGS` from a loose new-experience bucket into an AI automation goal.
+- Added the measurable target: complete 10 AI automation workflows/MVPs and reduce daily core work to DFK ≤2 hours plus INSO ≤2 hours.
+- Added the new AI hierarchy:
+  - `研究 AI 日常工作自动化`
+  - `快速将工作模式自动化`
+  - `搭建 MVP`
+  - `优化`
+  - `可以推销`
+- Added matching 20-minute preset tasks for finding automation opportunities, building MVPs, optimizing workflows, and turning internal tools into sellable cases.
+- Updated Todo Inbox classification so AI / MVP / automation keywords route into the new AI automation branches.
+
 ## v0.3.11 - 2026-05-14
 
 ### Goal

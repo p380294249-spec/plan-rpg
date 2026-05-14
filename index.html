@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Plan RPG v0.3.10 / 计划 RPG</title>
+  <title>Plan RPG v0.3.15 / 计划 RPG</title>
   <style>
     :root {
       --ink: #111827;
@@ -853,7 +853,7 @@
         <div>
           <h1>计划 RPG</h1>
           <p>把目标变成冒险</p>
-          <span class="version">v0.3.10 本地网页软件</span>
+          <span class="version">v0.3.15 本地网页软件</span>
         </div>
       </div>
 
@@ -905,7 +905,7 @@
         <div class="stats">
           <div class="stat"><b>⚡</b><div><strong id="totalMinutes">0 min</strong><span>本地专注时长</span></div></div>
           <div class="stat"><b>◆</b><div><strong id="gRatio">0%</strong><span>Growth 占比</span></div></div>
-          <div class="stat"><b>Lv</b><div><strong>探索者 28</strong><span>Plan RPG v0.3.10</span></div></div>
+          <div class="stat"><b>Lv</b><div><strong>探索者 28</strong><span>Plan RPG v0.3.15</span></div></div>
         </div>
       </header>
 
@@ -953,6 +953,12 @@
                 <b>本周成就</b>
                 <p><span id="weekSessions">0</span> 次 Session</p>
                 <p><span id="weekLogs">0</span> 条执行日志</p>
+              </div>
+              <div class="week-panel hide" id="activeTimerPanel">
+                <b>正在专注</b>
+                <p><span id="activeTimerLeft">00:00</span> · <span id="activeTimerState">进行中</span></p>
+                <p id="activeTimerTask">当前任务</p>
+                <button class="primary" id="returnFocusBtn">返回计时</button>
               </div>
             </div>
           </div>
@@ -1176,7 +1182,7 @@
   </div>
 
   <script>
-    const appVersion = "0.3.10";
+    const appVersion = "0.3.15";
     const seed = {
       version: appVersion,
       goals2030: [
@@ -1187,7 +1193,7 @@
         { id: "FAMILY", title: "Girl friend and family life", currentValue: 0, targetValue: 2, unit: "模块", role: "Life" },
         { id: "SOCIAL", title: "Meet people and find mentor", currentValue: 0, targetValue: 2, unit: "模块", role: "Sideline", displayTitle: "SOCIAL NETWORK" },
         { id: "INTERESTS", title: "Master one hobby", currentValue: 0, targetValue: 1, unit: "个爱好", role: "Sideline" },
-        { id: "NEW", title: "Try different new things", currentValue: 0, targetValue: 20, unit: "次", role: "Sideline", displayTitle: "NEW THINGS" }
+        { id: "NEW", title: "AI automation for daily work", currentValue: 0, targetValue: 10, unit: "个自动化", role: "Sideline", displayTitle: "NEW THINGS" }
       ],
       quests: [
         { id: "Q-001", name: "DFK 赚钱", type: "Main", goal: "BUSINESS", target: "每月约 50 个货柜（广州 + 义乌）", currentValue: 0, targetValue: 50, unit: "柜/月", description: "2026 两个主要目标之一：让 DFK 形成稳定出货和稳定系统。", nextMove: "先把稳定系统和培训系统拆清楚", status: "In Progress", gmn: "G", priority: "High", icon: "🚚" },
@@ -1196,10 +1202,10 @@
         { id: "Q-018", parentQuestId: "Q-009", name: "打印", type: "Main", goal: "BUSINESS", target: "单据、标签、交付资料打印稳定", description: "DFK 打印分支：把常用打印模板、检查点和异常处理固定下来。", nextMove: "检查一个打印模板或打印流程", status: "Not Started", gmn: "G", priority: "High", icon: "🖨️" },
         { id: "Q-019", parentQuestId: "Q-009", name: "人员管理", type: "Main", goal: "BUSINESS", target: "岗位、责任、检查和交接清楚", description: "DFK 人员管理分支：明确谁负责什么、怎么检查、怎么培训新人。", nextMove: "写清一个岗位的责任和检查标准", status: "Not Started", gmn: "G", priority: "High", icon: "👥" },
         { id: "Q-016", parentQuestId: "Q-001", name: "培训系统", type: "Main", goal: "BUSINESS", target: "把 DFK 每个关键环节做成可培训流程", currentValue: 0, targetValue: 1, unit: "套", description: "培训系统还在设计中，先作为独立章节收集流程、教材和验收标准。", nextMove: "选择一个环节，写出培训动作和验收标准", status: "Not Started", gmn: "G", priority: "High", icon: "📚" },
-        { id: "Q-003", name: "INSO 稳定客户收入", type: "Main", goal: "BUSINESS", target: "稳定客户每月收入 1WRMB", currentValue: 0, targetValue: 10000, unit: "RMB/月", description: "2026 两个主要目标之一：INSO 围绕报价、开发客户、维护客户关系形成稳定收入。", nextMove: "从报价或客户开发推进一个真实机会", status: "In Progress", gmn: "G", priority: "High", icon: "🔩" },
-        { id: "Q-011", parentQuestId: "Q-003", name: "报价", type: "Main", goal: "BUSINESS", target: "询价、采购报价、客户报价及时更新", description: "INSO 报价模块：处理 RFQ、采购价格、客户报价和反馈记录。", nextMove: "检查一轮询价和报价状态", status: "In Progress", gmn: "G", priority: "High", icon: "💬" },
-        { id: "Q-012", parentQuestId: "Q-003", name: "开发客户", type: "Main", goal: "BUSINESS", target: "持续找到可报价、可成交的新客户", description: "INSO 开发客户模块：主动找客户、新渠道、新联系人和新机会。", nextMove: "开发一批新客户并记录下一步", status: "In Progress", gmn: "G", priority: "High", icon: "📈" },
-        { id: "Q-013", parentQuestId: "Q-003", name: "维护客户关系", type: "Habit", goal: "BUSINESS", target: "已有客户保持联系并产生复购机会", description: "INSO 客户关系模块：跟进已有客户，记录关系温度、需求和下一步。", nextMove: "联系一批已有客户", status: "In Progress", gmn: "M", priority: "High", icon: "🤝" },
+        { id: "Q-003", name: "INSO 稳定客户收入", type: "Main", goal: "BUSINESS", target: "稳定客户每月收入 1WRMB", currentValue: 0, targetValue: 10000, unit: "RMB/月", description: "2026 两个主要目标之一：INSO 只保留订单跟进、客户开发、客户维护三条复盘主线。", nextMove: "从订单跟进、客户开发或客户维护里推进一个真实机会", status: "In Progress", gmn: "G", priority: "High", icon: "🔩" },
+        { id: "Q-011", parentQuestId: "Q-003", name: "订单跟进", type: "Main", goal: "BUSINESS", target: "订单、RFQ、报价、成交复盘清楚", description: "用于记录所有订单、RFQ、报价、成交相关复盘。每条记录尽量能看出状态、卡点、下一步和成交概率。", nextMove: "复盘一个 RFQ/报价/订单状态并写下一步", status: "In Progress", gmn: "G", priority: "High", icon: "💬" },
+        { id: "Q-012", parentQuestId: "Q-003", name: "客户开发", type: "Main", goal: "BUSINESS", target: "持续产生新客户线索和有效对话", description: "用于记录新客户开发，包括麦穗、LinkedIn、邮件、Google 搜索等来源。", nextMove: "开发一批新客户，并标记来源和下一步", status: "In Progress", gmn: "G", priority: "High", icon: "📈" },
+        { id: "Q-013", parentQuestId: "Q-003", name: "客户维护", type: "Habit", goal: "BUSINESS", target: "老客户定期互动和状态观察", description: "用于记录老客户联系、关系维护、定期互动、客户状态观察。", nextMove: "联系一个老客户并记录客户状态", status: "In Progress", gmn: "M", priority: "High", icon: "🤝" },
         { id: "Q-002", name: "汇款系统", type: "Main", goal: "PASSIVE", target: "制作流程、稳定客户、开发客户", currentValue: 0, targetValue: 3, unit: "模块", description: "Passive income 先以汇款系统为核心，沉淀流程并形成稳定客户来源。", nextMove: "先把一个汇款流程写成可复用 SOP", status: "Not Started", gmn: "G", priority: "Medium", icon: "🏦" },
         { id: "Q-014", parentQuestId: "Q-002", name: "制作汇款流程", type: "Main", goal: "PASSIVE", target: "汇款流程、资料、费用、限制清楚", description: "把不同通道的流程、费用、到账时间、资料要求和风险点整理成系统。", nextMove: "整理一条完整汇款流程", status: "In Progress", gmn: "G", priority: "Medium", icon: "🧩" },
         { id: "Q-015", parentQuestId: "Q-002", name: "稳定客户", type: "Main", goal: "PASSIVE", target: "让老客户稳定复用汇款服务", description: "维护现有汇款客户，记录频率、需求、问题和下一次跟进。", nextMove: "跟进一个已有汇款客户", status: "Not Started", gmn: "M", priority: "Medium", icon: "🏛️" },
@@ -1210,23 +1216,28 @@
         { id: "Q-022", parentQuestId: "Q-021", name: "旅游", type: "Side", goal: "FAMILY", target: "一起计划和完成旅行", description: "旅行作为 girl friend 下面的一个分支，放目的地、预算、时间和行动。", nextMove: "写下一个旅行备选方案", status: "Not Started", gmn: "M", priority: "Low", icon: "🧳" },
         { id: "Q-006", name: "SOCIAL NETWORK", type: "Side", goal: "SOCIAL", target: "认识更多关键人物，并找到导师", description: "记录认识多少人、关键联系人和导师线索。", nextMove: "复盘一个联系人或导师线索", status: "Not Started", gmn: "G", priority: "Medium", icon: "🤝" },
         { id: "Q-007", name: "INTERESTS", type: "Side", goal: "INTERESTS", target: "精通一个爱好", description: "先把今年真正想精通的一个爱好放进来，后续可以继续细化。", nextMove: "记录一次兴趣练习和改进点", status: "Not Started", gmn: "M", priority: "Low", icon: "☕" },
-        { id: "Q-008", name: "NEW THINGS", type: "Side", goal: "NEW", target: "尝试不一样的新事物", description: "今年的新事物还没完全想好，先作为收集箱和体验记录。", nextMove: "记录 1 个新体验候选", status: "Not Started", gmn: "M", priority: "Low", icon: "✨" }
+        { id: "Q-008", name: "NEW THINGS", type: "Side", goal: "NEW", target: "完成 10 个 AI 自动化工作流/MVP", currentValue: 0, targetValue: 10, unit: "个自动化", description: "今年 NEW THINGS 的核心方向：研究 AI，帮助日常工作 AI 化，让 DFK 每天 ≤2 小时、INSO 每天 ≤2 小时完成核心工作。", nextMove: "选择一个每天重复的手动动作，做成 AI 自动化 MVP", status: "In Progress", gmn: "G", priority: "High", icon: "✨" },
+        { id: "Q-023", parentQuestId: "Q-008", name: "研究 AI 日常工作自动化", type: "Side", goal: "NEW", target: "用 10 个自动化流程支撑 DFK + INSO 每天 4 小时以内", currentValue: 0, targetValue: 10, unit: "个流程", description: "研究 AI 如何嵌入自己的真实工作流，不只学习工具，而是把手动动作变成可复用系统。最终效果是 DFK 每天 ≤2 小时、INSO 每天 ≤2 小时。", nextMove: "列出 DFK 和 INSO 每天最耗时的 5 个动作", status: "In Progress", gmn: "G", priority: "High", icon: "🤖" },
+        { id: "Q-024", parentQuestId: "Q-023", name: "快速将工作模式自动化", type: "Main", goal: "NEW", target: "每月至少自动化 1 个重复工作流", description: "把报价、记录、跟进、打印、财务、客户维护等重复动作变成模板、脚本或 AI 工作流。", nextMove: "选一个手动流程，写出输入、处理、输出", status: "In Progress", gmn: "G", priority: "High", icon: "⚙️" },
+        { id: "Q-025", parentQuestId: "Q-023", name: "搭建 MVP", type: "Main", goal: "NEW", target: "做出可真实使用的 AI 自动化原型", description: "先做最小可用版本，能节省一次真实手动操作即可，不追求完美。", nextMove: "搭建一个 AI 自动化 MVP 并跑一次真实任务", status: "Not Started", gmn: "G", priority: "High", icon: "🧩" },
+        { id: "Q-026", parentQuestId: "Q-023", name: "优化", type: "Main", goal: "NEW", target: "把 MVP 优化到稳定、省时、可重复", description: "记录失败、卡点、误差和节省时间，不断把原型变成稳定工具。", nextMove: "复盘一个 MVP 的卡点并优化一次", status: "Not Started", gmn: "G", priority: "High", icon: "🔧" },
+        { id: "Q-027", parentQuestId: "Q-023", name: "可以推销", type: "Side", goal: "NEW", target: "沉淀成可展示、可销售的方案", description: "把自己用出来的 AI 自动化方案整理成案例、演示和报价逻辑，未来可以对外推销。", nextMove: "把一个内部自动化写成客户能听懂的案例", status: "Not Started", gmn: "G", priority: "Medium", icon: "📣" }
       ],
       tasks: [
         { id: "T-001", questId: "Q-009", name: "拆 DFK 稳定系统", instruction: "把 DFK 稳定系统拆成财务、打印、人员管理的当前问题和下一步。", minutes: 20, standard: "三条分支各有一个问题和下一步", gmn: "G", skillIds: ["operations", "strategy"], status: "Not Started" },
         { id: "T-002", questId: "Q-010", name: "整理 DFK 财务流程", instruction: "整理收入、成本、利润、收付款或对账中的一个流程。", minutes: 20, standard: "写出一个财务流程和检查点", gmn: "G", skillIds: ["operations", "finance"], status: "Not Started" },
         { id: "T-003", questId: "Q-009", name: "更新 DFK 系统记录", instruction: "把 DFK 系统问题、负责人、下一步集中记录到一个可复盘的位置。", minutes: 20, standard: "完成一次系统记录更新", gmn: "G", skillIds: ["operations", "personal-system"], status: "Not Started" },
-        { id: "T-004", questId: "Q-011", name: "检查 INSO 新询价", instruction: "查看有没有新的 INSO 询价，标记需要回复或报价的项目。", minutes: 20, standard: "更新询价状态", gmn: "G", skillIds: ["revenue", "market"], status: "Not Started" },
+        { id: "T-004", questId: "Q-011", name: "复盘 INSO RFQ/订单", instruction: "查看 INSO 订单、RFQ、报价或成交状态，标记卡点和下一步。", minutes: 20, standard: "更新一个订单/RFQ/报价复盘", gmn: "G", skillIds: ["revenue", "market"], status: "Not Started" },
         { id: "T-005", questId: "Q-016", name: "设计 DFK 培训环节", instruction: "选一个 DFK 环节，拆成培训动作、演示材料和验收标准。", minutes: 20, standard: "一个环节的培训动作 + 验收标准", gmn: "G", skillIds: ["operations", "leadership"], status: "Not Started" },
         { id: "T-011", questId: "Q-010", name: "更新财务记录", instruction: "处理一条 DFK 财务记录、费用、利润或收付款事项。", minutes: 20, standard: "处理并记录一个财务事项", gmn: "G", skillIds: ["finance", "operations"], status: "Not Started" },
         { id: "T-012", questId: "Q-018", name: "检查打印模板", instruction: "检查一个常用单据、标签或交付资料的打印模板。", minutes: 20, standard: "更新一个打印模板或问题记录", gmn: "G", skillIds: ["operations", "personal-system"], status: "Not Started" },
         { id: "T-013", questId: "Q-019", name: "写岗位检查标准", instruction: "选择一个岗位或人员协作点，写清责任、检查标准和交接方式。", minutes: 20, standard: "一个岗位/事项的责任清单", gmn: "G", skillIds: ["operations", "leadership"], status: "Not Started" },
-        { id: "T-014", questId: "Q-011", name: "跟进 INSO 采购报价", instruction: "查看采购有没有新报价，把可以发给客户的内容整理出来。", minutes: 20, standard: "更新采购报价状态", gmn: "G", skillIds: ["revenue", "operations"], status: "Not Started" },
-        { id: "T-015", questId: "Q-011", name: "给 INSO 客户报价", instruction: "把已确认的报价发给客户，并记录客户反馈或下一步。", minutes: 20, standard: "完成一批报价更新", gmn: "G", skillIds: ["revenue", "communication"], status: "Not Started" },
-        { id: "T-016", questId: "Q-012", name: "开发 INSO 新客户", instruction: "找一批新的 INSO 客户或联系人，记录可推进对象。", minutes: 20, standard: "新增一批客户线索", gmn: "G", skillIds: ["revenue", "market"], status: "Not Started" },
-        { id: "T-017", questId: "Q-012", name: "发送 INSO 开发消息", instruction: "给新客户发送开发消息，并记录回复状态。", minutes: 20, standard: "完成一轮客户开发", gmn: "G", skillIds: ["revenue", "communication"], status: "Not Started" },
-        { id: "T-018", questId: "Q-013", name: "联系 INSO 老客户", instruction: "联系已有客户，维护关系并确认近期需求。", minutes: 20, standard: "完成一批客户联系", gmn: "M", skillIds: ["communication", "revenue"], status: "Not Started" },
-        { id: "T-019", questId: "Q-013", name: "记录 INSO 客户关系", instruction: "把客户状态、关系温度、下一步动作写清楚。", minutes: 20, standard: "更新客户关系记录", gmn: "M", skillIds: ["communication", "personal-system"], status: "Not Started" },
+        { id: "T-014", questId: "Q-011", name: "跟进 INSO 报价/成交", instruction: "查看采购报价、客户报价、成交可能和下一步，把状态整理清楚。", minutes: 20, standard: "更新报价/成交状态", gmn: "G", skillIds: ["revenue", "operations"], status: "Not Started" },
+        { id: "T-015", questId: "Q-011", name: "整理 INSO 订单下一步", instruction: "把正在推进的订单或 RFQ 写清楚当前状态、责任人和下一步。", minutes: 20, standard: "完成一批订单跟进记录", gmn: "G", skillIds: ["revenue", "communication"], status: "Not Started" },
+        { id: "T-016", questId: "Q-012", name: "开发 INSO 新客户", instruction: "从麦穗、LinkedIn、邮件或 Google 搜索找一批新客户，记录来源和可推进对象。", minutes: 20, standard: "新增一批带来源的客户线索", gmn: "G", skillIds: ["revenue", "market"], status: "Not Started" },
+        { id: "T-017", questId: "Q-012", name: "发送 INSO 开发消息", instruction: "给新客户发送开发消息，并记录来源、回复状态和下一步。", minutes: 20, standard: "完成一轮客户开发", gmn: "G", skillIds: ["revenue", "communication"], status: "Not Started" },
+        { id: "T-018", questId: "Q-013", name: "联系 INSO 老客户", instruction: "联系已有客户，维护关系并确认近期需求或状态变化。", minutes: 20, standard: "完成一批老客户互动", gmn: "M", skillIds: ["communication", "revenue"], status: "Not Started" },
+        { id: "T-019", questId: "Q-013", name: "记录 INSO 客户状态", instruction: "把老客户状态、关系温度、定期互动、下一步动作写清楚。", minutes: 20, standard: "更新客户维护记录", gmn: "M", skillIds: ["communication", "personal-system"], status: "Not Started" },
         { id: "T-006", questId: "Q-015", name: "跟进汇款稳定客户", instruction: "联系一个已有汇款客户，确认需求、问题和下一次使用可能。", minutes: 20, standard: "完成一个客户跟进记录", gmn: "M", skillIds: ["finance", "communication"], status: "Not Started" },
         { id: "T-020", questId: "Q-014", name: "制作汇款流程", instruction: "整理一个汇款流程的步骤、资料、费用、到账时间和限制。", minutes: 20, standard: "完成一条汇款流程 SOP", gmn: "G", skillIds: ["finance", "operations"], status: "Not Started" },
         { id: "T-021", questId: "Q-014", name: "更新汇款通道规则", instruction: "把一个通道的规则、风险、限制和当前可用状态写清楚。", minutes: 20, standard: "完成一条通道规则更新", gmn: "G", skillIds: ["finance", "operations"], status: "Not Started" },
@@ -1236,7 +1247,11 @@
         { id: "T-025", questId: "Q-016", name: "写培训验收标准", instruction: "为一个 DFK 培训环节写清楚合格标准和常见错误。", minutes: 20, standard: "一份验收标准草稿", gmn: "G", skillIds: ["operations", "leadership"], status: "Not Started" },
         { id: "T-026", questId: "Q-021", name: "关系维护记录", instruction: "记录一次沟通、约会、计划或需要注意的关系细节。", minutes: 20, standard: "完成一条 girl friend 关系记录", gmn: "M", skillIds: ["communication", "personal-system"], status: "Not Started" },
         { id: "T-027", questId: "Q-022", name: "旅行备选方案", instruction: "写一个旅行目的地、预算、时间和下一步动作。", minutes: 20, standard: "完成一个旅行备选方案", gmn: "M", skillIds: ["communication", "personal-system"], status: "Not Started" },
-        { id: "T-028", questId: "Q-008", name: "记录新事物候选", instruction: "写下一个今年可能尝试的新事物，以及为什么值得试。", minutes: 20, standard: "完成一个新事物候选记录", gmn: "M", skillIds: ["personal-system"], status: "Not Started" },
+        { id: "T-028", questId: "Q-008", name: "记录 AI 自动化机会", instruction: "写下一个每天重复、耗时、适合 AI 化的工作动作。", minutes: 20, standard: "完成一个自动化机会记录", gmn: "G", skillIds: ["strategy", "operations"], status: "Not Started" },
+        { id: "T-029", questId: "Q-024", name: "拆一个手动工作流", instruction: "选择一个 DFK 或 INSO 手动流程，写出输入、处理、输出、耗时和卡点。", minutes: 20, standard: "一条可自动化流程清单", gmn: "G", skillIds: ["operations", "strategy"], status: "Not Started" },
+        { id: "T-030", questId: "Q-025", name: "搭建 AI 自动化 MVP", instruction: "用最简单方式做一个能跑通真实任务的 AI 自动化原型。", minutes: 20, standard: "MVP 跑通一次真实任务", gmn: "G", skillIds: ["operations", "market"], status: "Not Started" },
+        { id: "T-031", questId: "Q-026", name: "优化自动化流程", instruction: "复盘一个 AI 自动化 MVP 的错误、卡点、耗时和下一步优化。", minutes: 20, standard: "完成一次优化记录或修正", gmn: "G", skillIds: ["operations", "personal-system"], status: "Not Started" },
+        { id: "T-032", questId: "Q-027", name: "整理可推销案例", instruction: "把一个内部 AI 自动化方案写成客户能懂的案例：问题、方案、效果、报价方向。", minutes: 20, standard: "完成一版案例草稿", gmn: "G", skillIds: ["communication", "market"], status: "Not Started" },
         { id: "T-007", questId: "Q-004", name: "每日冥想记录", instruction: "冥想/呼吸后描述场景和感受。", minutes: 10, standard: "写下冥想场景和身体/情绪感受", gmn: "M", skillIds: ["personal-system"], status: "Not Started" },
         { id: "T-008", questId: "Q-005", name: "每周体重测量", instruction: "记录本周体重、变化原因、饮食/运动状态。", minutes: 10, standard: "完成一次体重趋势记录", gmn: "G", skillIds: ["personal-system"], status: "Not Started" },
         { id: "T-009", questId: "Q-006", name: "复盘一个联系人", instruction: "写下一个人能帮什么、你能提供什么、下一步联系。", minutes: 20, standard: "完成联系人卡片", gmn: "G", skillIds: ["communication", "leadership"], status: "Not Started" },
@@ -1289,6 +1304,7 @@
     let timer = null;
     let timerEndsAt = 0;
     let running = false;
+    let timerSessionActive = false;
     let selectedPivotType = "renamed";
 
     const $ = (id) => document.getElementById(id);
@@ -1568,6 +1584,7 @@
       if (!force && running) return;
       if (force || timerTaskId !== task.id) {
         timerTaskId = task.id;
+        timerSessionActive = false;
         seconds = minutes * 60;
         timerEndsAt = 0;
         if ($("durationInput")) $("durationInput").value = String(Math.max(1, minutes));
@@ -1591,15 +1608,34 @@
       `).join("");
     }
     function renderMap() {
+      syncTimerWithClock();
       renderLifeGrid();
       renderCampaignGrid();
       renderWeeklyMap();
       renderTaskRail();
+      renderActiveTimerPanel();
       const avg = overallAnnualProgress();
       $("annualProgress").textContent = pct(avg);
       $("annualFill").style.setProperty("--value", pct(avg));
       $("weekSessions").textContent = data.logs.length;
       $("weekLogs").textContent = data.logs.length;
+    }
+    function renderActiveTimerPanel() {
+      const panel = $("activeTimerPanel");
+      if (!panel) return;
+      const task = taskById(timerTaskId || selectedTaskId);
+      const show = Boolean(task && timerSessionActive && seconds > 0);
+      panel.classList.toggle("hide", !show);
+      if (!show) return;
+      $("activeTimerLeft").textContent = `${String(Math.floor(seconds / 60)).padStart(2, "0")}:${String(seconds % 60).padStart(2, "0")}`;
+      $("activeTimerState").textContent = running ? "计时中" : "已暂停";
+      $("activeTimerTask").textContent = task.current_title || task.name;
+      $("returnFocusBtn").onclick = () => {
+        selectedTaskId = task.id;
+        selectedQuestId = task.questId;
+        syncGoalForQuest(selectedQuestId);
+        showScreen("focus");
+      };
     }
     function renderLifeGrid() {
       $("lifeGrid").innerHTML = data.goals2030.map(goal => `
@@ -1629,9 +1665,9 @@
         const progress = computedQuestProgress(q);
         const type = questTypeForQuest(q);
         return `
-          <button class="campaign-card ${typeClass(type)} ${gmnClass(q.gmn)} ${q.id === selectedCampaignId ? "active" : ""} ${progress >= 100 ? "state-done" : "state-todo"}" data-campaign="${q.id}">
+          <button class="campaign-card ${typeClass(type)} ${q.id === selectedCampaignId ? "active" : ""} ${progress >= 100 ? "state-done" : "state-todo"}" data-campaign="${q.id}">
             <span class="node-title">${escapeHtml(q.name)}</span>
-            <span class="node-compact"><span class="type-badge">年度目标</span><span class="gmn-tag ${gmnClass(q.gmn)}">${q.gmn}</span><span>${Math.round(progress)}%</span></span>
+            <span class="node-compact"><span class="type-badge">年度目标</span><span>${Math.round(progress)}%</span></span>
             <div class="bar"><div class="fill" style="--value:${progress}%"></div></div>
             <small>${escapeHtml(q.target)}</small>
           </button>
@@ -1710,6 +1746,19 @@
           <span class="pill">${typeBadge(taskType)} · ${gmnText(selectedTask?.gmn || q.gmn)}</span>
           <h3>${escapeHtml(q.name)}</h3>
           <p>${escapeHtml(q.description)}</p>
+          <div class="custom-task-box">
+            <h4>修改章节 GMN</h4>
+            <div class="form-grid">
+              <label>这个章节属于
+                <select id="detailQuestGmn">
+                  <option value="G" ${q.gmn === "G" ? "selected" : ""}>G 成长</option>
+                  <option value="M" ${q.gmn === "M" ? "selected" : ""}>M 维护</option>
+                  <option value="N" ${q.gmn === "N" ? "selected" : ""}>N 噪音</option>
+                </select>
+              </label>
+            </div>
+            <button class="secondary full" id="saveQuestGmnBtn">保存章节判断</button>
+          </div>
           ${selectedTask ? `
           <div class="custom-task-box">
             <h4>修改当前任务 GMN</h4>
@@ -1774,6 +1823,7 @@
         });
       });
       if ($("saveMetricBtn")) $("saveMetricBtn").onclick = () => updateQuestMetric(q.id);
+      if ($("saveQuestGmnBtn")) $("saveQuestGmnBtn").onclick = () => updateQuestGmn(q.id, $("detailQuestGmn").value);
       if ($("saveTaskGmnBtn")) $("saveTaskGmnBtn").onclick = () => updateTaskGmn(selectedTask.id, $("detailTaskGmn").value);
       $("detailStart").addEventListener("click", () => showScreen("focus"));
       $("quickTaskStart").addEventListener("click", createQuickTask);
@@ -1816,6 +1866,7 @@
         selectedQuestId = taskById(selectedTaskId).questId;
         syncGoalForQuest(selectedQuestId);
         running = false;
+        timerSessionActive = false;
         clearInterval(timer);
         renderAll();
       };
@@ -1834,6 +1885,7 @@
     function renderTimer() {
       $("timerValue").textContent = `${String(Math.floor(seconds / 60)).padStart(2, "0")}:${String(seconds % 60).padStart(2, "0")}`;
       $("startPauseBtn").textContent = running ? "暂停" : "开始";
+      renderActiveTimerPanel();
     }
     function syncTimerWithClock() {
       if (!running || !timerEndsAt) return;
@@ -1842,6 +1894,7 @@
       renderTimer();
       if (remainingMs <= 0) {
         running = false;
+        timerSessionActive = false;
         clearInterval(timer);
         timer = null;
         timerEndsAt = 0;
@@ -1859,6 +1912,7 @@
       } else {
         if (seconds <= 0) seconds = selectedDurationMinutes() * 60;
         running = true;
+        timerSessionActive = true;
         timerEndsAt = Date.now() + seconds * 1000;
         syncTimerWithClock();
         timer = setInterval(syncTimerWithClock, 250);
@@ -1867,6 +1921,7 @@
     }
     function resetTimer() {
       running = false;
+      timerSessionActive = false;
       clearInterval(timer);
       timer = null;
       timerEndsAt = 0;
@@ -2110,9 +2165,9 @@
       const has = (...words) => words.some(word => value.includes(word.toLowerCase()));
       if (has("汇款流程", "通道规则", "收款流程")) return { questId: "Q-014", gmn: "G", reason: "汇款流程/通道系统" };
       if (has("汇款客户", "稳定客户", "银行", "汇款", "收款", "付款", "通道", "bank", "payment")) return { questId: "Q-015", gmn: "M", reason: "汇款系统/客户维护" };
-      if (has("rfq", "报价", "询价", "采购", "元器件", "ic", "bom", "客户线索")) return { questId: "Q-011", gmn: "G", reason: "INSO 报价/客户机会" };
-      if (has("开发客户", "新客户", "linkedin", "whatsapp", "邮件开发", "销售")) return { questId: "Q-012", gmn: "G", reason: "客户开发/增长" };
-      if (has("联系客户", "老客户", "跟进客户", "客户关系")) return { questId: "Q-013", gmn: "M", reason: "INSO 客户维护" };
+      if (has("订单", "rfq", "报价", "询价", "采购", "成交", "元器件", "ic", "bom")) return { questId: "Q-011", gmn: "G", reason: "INSO 订单跟进" };
+      if (has("麦穗", "开发客户", "新客户", "linkedin", "whatsapp", "邮件开发", "google", "搜索", "销售")) return { questId: "Q-012", gmn: "G", reason: "INSO 客户开发" };
+      if (has("联系客户", "老客户", "跟进客户", "客户关系", "定期互动", "客户状态")) return { questId: "Q-013", gmn: "M", reason: "INSO 客户维护" };
       if (has("打印", "标签", "单据")) return { questId: "Q-018", gmn: "G", reason: "DFK 打印系统" };
       if (has("人员", "岗位", "交接", "员工")) return { questId: "Q-019", gmn: "G", reason: "DFK 人员管理" };
       if (has("财务", "利润", "对账", "成本", "费用")) return { questId: "Q-010", gmn: "G", reason: "DFK 财务系统" };
@@ -2121,6 +2176,9 @@
       if (has("冥想", "焦虑", "呼吸", "冷静")) return { questId: "Q-004", gmn: "M", reason: "心态维护" };
       if (has("健康", "体重", "训练", "饮食", "健身")) return { questId: "Q-005", gmn: "G", reason: "健康系统" };
       if (has("女朋友", "girlfriend", "约会", "旅行", "旅游")) return { questId: "Q-021", gmn: "M", reason: "Family / girl friend" };
+      if (has("优化ai", "优化自动化", "流程优化")) return { questId: "Q-026", gmn: "G", reason: "AI 自动化优化" };
+      if (has("推销ai", "ai方案", "案例", "演示")) return { questId: "Q-027", gmn: "G", reason: "AI 自动化可推销方案" };
+      if (has("ai", "自动化", "自动", "mvp", "工作流", "省时间", "脚本")) return { questId: "Q-024", gmn: "G", reason: "AI 工作自动化" };
       if (has("咖啡", "兴趣", "爱好")) return { questId: "Q-007", gmn: "M", reason: "兴趣/爱好" };
       if (has("体验", "第一次", "新事物")) return { questId: "Q-008", gmn: "M", reason: "新体验" };
       return { questId: "Q-009", gmn: "M", reason: "默认进入 DFK 稳定系统，稍后手动归类" };
@@ -2414,6 +2472,13 @@
       save();
       renderAll();
     }
+    function updateQuestGmn(questId, gmn) {
+      const quest = questById(questId);
+      if (!quest || !["G", "M", "N"].includes(gmn)) return;
+      quest.gmn = gmn;
+      save();
+      renderAll();
+    }
     function classifyRandomEvent(taskId, type) {
       const task = taskById(taskId);
       if (!task) return;
@@ -2578,6 +2643,7 @@
     function showScreen(id) {
       document.querySelectorAll(".screen").forEach(s => s.classList.toggle("active", s.id === id));
       document.querySelectorAll(".nav button").forEach(b => b.classList.toggle("active", b.dataset.screen === id));
+      if (id === "map") renderMap();
       if (id === "focus") renderFocus();
       if (id === "todos") renderTodos();
       if (id === "review") renderReview();

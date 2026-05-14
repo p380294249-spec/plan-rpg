@@ -2,7 +2,7 @@
 
 本项目是一个本地网页软件 MVP，用来把年度计划、每周计划、主线任务、支线任务、20 分钟专注、执行日志、奖励、技能成长和每周复盘串成一个游戏化系统。
 
-当前版本：`v0.3.10`
+当前版本：`v0.3.15`
 
 ## 文件说明
 
@@ -64,6 +64,24 @@ index.html
 ```
 
 脚本会自动寻找 Downloads 文件夹里最新的 `plan-rpg-backup-*.json`。
+
+## 在线网页 / GitHub Pages
+
+这个项目可以直接用 GitHub Pages 发布，因为主程序就是仓库根目录的 `index.html`。
+
+推荐发布设置：
+
+- Source: `Deploy from a branch`
+- Branch: `main`
+- Folder: `/root`
+
+发布后网址通常是：
+
+```txt
+https://p380294249-spec.github.io/plan-rpg/
+```
+
+注意：GitHub Pages 上的网页本身是公开入口。真实业务数据不要写死在 `index.html` 里；后续建议把 INSO 客户、订单、报价、维护记录等数据接到 Google Sheet。
 
 ## 重要：数据保存在哪里
 

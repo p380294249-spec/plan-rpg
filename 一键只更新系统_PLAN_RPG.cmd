@@ -1,6 +1,11 @@
 @echo off
 setlocal
 cd /d "%~dp0"
+if not exist ".git" (
+  if exist "H:\CODEX\SYS\.git" (
+    cd /d "H:\CODEX\SYS"
+  )
+)
 set "PATH=C:\Program Files\Git\cmd;%PATH%"
 
 echo [Plan RPG] System-only update.
@@ -19,7 +24,7 @@ if not exist ".git" (
   exit /b 1
 )
 
-git pull --ff-only origin main
+git -c safe.directory=H:/CODEX/SYS pull --ff-only origin main
 if errorlevel 1 (
   echo.
   echo [ERROR] System update failed.
@@ -27,7 +32,7 @@ if errorlevel 1 (
   exit /b 1
 )
 
-start "" "%~dp0index.html"
+start "" "%CD%\index.html"
 echo.
 echo [OK] System updated and opened.
 pause

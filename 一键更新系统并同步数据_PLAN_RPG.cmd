@@ -1,6 +1,11 @@
 @echo off
 setlocal
 cd /d "%~dp0"
+if not exist ".git" (
+  if exist "H:\CODEX\SYS\.git" (
+    cd /d "H:\CODEX\SYS"
+  )
+)
 set "PATH=C:\Program Files\Git\cmd;%PATH%"
 
 echo [Plan RPG] System + data update.
@@ -22,7 +27,7 @@ if not exist ".git" (
   exit /b 1
 )
 
-git pull --rebase origin main
+git -c safe.directory=H:/CODEX/SYS pull --rebase origin main
 if errorlevel 1 (
   echo.
   echo [ERROR] System update failed.
@@ -37,17 +42,17 @@ if defined LATEST_BACKUP (
   echo [OK] Latest export:
   echo %LATEST_BACKUP%
   copy /Y "%LATEST_BACKUP%" "data\plan-rpg-data.json" >nul
-  git add data\plan-rpg-data.json
-  git diff --cached --quiet
+  git -c safe.directory=H:/CODEX/SYS add data\plan-rpg-data.json
+  git -c safe.directory=H:/CODEX/SYS diff --cached --quiet
   if errorlevel 1 (
     for /f %%i in ('powershell -NoProfile -Command "Get-Date -Format yyyyMMdd_HHmmss"') do set "STAMP=%%i"
-    git commit -m "sync plan rpg data %STAMP%"
+    git -c safe.directory=H:/CODEX/SYS commit -m "sync plan rpg data %STAMP%"
     if errorlevel 1 (
       echo [ERROR] Data commit failed.
       pause
       exit /b 1
     )
-    git push origin main
+    git -c safe.directory=H:/CODEX/SYS push origin main
     if errorlevel 1 (
       echo [ERROR] Data push failed.
       pause
@@ -61,7 +66,7 @@ if defined LATEST_BACKUP (
   echo [WARN] No plan-rpg-backup-*.json found in Downloads. Skipping data sync.
 )
 
-start "" "%~dp0index.html"
+start "" "%CD%\index.html"
 echo.
 echo [OK] System updated, data sync checked, app opened.
 pause
