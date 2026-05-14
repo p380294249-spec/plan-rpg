@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Plan RPG v0.3.21 / 计划 RPG</title>
+  <title>Plan RPG v0.3.22 / 计划 RPG</title>
   <style>
     :root {
       --ink: #111827;
@@ -539,6 +539,35 @@
       background: rgba(13, 23, 40, .9);
       box-shadow: 0 16px 35px rgba(15, 23, 42, .28);
     }
+    #activeTimerPanel {
+      position: fixed;
+      right: 24px;
+      bottom: 24px;
+      width: min(320px, calc(100vw - 48px));
+      z-index: 80;
+      border: 1px solid rgba(147, 197, 253, .58);
+      background: rgba(15, 23, 42, .94);
+      backdrop-filter: blur(14px);
+    }
+    #activeTimerPanel b {
+      display: block;
+      margin-bottom: 8px;
+      color: #fff;
+      font-size: 17px;
+    }
+    #activeTimerPanel p {
+      margin: 7px 0;
+      color: #cbd5e1;
+    }
+    #activeTimerLeft {
+      color: #fef3c7;
+      font-weight: 1000;
+      font-variant-numeric: tabular-nums;
+    }
+    #returnFocusBtn {
+      width: 100%;
+      margin-top: 10px;
+    }
     .progress-panel strong { display: block; font-size: 34px; margin: 8px 0; }
     .milestones {
       display: grid;
@@ -853,7 +882,7 @@
         <div>
           <h1>计划 RPG</h1>
           <p>把目标变成冒险</p>
-          <span class="version">v0.3.21 在线网页软件</span>
+          <span class="version">v0.3.22 在线网页软件</span>
         </div>
       </div>
 
@@ -917,7 +946,7 @@
         <div class="stats">
           <div class="stat"><b>⚡</b><div><strong id="totalMinutes">0 min</strong><span>同步专注时长</span></div></div>
           <div class="stat"><b>◆</b><div><strong id="gRatio">0%</strong><span>Growth 占比</span></div></div>
-          <div class="stat"><b>Lv</b><div><strong>探索者 28</strong><span>Plan RPG v0.3.21</span></div></div>
+          <div class="stat"><b>Lv</b><div><strong>探索者 28</strong><span>Plan RPG v0.3.22</span></div></div>
         </div>
       </header>
 
@@ -1194,7 +1223,7 @@
   </div>
 
   <script>
-    const appVersion = "0.3.21";
+    const appVersion = "0.3.22";
     const seed = {
       version: appVersion,
       goals2030: [

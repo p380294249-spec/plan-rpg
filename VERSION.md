@@ -1,5 +1,18 @@
 # Plan RPG Version Notes
 
+## v0.3.22 - 2026-05-14
+
+### Goal
+
+Make the active focus-session return entry impossible to miss on the map.
+
+### Main Changes
+
+- Changed the `正在专注` timer card from a bottom map-grid item into a fixed floating panel.
+- The timer return panel now stays visible in the lower-right corner of the map instead of being pushed inside the scroll area.
+- Added stronger contrast, tabular timer numbers, and a full-width return button.
+- Updated visible version labels to `v0.3.22`.
+
 ## v0.3.21 - 2026-05-14
 
 ### Goal
