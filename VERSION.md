@@ -1,5 +1,31 @@
 # Plan RPG Version Notes
 
+## v0.3.11 - 2026-05-14
+
+### Goal
+
+Add three separate one-click workflows for code updates, data sync, and combined update+data sync.
+
+### Main Changes
+
+- Added `一键只更新系统_PLAN_RPG.cmd`.
+  - Runs `git pull --ff-only origin main`.
+  - Opens `index.html`.
+- Added `一键只同步数据_PLAN_RPG.cmd`.
+  - Finds the newest `plan-rpg-backup-*.json` in Downloads.
+  - Copies it to `data/plan-rpg-data.json`.
+  - Commits and pushes the data file to GitHub.
+- Added `一键更新系统并同步数据_PLAN_RPG.cmd`.
+  - Pulls latest code.
+  - Syncs the newest exported data if available.
+  - Opens `index.html`.
+- Added `data/README.md` to document how data sync works.
+- Added matching desktop entry scripts.
+
+### Important Note
+
+The scripts cannot directly read browser localStorage. Before syncing data, export data from the app using `备份/迁移 -> 导出数据`.
+
 ## v0.3.10 - 2026-05-13
 
 ### Goal

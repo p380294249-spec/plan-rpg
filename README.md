@@ -27,6 +27,44 @@ open_plan_rpg.cmd
 index.html
 ```
 
+## 三种快捷更新
+
+桌面和项目文件夹里都有这三个快捷脚本：
+
+```txt
+一键只更新系统_PLAN_RPG.cmd
+一键只同步数据_PLAN_RPG.cmd
+一键更新系统并同步数据_PLAN_RPG.cmd
+```
+
+使用场景：
+
+```txt
+只更新系统
+```
+
+从 GitHub 拉取最新代码，然后打开 `index.html`。不会上传你的本地记录。
+
+```txt
+只同步数据
+```
+
+把你刚从网页导出的最新 `plan-rpg-backup-*.json` 复制到 `data/plan-rpg-data.json`，提交并推送到 GitHub。不会更新系统代码。
+
+```txt
+更新系统并同步数据
+```
+
+先从 GitHub 拉取最新系统代码，再同步最新导出的数据，然后打开网页。
+
+注意：浏览器 localStorage 不能被 `.cmd` 直接读取。同步数据前请先在网页左侧点击：
+
+```txt
+备份/迁移 -> 导出数据
+```
+
+脚本会自动寻找 Downloads 文件夹里最新的 `plan-rpg-backup-*.json`。
+
 ## 重要：数据保存在哪里
 
 代码文件在项目目录里。
