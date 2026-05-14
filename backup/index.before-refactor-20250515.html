@@ -1193,10 +1193,10 @@
     </div>
   </div>
 
-  <script src="src/config/app-config.js"></script>
   <script>
+    const appVersion = "0.3.18";
     const seed = {
-      version: APP_CONFIG.VERSION,
+      version: appVersion,
       goals2030: [
         { id: "BUSINESS", title: "Business: DFK + INSO as 2026 main goals", currentValue: 0, targetValue: 2, unit: "个主目标", role: "Mainline" },
         { id: "PASSIVE", title: "Passive: remittance system and clients", currentValue: 0, targetValue: 3, unit: "个模块", role: "Mainline", displayTitle: "PASSIVE INCOME" },
@@ -1301,6 +1301,9 @@
       ]
     };
 
+    const storageKey = "plan-rpg-local-mvp-v2";
+    const legacyKey = "plan-rpg-local-mvp-v1";
+    const sheetSyncConfigKey = "plan-rpg-sheet-sync-config-v1";
     let data = loadData();
     let selectedCampaignId = "Q-001";
     let selectedQuestId = "Q-009";
@@ -1309,7 +1312,7 @@
     let selectedSkillId = "personal-system";
     let editingLogId = null;
     let lastSession = null;
-    let seconds = APP_CONFIG.SESSION_DURATION_SECONDS;
+    let seconds = 1200;
     let timerTaskId = selectedTaskId;
     let timer = null;
     let timerEndsAt = 0;
@@ -1326,14 +1329,14 @@
     const escapeHtml = (value = "") => String(value).replace(/[&<>"']/g, ch => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[ch]));
     const goalLabel = (goal) => goal?.displayTitle || goal?.id || "";
     function sheetSyncConfig() {
-      return JSON.parse(localStorage.getItem(APP_CONFIG.SHEET_SYNC_CONFIG_KEY) || "{}");
+      return JSON.parse(localStorage.getItem(sheetSyncConfigKey) || "{}");
     }
     function saveSheetSyncConfig() {
       const config = {
         url: $("sheetSyncUrl").value.trim(),
         token: $("sheetSyncToken").value.trim()
       };
-      localStorage.setItem(APP_CONFIG.SHEET_SYNC_CONFIG_KEY, JSON.stringify(config));
+      localStorage.setItem(sheetSyncConfigKey, JSON.stringify(config));
       renderSheetSyncConfig();
     }
     function renderSheetSyncConfig(message = "") {
@@ -1348,9 +1351,9 @@
     }
 
     function loadData() {
-      const current = JSON.parse(localStorage.getItem(APP_CONFIG.STORAGE_KEY) || "null");
+      const current = JSON.parse(localStorage.getItem(storageKey) || "null");
       if (current) return normalizeData(current);
-      const legacy = JSON.parse(localStorage.getItem(APP_CONFIG.LEGACY_KEY) || "null");
+      const legacy = JSON.parse(localStorage.getItem(legacyKey) || "null");
       if (!legacy) return normalizeData(seed);
       const migrated = structuredClone(seed);
       if (Array.isArray(legacy.logs)) migrated.logs = legacy.logs.map((log, index) => normalizeLog(log, index, migrated.tasks));
@@ -1465,8 +1468,8 @@
       return rows.find(t => t.id === id) || taskByIdFromSeed(id);
     }
     function save() {
-      data.version = APP_CONFIG.VERSION;
-      localStorage.setItem(APP_CONFIG.STORAGE_KEY, JSON.stringify(data));
+      data.version = appVersion;
+      localStorage.setItem(storageKey, JSON.stringify(data));
     }
     function newId(prefix) {
       return `${prefix}-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 6)}`;
@@ -2107,9 +2110,9 @@
         });
         renderSheetSyncConfig("已发送到 Google Sheet。刷新表格后查看 Session_Logs。");
       } catch (error) {
-        const pending = JSON.parse(localStorage.getItem(APP_CONFIG.PENDING_SYNC_KEY) || "[]");
+        const pending = JSON.parse(localStorage.getItem("plan-rpg-sheet-sync-pending-v1") || "[]");
         pending.push(payload);
-        localStorage.setItem(APP_CONFIG.PENDING_SYNC_KEY, JSON.stringify(pending));
+        localStorage.setItem("plan-rpg-sheet-sync-pending-v1", JSON.stringify(pending));
         renderSheetSyncConfig("同步失败，已暂存到本机待重试队列。");
       }
     }
@@ -2131,7 +2134,7 @@
       ["whatDone", "problem", "solution", "good", "bad", "nextStep"].forEach(id => $(id).value = "");
     }
     function saveDraft() {
-      localStorage.setItem(APP_CONFIG.FOCUS_DRAFT_KEY, JSON.stringify({ taskId: selectedTaskId, ...readForm() }));
+      localStorage.setItem("plan-rpg-focus-draft", JSON.stringify({ taskId: selectedTaskId, ...readForm() }));
       $("sessionResult").innerHTML = `<span class="pill">草稿已保存</span><h3>可以先离开</h3><p>当前记录已暂存在本机浏览器，完成后再结算。</p>`;
     }
     function saveSession() {
@@ -2873,7 +2876,7 @@
     pullSessionLogsFromSheet({ silent: true });
 
     function exportData() {
-      const payload = JSON.stringify({ exportedAt: new Date().toISOString(), app: "Plan RPG", version: APP_CONFIG.VERSION, data }, null, 2);
+      const payload = JSON.stringify({ exportedAt: new Date().toISOString(), app: "Plan RPG", version: appVersion, data }, null, 2);
       const blob = new Blob([payload], { type: "application/json" });
       const url = URL.createObjectURL(blob);
       const link = document.createElement("a");
