@@ -7,7 +7,7 @@ function newId(prefix) {
 function questIdForType(type, goalId = "") {
   if (type === "main") {
     if (goalId === "PASSIVE") return "Q-002";
-    if (goalId === "BUSINESS") return "Q-003";
+    if (goalId === "BUSINESS") return "Q-001";
     return "Q-001";
   }
   if (type === "maintenance") return "Q-005";
@@ -93,6 +93,7 @@ assert.equal(random.questId, "Q-002");
 assert.equal(random.gmn, "G");
 assert.equal(questTypeForTask({ ...random, status: "Not Started" }), "emergency");
 assert.equal(questTypeForTask({ ...random, status: "Promoted" }), "main");
+assert.equal(questIdForType("main", "BUSINESS"), "Q-001");
 
 const original = { id: "T-001", name: "整理客户问题", questId: "Q-003", gmn: "G" };
 const renamed = pivotTask(original, "renamed", "整理客户付款问题", "标题不准确");

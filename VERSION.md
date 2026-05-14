@@ -1,5 +1,63 @@
 # Plan RPG Version Notes
 
+## v0.3.10 - 2026-05-13
+
+### Goal
+
+Make Todo Inbox classification match the user's life-grid hierarchy instead of one flat quest dropdown.
+
+### Main Changes
+
+- Replaced the flat `归类到` dropdown with two controls:
+  - `人生分类`: Business, Passive, Health, Mindset, Family, Social Network, Interests, New Things.
+  - `具体目标/章节`: filtered by the selected life category.
+- Todo options now show hierarchy paths, such as `DFK 赚钱 / 稳定系统 / 财务`.
+- Typing a todo now shows a classification suggestion without automatically changing the user's selected category.
+- `采用建议` applies the suggested category, chapter, and GMN only when the user clicks it.
+- Todo cards now display both the life category and the selected hierarchy path.
+
+## v0.3.9 - 2026-05-13
+
+### Goal
+
+Make GMN classification editable by the user instead of being fixed by system defaults.
+
+### Main Changes
+
+- Added a `修改当前任务 GMN` control in the map detail panel.
+- Added a `本次 GMN` selector on the focus/session page before saving a log.
+- Session settlement, XP, and review stats now use the user's latest selected GMN.
+- Random-event reclassification no longer forces GMN to G/M/N; the user keeps control of that judgment.
+
+## v0.3.8 - 2026-05-13
+
+### Goal
+
+Recalibrate the goal system around the user's 2026 life-grid hierarchy.
+
+### Main Changes
+
+- Rebuilt the 2030 life-grid defaults around Business, Passive, Health, Mindset, Family, Social Network, Interests, and New Things.
+- Set Business to contain the two 2026 main goals:
+  - `DFK 赚钱`: target is roughly 50 containers per month across Guangzhou and Yiwu.
+  - `INSO 稳定客户收入`: target is stable client income of 1WRMB per month.
+- Reworked DFK into chapters and branches:
+  - `稳定系统`
+  - `财务`
+  - `打印`
+  - `人员管理`
+  - `培训系统`
+- Reworked INSO into:
+  - `报价`
+  - `开发客户`
+  - `维护客户关系`
+- Reworked Passive into `汇款系统` with:
+  - `制作汇款流程`
+  - `稳定客户`
+  - `开发客户`
+- Added Family / girl friend, travel, weekly weight measurement, daily meditation, mentor/network, hobby mastery, and new-things placeholders.
+- Updated todo auto-classification and migration normalization to match the new hierarchy.
+
 ## v0.3.7 - 2026-05-13
 
 ### Goal
