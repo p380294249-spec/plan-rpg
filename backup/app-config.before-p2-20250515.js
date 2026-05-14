@@ -8,6 +8,7 @@ const APP_CONFIG = {
   LEGACY_KEY: "plan-rpg-local-mvp-v1",
   SHEET_SYNC_CONFIG_KEY: "plan-rpg-sheet-sync-config-v1",
   SESSION_DURATION_SECONDS: 1200,
+  DEFAULT_MINUTES: 20,
   PENDING_SYNC_KEY: "plan-rpg-sheet-sync-pending-v1",
   FOCUS_DRAFT_KEY: "plan-rpg-focus-draft",
   DEFAULT_GAS_URL: "",

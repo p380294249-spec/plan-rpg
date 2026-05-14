@@ -1,0 +1,3032 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Plan RPG v0.3.23 / 计划 RPG</title>
+  <style>
+    :root {
+      --ink: #111827;
+      --muted: #667085;
+      --line: rgba(109, 122, 145, .28);
+      --panel: rgba(246, 248, 252, .9);
+      --paper: rgba(255, 255, 255, .82);
+      --night: #0c1628;
+      --night2: #17243a;
+      --gold: #f3b43f;
+      --violet: #8557e8;
+      --blue: #2f80ed;
+      --green: #20a66a;
+      --red: #dd4c4c;
+      --shadow: 0 24px 60px rgba(20, 31, 52, .2);
+    }
+
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      color: var(--ink);
+      font-family: "Microsoft YaHei", "PingFang SC", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+      background:
+        linear-gradient(125deg, rgba(252, 240, 220, .98), rgba(234, 241, 250, .95) 45%, rgba(214, 225, 244, .98)),
+        #edf2f9;
+    }
+
+    button, input, textarea, select { font: inherit; }
+    button { border: 0; cursor: pointer; }
+    textarea, input, select {
+      width: 100%;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: rgba(255, 255, 255, .88);
+      color: var(--ink);
+      padding: 10px 12px;
+      outline: none;
+    }
+    textarea { min-height: 86px; resize: vertical; line-height: 1.55; }
+    label { display: grid; gap: 6px; font-size: 13px; color: #344054; font-weight: 800; }
+
+    .app {
+      min-height: 100vh;
+      display: grid;
+      grid-template-columns: 264px minmax(0, 1fr);
+    }
+
+    .sidebar {
+      color: #e7edf7;
+      background:
+        linear-gradient(180deg, rgba(255,255,255,.05), transparent 20%),
+        linear-gradient(180deg, #091324, #13243f);
+      border-right: 1px solid rgba(255, 255, 255, .08);
+      padding: 22px 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+    .brand {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      padding-bottom: 18px;
+      border-bottom: 1px solid rgba(255, 255, 255, .09);
+    }
+    .brand-mark {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      color: #0c1628;
+      font-size: 25px;
+      background: conic-gradient(from 30deg, #fef3c7, #38bdf8, #a78bfa, #fef3c7);
+      box-shadow: 0 10px 26px rgba(56, 189, 248, .2);
+    }
+    .brand h1 { margin: 0; font-size: 20px; letter-spacing: 0; }
+    .brand p { margin: 4px 0 0; color: #9fb0c8; font-size: 12px; }
+    .version {
+      display: inline-flex;
+      margin-top: 7px;
+      padding: 3px 8px;
+      border-radius: 999px;
+      color: #fde68a;
+      background: rgba(245, 180, 63, .14);
+      border: 1px solid rgba(245, 180, 63, .24);
+      font-size: 11px;
+      font-weight: 900;
+    }
+
+    .side-card {
+      border: 1px solid rgba(255, 255, 255, .1);
+      background: rgba(255, 255, 255, .048);
+      border-radius: 8px;
+      padding: 14px;
+    }
+    .side-title {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      color: #f8fafc;
+      font-weight: 900;
+      margin-bottom: 12px;
+    }
+    .goal-row, .skill-mini {
+      display: grid;
+      gap: 6px;
+      margin: 11px 0;
+      font-size: 13px;
+    }
+    .goal-head {
+      display: flex;
+      justify-content: space-between;
+      gap: 8px;
+      color: #cbd5e1;
+    }
+    .bar {
+      height: 8px;
+      border-radius: 999px;
+      background: rgba(148, 163, 184, .24);
+      overflow: hidden;
+    }
+    .fill {
+      height: 100%;
+      width: var(--value);
+      background: linear-gradient(90deg, #50c4ff, #a884ff);
+      border-radius: inherit;
+    }
+
+    .nav { display: grid; gap: 8px; }
+    .nav button {
+      min-height: 42px;
+      border-radius: 8px;
+      color: #cbd5e1;
+      background: transparent;
+      text-align: left;
+      padding: 10px 12px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 800;
+    }
+    .nav button.active {
+      color: #fff;
+      background: rgba(133, 87, 232, .24);
+      outline: 1px solid rgba(167, 139, 250, .36);
+    }
+    .quote {
+      margin-top: auto;
+      color: #aab8ce;
+      font-size: 13px;
+      line-height: 1.65;
+    }
+    .utility-actions {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+    .utility-actions button {
+      min-height: 36px;
+      border-radius: 8px;
+      color: #dbeafe;
+      background: rgba(255, 255, 255, .07);
+      border: 1px solid rgba(255, 255, 255, .1);
+      font-size: 12px;
+      font-weight: 900;
+    }
+
+    .main {
+      min-width: 0;
+      display: grid;
+      grid-template-rows: auto 1fr;
+    }
+    .topbar {
+      min-height: 98px;
+      padding: 22px 30px 14px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+    }
+    .title h2 {
+      margin: 0;
+      font-size: clamp(32px, 4vw, 52px);
+      line-height: 1;
+      letter-spacing: 0;
+      font-family: Georgia, "Times New Roman", serif;
+    }
+    .title p { margin: 9px 0 0; color: var(--muted); }
+    .stats {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+    .stat {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      min-width: 138px;
+      border: 1px solid rgba(148, 163, 184, .42);
+      border-radius: 8px;
+      background: rgba(255, 255, 255, .58);
+      padding: 10px 12px;
+    }
+    .stat b { font-size: 18px; }
+    .stat strong { display: block; font-size: 14px; }
+    .stat span { color: var(--muted); font-size: 12px; }
+
+    .screen {
+      display: none;
+      min-height: 0;
+      padding: 12px 30px 28px;
+    }
+    .screen.active { display: block; }
+
+    .map-layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 374px;
+      gap: 18px;
+      height: calc(100vh - 140px);
+      min-height: 660px;
+    }
+    .map-stage {
+      position: relative;
+      overflow: auto;
+      border-radius: 8px;
+      border: 1px solid rgba(148, 163, 184, .32);
+      background:
+        linear-gradient(180deg, rgba(255, 255, 255, .32), rgba(15, 23, 42, .18)),
+        radial-gradient(circle at 75% 25%, rgba(120, 172, 214, .65), transparent 25%),
+        radial-gradient(circle at 28% 38%, rgba(250, 223, 145, .55), transparent 28%),
+        linear-gradient(135deg, #d8eadb 0%, #e9ddb8 36%, #9fc8d7 68%, #d9e3f3 100%);
+      box-shadow: var(--shadow);
+      padding: 22px;
+    }
+    .map-stage:before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      opacity: .2;
+      background:
+        linear-gradient(128deg, transparent 0 18%, rgba(255,255,255,.85) 18.5% 19%, transparent 19.5% 100%),
+        linear-gradient(45deg, transparent 0 31%, rgba(15,23,42,.12) 31.5% 32%, transparent 32.5% 100%);
+      pointer-events: none;
+    }
+    .map-section-title {
+      position: relative;
+      z-index: 1;
+      margin: 0 0 16px;
+      font-size: 21px;
+      font-weight: 900;
+      color: #162033;
+    }
+    .quest-lane {
+      position: relative;
+      z-index: 1;
+      height: 205px;
+      display: grid;
+      grid-template-columns: repeat(4, minmax(126px, 1fr));
+      align-items: center;
+      gap: 22px;
+    }
+    .quest-lane.side {
+      grid-template-columns: repeat(5, minmax(108px, 1fr));
+      margin-top: 16px;
+    }
+    .quest-lane:before {
+      content: "";
+      position: absolute;
+      left: 6%;
+      right: 7%;
+      top: 50%;
+      border-top: 4px solid rgba(245, 180, 63, .82);
+      box-shadow: 0 0 14px rgba(245, 180, 63, .42);
+      z-index: -1;
+    }
+    .quest-lane.side:before {
+      top: 44%;
+      border-top: 4px dotted rgba(255, 255, 255, .95);
+      box-shadow: none;
+    }
+    .quest-node {
+      display: grid;
+      justify-items: center;
+      gap: 8px;
+      min-width: 0;
+      background: transparent;
+      color: #172033;
+    }
+    .node-icon {
+      width: 76px;
+      height: 76px;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      font-size: 28px;
+      color: #fff;
+      background: linear-gradient(145deg, #334155, #0f172a);
+      border: 4px solid rgba(255, 255, 255, .78);
+      box-shadow: 0 10px 22px rgba(15, 23, 42, .28);
+      transition: transform .18s ease, box-shadow .18s ease;
+    }
+    .quest-node:hover .node-icon { transform: translateY(-3px); }
+    .quest-node.active .node-icon {
+      background: linear-gradient(145deg, #f59e0b, #7c3aed);
+      box-shadow: 0 0 0 6px rgba(245, 158, 11, .22), 0 18px 34px rgba(124, 58, 237, .25);
+    }
+    .quest-node.completed .node-icon { background: linear-gradient(145deg, #0ea5e9, #166534); }
+    .node-name {
+      max-width: 150px;
+      border-radius: 8px;
+      background: rgba(255, 255, 255, .78);
+      border: 1px solid rgba(148, 163, 184, .42);
+      padding: 6px 9px;
+      font-size: 13px;
+      font-weight: 900;
+      text-align: center;
+      box-shadow: 0 4px 12px rgba(15,23,42,.11);
+    }
+    .node-meta { color: #475569; font-size: 12px; font-weight: 800; }
+
+    .world-map {
+      position: relative;
+      z-index: 1;
+      display: grid;
+      gap: 18px;
+    }
+    .map-layer {
+      border-radius: 8px;
+      border: 1px solid rgba(148, 163, 184, .38);
+      background: rgba(255,255,255,.58);
+      padding: 14px;
+      backdrop-filter: blur(8px);
+    }
+    .layer-head {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 10px;
+    }
+    .layer-head h3 {
+      margin: 0;
+      font-size: 19px;
+    }
+    .layer-head small {
+      max-width: 460px;
+      text-align: right;
+    }
+    .life-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(130px, 1fr));
+      gap: 10px;
+    }
+    .life-cell, .campaign-card, .quest-map-node, .task-map-card {
+      text-align: left;
+      border-radius: 8px;
+      border: 1px solid var(--line);
+      background: rgba(255,255,255,.78);
+      color: #172033;
+      padding: 11px;
+      min-width: 0;
+    }
+    .life-cell {
+      display: grid;
+      gap: 7px;
+      min-height: 92px;
+    }
+    .life-cell.active {
+      outline: 2px solid rgba(37, 99, 235, .42);
+      background: rgba(255,255,255,.95);
+    }
+    .campaign-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(150px, 1fr));
+      gap: 10px;
+    }
+    .campaign-card {
+      display: grid;
+      gap: 8px;
+    }
+    .campaign-card.active {
+      outline: 2px solid rgba(245, 158, 11, .42);
+      background: #fff;
+    }
+    .state-done {
+      border-color: rgba(22, 163, 74, .65) !important;
+      background: rgba(240, 253, 244, .9) !important;
+    }
+    .state-todo {
+      border-color: rgba(148, 163, 184, .45) !important;
+      background: rgba(248, 250, 252, .82) !important;
+      color: #334155;
+    }
+    .weekly-map {
+      position: relative;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(132px, 1fr));
+      gap: 12px;
+    }
+    .quest-map-node {
+      position: relative;
+      display: grid;
+      gap: 8px;
+      min-height: 140px;
+      overflow: hidden;
+    }
+    .quest-map-node.active {
+      outline: 3px solid rgba(250, 204, 21, .55);
+      box-shadow: 0 0 0 6px rgba(250, 204, 21, .16);
+    }
+    .quest-map-node.discovery {
+      opacity: .72;
+      border-style: dashed;
+    }
+    .quest-map-node:before, .task-map-card:before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      opacity: .13;
+      background: var(--type-color);
+      pointer-events: none;
+    }
+    .task-rail {
+      display: grid;
+      grid-auto-flow: column;
+      grid-auto-columns: minmax(174px, 1fr);
+      gap: 12px;
+      overflow-x: auto;
+      padding-bottom: 6px;
+    }
+    .task-map-card {
+      position: relative;
+      display: grid;
+      gap: 8px;
+      min-height: 124px;
+    }
+    .task-map-card.active {
+      outline: 2px solid rgba(124, 58, 237, .45);
+      background: #fff;
+    }
+    .type-main { --type-color: #2563eb; border-color: rgba(37, 99, 235, .48); }
+    .type-side { --type-color: #7c3aed; border-color: rgba(124, 58, 237, .45); }
+    .type-maintenance { --type-color: #059669; border-color: rgba(5, 150, 105, .46); }
+    .type-noise { --type-color: #64748b; border-color: rgba(100, 116, 139, .48); }
+    .type-emergency { --type-color: #f97316; border-color: rgba(249, 115, 22, .64); box-shadow: 0 10px 22px rgba(249, 115, 22, .16); }
+    .type-pivot { --type-color: #db2777; border-style: dashed; border-color: rgba(219, 39, 119, .55); }
+    .gmn-g { box-shadow: inset 0 4px 0 #2563eb; }
+    .gmn-m { box-shadow: inset 0 4px 0 #059669; }
+    .gmn-n { box-shadow: inset 0 4px 0 #64748b; }
+    .node-title {
+      position: relative;
+      z-index: 1;
+      font-weight: 900;
+      line-height: 1.35;
+      word-break: break-word;
+    }
+    .node-compact {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      align-items: center;
+    }
+    .type-badge, .gmn-tag {
+      display: inline-flex;
+      align-items: center;
+      border-radius: 999px;
+      padding: 4px 7px;
+      font-size: 11px;
+      font-weight: 900;
+      background: rgba(255,255,255,.78);
+      border: 1px solid rgba(148, 163, 184, .42);
+      color: #334155;
+    }
+    .gmn-tag {
+      color: #fff;
+      border: 0;
+    }
+    .gmn-tag.gmn-g { background: #2563eb; box-shadow: none; }
+    .gmn-tag.gmn-m { background: #059669; box-shadow: none; }
+    .gmn-tag.gmn-n { background: #64748b; box-shadow: none; }
+    .pivot-link {
+      position: relative;
+      z-index: 1;
+      margin-top: 8px;
+      padding: 8px 10px;
+      border-radius: 8px;
+      border: 1px dashed rgba(219, 39, 119, .6);
+      background: rgba(255,255,255,.68);
+      color: #831843;
+      font-size: 12px;
+      font-weight: 800;
+    }
+    .simple-detail {
+      display: grid;
+      gap: 14px;
+    }
+    .task-card.done {
+      border-color: rgba(22, 163, 74, .65);
+      background: rgba(240, 253, 244, .88);
+    }
+    .task-card.todo {
+      border-color: rgba(148, 163, 184, .42);
+      background: rgba(248, 250, 252, .9);
+    }
+    .custom-task-box {
+      border-top: 1px solid var(--line);
+      padding-top: 14px;
+      display: grid;
+      gap: 10px;
+    }
+
+    .map-bottom {
+      position: relative;
+      z-index: 1;
+      display: grid;
+      grid-template-columns: 1fr 260px;
+      gap: 12px;
+      margin-top: 18px;
+    }
+    .progress-panel, .week-panel {
+      border-radius: 8px;
+      padding: 18px;
+      color: #e5e7eb;
+      background: rgba(13, 23, 40, .9);
+      box-shadow: 0 16px 35px rgba(15, 23, 42, .28);
+    }
+    #activeTimerPanel {
+      position: fixed;
+      right: 24px;
+      bottom: 24px;
+      width: min(320px, calc(100vw - 48px));
+      z-index: 80;
+      border: 1px solid rgba(147, 197, 253, .58);
+      background: rgba(15, 23, 42, .94);
+      backdrop-filter: blur(14px);
+    }
+    #activeTimerPanel b {
+      display: block;
+      margin-bottom: 8px;
+      color: #fff;
+      font-size: 17px;
+    }
+    #activeTimerPanel p {
+      margin: 7px 0;
+      color: #cbd5e1;
+    }
+    #activeTimerLeft {
+      color: #fef3c7;
+      font-weight: 1000;
+      font-variant-numeric: tabular-nums;
+    }
+    #returnFocusBtn {
+      width: 100%;
+      margin-top: 10px;
+    }
+    .progress-panel strong { display: block; font-size: 34px; margin: 8px 0; }
+    .milestones {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+      margin-top: 14px;
+      color: #cbd5e1;
+      font-size: 12px;
+    }
+
+    .panel, .detail {
+      border-radius: 8px;
+      background: var(--panel);
+      border: 1px solid rgba(148, 163, 184, .38);
+      box-shadow: var(--shadow);
+      padding: 20px;
+    }
+    .detail { overflow: auto; }
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      border-radius: 999px;
+      padding: 5px 9px;
+      font-size: 12px;
+      font-weight: 900;
+      border: 1px solid rgba(148, 163, 184, .42);
+      background: rgba(255, 255, 255, .65);
+      color: #475569;
+    }
+    h3 { margin: 12px 0 8px; font-size: 25px; letter-spacing: 0; }
+    p { color: #475569; line-height: 1.7; }
+    .progress-number {
+      display: flex;
+      justify-content: space-between;
+      color: #334155;
+      font-weight: 900;
+      margin: 16px 0 8px;
+    }
+    .task-list, .route, .log-list, .skill-grid { display: grid; gap: 10px; }
+    .task-card, .route-item, .log-card, .skill-card {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: rgba(255, 255, 255, .72);
+      padding: 12px;
+    }
+    .task-card {
+      display: grid;
+      gap: 7px;
+      text-align: left;
+    }
+    .task-card.selected {
+      outline: 2px solid rgba(133, 87, 232, .45);
+      background: #fff;
+    }
+    .pivot-option.active {
+      color: #fff;
+      background: linear-gradient(135deg, #2563eb, #8557e8);
+    }
+    .task-head, .row {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      align-items: start;
+    }
+    small { color: var(--muted); line-height: 1.5; }
+    .primary, .secondary, .danger, .ghost {
+      min-height: 42px;
+      border-radius: 8px;
+      padding: 9px 13px;
+      font-weight: 900;
+    }
+    .primary {
+      color: #fff;
+      background: linear-gradient(135deg, #2563eb, #8557e8);
+      box-shadow: 0 13px 24px rgba(79, 70, 229, .22);
+    }
+    .secondary {
+      color: #334155;
+      background: rgba(255, 255, 255, .72);
+      border: 1px solid var(--line);
+    }
+    .danger {
+      color: #fff;
+      background: linear-gradient(135deg, #dc2626, #ef4444);
+    }
+    .ghost {
+      color: #334155;
+      background: transparent;
+      border: 1px solid transparent;
+    }
+    .option-row {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 8px;
+      margin-top: 8px;
+    }
+    .full { width: 100%; }
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 14px;
+    }
+
+    .focus-grid {
+      display: grid;
+      grid-template-columns: 360px minmax(0, 1fr) 330px;
+      gap: 18px;
+      align-items: start;
+    }
+    .review-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 420px;
+      gap: 18px;
+      align-items: start;
+    }
+    .timer {
+      text-align: center;
+      padding: 18px 0;
+    }
+    .duration-control {
+      margin-top: 12px;
+    }
+    .duration-control input {
+      max-width: 150px;
+    }
+    .timer-value {
+      font-size: 72px;
+      line-height: 1;
+      color: #172033;
+      font-family: Georgia, "Times New Roman", serif;
+      font-weight: 900;
+    }
+    .timer-actions {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-top: 18px;
+    }
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 14px;
+    }
+    .form-grid label:first-child,
+    .form-grid label:last-child { grid-column: 1 / -1; }
+    .session-result {
+      border: 1px solid rgba(245, 180, 63, .4);
+      background: linear-gradient(135deg, rgba(255, 247, 237, .94), rgba(238, 242, 255, .9));
+    }
+    .reward-line {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      margin: 12px 0;
+    }
+    .reward {
+      border-radius: 8px;
+      border: 1px solid var(--line);
+      background: rgba(255,255,255,.72);
+      padding: 10px;
+    }
+    .reward b { display: block; font-size: 18px; margin-top: 4px; }
+
+    .review-cards {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+    .metric {
+      background: rgba(255, 255, 255, .78);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 14px;
+    }
+    .metric b { display: block; font-size: 28px; margin-top: 7px; }
+    .metric span { color: var(--muted); font-size: 12px; }
+    .log-card {
+      display: grid;
+      gap: 8px;
+    }
+    .log-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      justify-content: flex-end;
+    }
+    .edit-panel {
+      margin-top: 14px;
+      border-top: 1px solid var(--line);
+      padding-top: 14px;
+    }
+    .review-section {
+      margin-top: 16px;
+      display: grid;
+      gap: 10px;
+    }
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      z-index: 20;
+      display: grid;
+      place-items: center;
+      padding: 20px;
+      background: rgba(15, 23, 42, .48);
+    }
+    .modal {
+      width: min(680px, 100%);
+      max-height: calc(100vh - 40px);
+      overflow: auto;
+      border-radius: 8px;
+      border: 1px solid rgba(148, 163, 184, .5);
+      background: rgba(248, 250, 252, .98);
+      box-shadow: 0 28px 70px rgba(15, 23, 42, .32);
+      padding: 20px;
+    }
+    .advanced {
+      margin-top: 14px;
+      border-top: 1px solid var(--line);
+      padding-top: 12px;
+    }
+    .advanced summary {
+      cursor: pointer;
+      font-weight: 900;
+      color: #334155;
+    }
+
+    .skill-tree {
+      display: grid;
+      grid-template-columns: 330px minmax(0, 1fr);
+      gap: 18px;
+      align-items: start;
+    }
+    .skill-card {
+      display: grid;
+      gap: 8px;
+    }
+    .skill-card.active {
+      outline: 2px solid rgba(133, 87, 232, .45);
+      background: #fff;
+    }
+    .skill-node-row {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 12px;
+      margin-top: 14px;
+    }
+    .skill-node {
+      border-radius: 8px;
+      border: 1px solid var(--line);
+      background: rgba(255,255,255,.72);
+      padding: 14px;
+      min-height: 120px;
+    }
+
+    .table-wrap {
+      overflow: auto;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: rgba(255, 255, 255, .72);
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 760px;
+      font-size: 13px;
+    }
+    th, td {
+      padding: 11px 12px;
+      border-bottom: 1px solid #e2e8f0;
+      text-align: left;
+      vertical-align: top;
+    }
+    th { color: #334155; background: #f8fafc; font-size: 12px; }
+    td { color: #475569; }
+    .hide { display: none !important; }
+
+    @media (max-width: 1180px) {
+      .app { grid-template-columns: 1fr; }
+      .sidebar { display: grid; }
+      .map-layout, .focus-grid, .review-grid, .skill-tree {
+        grid-template-columns: 1fr;
+        height: auto;
+        min-height: 0;
+      }
+      .map-stage { min-height: 790px; }
+      .detail { max-height: none; }
+    }
+    @media (max-width: 760px) {
+      .topbar { align-items: flex-start; flex-direction: column; padding: 20px; }
+      .screen { padding: 8px 16px 24px; }
+      .quest-lane, .quest-lane.side {
+        grid-template-columns: repeat(2, minmax(120px, 1fr));
+        height: auto;
+        gap: 18px;
+        margin-bottom: 22px;
+      }
+      .quest-lane:before { display: none; }
+      .map-bottom { position: static; grid-template-columns: 1fr; margin-top: 16px; }
+      .form-grid, .review-cards, .skill-node-row, .reward-line, .option-row { grid-template-columns: 1fr; }
+      .timer-value { font-size: 58px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <aside class="sidebar">
+      <div class="brand">
+        <div class="brand-mark">✦</div>
+        <div>
+          <h1>计划 RPG</h1>
+          <p>把目标变成冒险</p>
+          <span class="version">v0.3.23 在线网页软件</span>
+        </div>
+      </div>
+
+      <div class="side-card">
+        <div class="side-title"><span>年度目标</span><span>2026</span></div>
+        <div id="goalList"></div>
+      </div>
+
+      <nav class="nav">
+        <button class="active" data-screen="map">地图 / Dashboard</button>
+        <button data-screen="focus">20分钟专注</button>
+        <button data-screen="todos">待办 / 今日提醒</button>
+        <button data-screen="review">日志 / 复盘</button>
+        <button data-screen="skills">CEO 技能树</button>
+        <button data-screen="model">数据模型</button>
+      </nav>
+
+      <div class="side-card">
+        <div class="side-title"><span>当前焦点</span><span>W20</span></div>
+        <div id="weeklyFocus"></div>
+      </div>
+
+      <div class="side-card">
+        <div class="side-title"><span>技能专项</span><span>CEO</span></div>
+        <div id="skillMini"></div>
+      </div>
+
+      <div class="side-card">
+        <div class="side-title"><span>备份/迁移</span><span>JSON</span></div>
+        <div class="utility-actions">
+          <button id="exportDataBtn">导出数据</button>
+          <button id="importDataBtn">导入数据</button>
+        </div>
+        <input class="hide" id="importDataFile" type="file" accept="application/json" />
+      </div>
+
+      <div class="side-card">
+        <div class="side-title"><span>Google Sheet 同步</span><span id="sheetSyncBadge">未配置</span></div>
+        <label>Apps Script URL<input id="sheetSyncUrl" placeholder="https://script.google.com/macros/s/..." /></label>
+        <label>同步 Token<input id="sheetSyncToken" placeholder="自己设置一个口令" /></label>
+        <div class="utility-actions">
+          <button id="saveSheetSyncBtn">保存同步设置</button>
+          <button id="testSheetSyncBtn">测试</button>
+          <button id="pullSheetLogsBtn">拉取记录</button>
+        </div>
+        <small id="sheetSyncStatus">打开网页会自动读取，完成专注会自动写入 Session_Logs。</small>
+      </div>
+
+      <div class="quote">
+        最远的旅程，从今天的 20 分钟开始。<br />
+        每一条日志，都是下周路线的材料。
+      </div>
+    </aside>
+
+    <main class="main">
+      <header class="topbar">
+        <div class="title">
+          <h2>2026 计划地图</h2>
+          <p>2030 方向 → 2026 Quest → 20min Session → Log → Review → Skill XP</p>
+        </div>
+        <div class="stats">
+          <div class="stat"><b>⚡</b><div><strong id="totalMinutes">0 min</strong><span>同步专注时长</span></div></div>
+          <div class="stat"><b>◆</b><div><strong id="gRatio">0%</strong><span>Growth 占比</span></div></div>
+          <div class="stat"><b>Lv</b><div><strong>探索者 28</strong><span>Plan RPG v0.3.23</span></div></div>
+        </div>
+      </header>
+
+      <section id="map" class="screen active">
+        <div class="map-layout">
+          <div class="map-stage">
+            <div class="world-map">
+              <section class="map-layer">
+                <div class="layer-head">
+                  <h3>2030 人生九宫格</h3>
+                  <small>五年后的方向提醒。</small>
+                </div>
+                <div class="life-grid" id="lifeGrid"></div>
+              </section>
+              <section class="map-layer">
+                <div class="layer-head">
+                  <h3>2026 目标</h3>
+                  <small>看进度，决定现在推进哪条线。</small>
+                </div>
+                <div class="campaign-grid" id="campaignGrid"></div>
+              </section>
+              <section class="map-layer">
+                <div class="layer-head">
+                  <h3>章节</h3>
+                  <small>目标下面的阶段。灰色未完成，绿色已完成。</small>
+                </div>
+                <div class="weekly-map" id="weeklyMap"></div>
+              </section>
+              <section class="map-layer">
+                <div class="layer-head">
+                  <h3>20 分钟行动</h3>
+                  <small>选一张卡，开始记录。</small>
+                </div>
+                <div class="task-rail" id="taskRail"></div>
+              </section>
+            </div>
+            <div class="map-bottom">
+              <div class="progress-panel">
+                <div>年度探索进度</div>
+                <strong id="annualProgress">0%</strong>
+                <div class="bar"><div class="fill" id="annualFill" style="--value:0%"></div></div>
+                <div class="milestones"><span>Q1 25%</span><span>Q2 50%</span><span>Q3 75%</span><span>Q4 100%</span></div>
+              </div>
+              <div class="week-panel">
+                <b>本周成就</b>
+                <p><span id="weekSessions">0</span> 次 Session</p>
+                <p><span id="weekLogs">0</span> 条执行日志</p>
+              </div>
+              <div class="week-panel hide" id="activeTimerPanel">
+                <b>正在专注</b>
+                <p><span id="activeTimerLeft">00:00</span> · <span id="activeTimerState">进行中</span></p>
+                <p id="activeTimerTask">当前任务</p>
+                <button class="primary" id="returnFocusBtn">返回计时</button>
+              </div>
+            </div>
+          </div>
+          <aside class="detail" id="questDetail"></aside>
+        </div>
+      </section>
+
+      <section id="focus" class="screen">
+        <div class="focus-grid">
+          <div class="panel">
+            <div class="row">
+              <span class="pill" id="sessionTypePill">20min Session</span>
+              <button class="ghost" id="backToMapBtn">返回地图</button>
+            </div>
+            <h3 id="focusTaskName">选择一个任务开始</h3>
+            <p id="focusTaskInfo"></p>
+            <label>当前任务<select id="taskSelect"></select></label>
+            <label class="duration-control">本次时间（分钟）<input id="durationInput" type="number" min="1" max="180" step="1" value="20" /></label>
+            <label>本次 GMN<select id="sessionGmn"><option value="G">G 成长</option><option value="M">M 维护</option><option value="N">N 噪音</option></select></label>
+            <div class="timer">
+              <div class="timer-value" id="timerValue">20:00</div>
+              <div class="timer-actions">
+                <button class="primary" id="startPauseBtn">开始</button>
+                <button class="secondary" id="resetBtn">重置</button>
+              </div>
+            </div>
+            <div id="skillRewardPreview"></div>
+            <div class="actions">
+              <button class="secondary" id="randomEventBtn">+ 突发任务</button>
+              <button class="secondary" id="pivotTaskBtn">任务转向</button>
+              <button class="secondary" id="saveDraftBtn">保存草稿</button>
+              <button class="primary" id="saveSessionBtn">完成并结算</button>
+            </div>
+          </div>
+
+          <div class="panel">
+            <h3 id="recordBoardTitle">战斗记录板</h3>
+            <p id="recordBoardHelp">先写关键内容，结束时再补全。保存后可以编辑。</p>
+            <div class="form-grid">
+              <label id="whatDoneLabel">做了什么<textarea id="whatDone" placeholder="这 20 分钟具体推进了什么？"></textarea></label>
+              <label id="problemLabel">遇到什么问题<textarea id="problem" placeholder="卡点、阻力、情绪、信息缺口..."></textarea></label>
+              <label id="solutionLabel">怎么解决<textarea id="solution" placeholder="你采取了什么处理方式？"></textarea></label>
+              <label id="goodLabel">好的地方<textarea id="good" placeholder="值得保留的动作、判断、节奏..."></textarea></label>
+              <label id="badLabel">不好的地方<textarea id="bad" placeholder="浪费、拖延、误判、流程问题..."></textarea></label>
+              <label id="nextStepLabel">下一步<textarea id="nextStep" placeholder="下一次 20 分钟应该从哪里开始？"></textarea></label>
+            </div>
+          </div>
+
+          <div class="panel session-result" id="sessionResult">
+            <span class="pill">Session 结算</span>
+            <h3>还没有完成本次专注</h3>
+            <p>完成后这里会显示你写了什么、获得了什么、下一步去哪里。</p>
+          </div>
+        </div>
+      </section>
+
+      <section id="todos" class="screen">
+        <div class="review-grid">
+          <div class="panel">
+            <span class="pill">Todo Inbox</span>
+            <h3>待办收件箱</h3>
+            <p>先把事情丢进来。系统会按关键词给一个归类建议，你也可以手动改。到期日是今天的会进入今日提醒。</p>
+            <div class="form-grid">
+              <label>待办事项<input id="todoTitle" placeholder="例如：明天联系银行确认收款限制" /></label>
+              <label>到期日<input id="todoDueDate" type="date" /></label>
+              <label>优先级<select id="todoPriority"><option value="medium">medium</option><option value="high">high</option><option value="urgent">urgent</option><option value="low">low</option></select></label>
+              <label>人生分类<select id="todoGoal"></select></label>
+              <label>具体目标/章节<select id="todoQuest"></select></label>
+              <label>GMN<select id="todoGmn"><option>G</option><option>M</option><option>N</option></select></label>
+              <label>备注<textarea id="todoNote" placeholder="背景、链接、等待什么、下一步是什么..."></textarea></label>
+            </div>
+            <div class="route-item" id="todoSuggestion">
+              <b>自动归类建议</b>
+              <p>输入待办后会显示建议。</p>
+            </div>
+            <div class="actions">
+              <button class="secondary" id="autoClassifyTodoBtn">采用建议</button>
+              <button class="primary" id="addTodoBtn">加入待办</button>
+            </div>
+          </div>
+          <div class="panel">
+            <span class="pill">Today</span>
+            <h3>今日提醒</h3>
+            <div class="log-list" id="todayTodoList"></div>
+            <h3>晚点做</h3>
+            <div class="log-list" id="laterTodoList"></div>
+          </div>
+        </div>
+      </section>
+
+      <section id="review" class="screen">
+        <div class="review-grid">
+          <div class="panel">
+            <span class="pill">Weekly Review</span>
+            <h3>本周自动汇总</h3>
+            <p>这里会汇总本地 Session Log。点击日志可编辑，后续可以交给 AI 做复盘。</p>
+            <div class="review-cards">
+              <div class="metric"><span>Total</span><b id="metricTotal">0</b></div>
+              <div class="metric"><span>Growth</span><b id="metricG">0</b></div>
+              <div class="metric"><span>维护</span><b id="metricM">0</b></div>
+              <div class="metric"><span>Noise</span><b id="metricN">0</b></div>
+            </div>
+            <div class="review-cards">
+              <div class="metric"><span>突发任务</span><b id="metricRandomCount">0</b></div>
+              <div class="metric"><span>突发时间</span><b id="metricRandomMinutes">0</b></div>
+              <div class="metric"><span>任务转向</span><b id="metricPivotCount">0</b></div>
+              <div class="metric"><span>维护/噪音</span><b id="metricMaintNoise">0</b></div>
+            </div>
+            <div class="review-section" id="dynamicReview"></div>
+            <h4>下周建议路线</h4>
+            <div class="route" id="nextRoute"></div>
+          </div>
+          <div class="panel">
+            <h3>Session Logs</h3>
+            <div class="log-list" id="logList"></div>
+            <div class="edit-panel hide" id="editPanel">
+              <h3>修改日志</h3>
+              <div class="form-grid">
+                <label>GMN<select id="editGmn"><option>G</option><option>M</option><option>N</option></select></label>
+                <label>任务<select id="editTask"></select></label>
+                <label>做了什么<textarea id="editWhat"></textarea></label>
+                <label>问题<textarea id="editProblem"></textarea></label>
+                <label>解决<textarea id="editSolution"></textarea></label>
+                <label>好的地方<textarea id="editGood"></textarea></label>
+                <label>不好的地方<textarea id="editBad"></textarea></label>
+                <label>下一步<textarea id="editNext"></textarea></label>
+              </div>
+              <div class="actions">
+                <button class="primary" id="updateLogBtn">保存修改</button>
+                <button class="secondary" id="cancelEditBtn">取消</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="skills" class="screen">
+        <div class="skill-tree">
+          <div class="panel">
+            <span class="pill">CEO Skill Tree</span>
+            <h3>技能专项</h3>
+            <p>从 CEO / Founder / GM 招聘要求反推学习路线。每次 20 分钟会给相关技能加 XP。</p>
+            <div class="skill-grid" id="skillList"></div>
+          </div>
+          <div class="panel" id="skillDetail"></div>
+        </div>
+      </section>
+
+      <section id="model" class="screen">
+        <div class="panel">
+          <h3>数据模型</h3>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Level</th><th>Entity</th><th>Purpose</th><th>Key Fields</th><th>Why It Exists</th></tr></thead>
+              <tbody id="modelTable"></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <div class="modal-backdrop hide" id="randomEventModal">
+    <div class="modal">
+      <div class="row">
+        <div>
+          <span class="pill">Random Event</span>
+          <h3>突发任务</h3>
+          <p>把临时事件收编进地图，判断它是机会、风险、维护，还是噪音。</p>
+        </div>
+        <button class="ghost" data-close-modal="randomEventModal">关闭</button>
+      </div>
+      <div class="form-grid">
+        <label>任务标题<input id="randomTitle" placeholder="例如：紧急处理客户付款问题" /></label>
+        <label>任务分类<select id="randomQuestType"><option value="main">主线</option><option value="side">支线</option><option value="maintenance">维护</option><option value="noise">噪音</option></select></label>
+        <label>GMN<select id="randomGmn"><option>G</option><option>M</option><option>N</option></select></label>
+        <label>为什么要做<textarea id="randomReason" placeholder="一句话说明这个事件为什么值得处理"></textarea></label>
+      </div>
+      <details class="advanced">
+        <summary>Advanced</summary>
+        <div class="form-grid" style="margin-top:12px;">
+          <label>简单描述<textarea id="randomDescription" placeholder="补充背景，可不填"></textarea></label>
+          <label>预计 Session 数<input id="randomEstimated" type="number" min="1" max="50" value="1" /></label>
+          <label>来源<select id="randomSource"><option value="manual">手动</option><option value="emergency">紧急</option><option value="interruption">被打断</option></select></label>
+          <label>关联 Goal<select id="randomGoal"></select></label>
+          <label>优先级<select id="randomPriority"><option value="medium">medium</option><option value="low">low</option><option value="high">high</option><option value="urgent">urgent</option></select></label>
+        </div>
+      </details>
+      <div class="actions">
+        <button class="primary" id="createRandomStartBtn">创建并开始</button>
+        <button class="secondary" id="createRandomBtn">只创建</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-backdrop hide" id="pivotModal">
+    <div class="modal">
+      <div class="row">
+        <div>
+      <span class="pill">隐藏任务</span>
+          <h3>任务转向</h3>
+          <p>A 不是失败。如果它暴露了真正的问题，系统会把这次探索留下来。</p>
+        </div>
+        <button class="ghost" data-close-modal="pivotModal">关闭</button>
+      </div>
+      <label>转向类型</label>
+      <div class="option-row">
+        <button class="secondary pivot-option active" data-pivot-type="renamed">改名继续</button>
+        <button class="secondary pivot-option" data-pivot-type="paused_for_new_task">暂停旧任务，创建新任务</button>
+        <button class="secondary pivot-option" data-pivot-type="completed_as_discovery">旧任务算发现问题，创建新任务</button>
+      </div>
+      <div class="form-grid" style="margin-top:14px;">
+        <label>新任务标题<input id="pivotNewTitle" placeholder="真正要处理的问题 B" /></label>
+        <label>转向原因<textarea id="pivotReason" placeholder="为什么从 A 转向 B？"></textarea></label>
+        <label>发现了什么<textarea id="pivotDiscovery" placeholder="A 暴露出的真实问题，可选"></textarea></label>
+      </div>
+      <div class="actions">
+        <button class="primary" id="applyPivotBtn">确认转向</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="src/config/app-config.js"></script>
+  <script>
+    const seed = {
+      version: APP_CONFIG.VERSION,
+      goals2030: [
+        { id: "BUSINESS", title: "Business: DFK + INSO as 2026 main goals", currentValue: 0, targetValue: 2, unit: "个主目标", role: "Mainline" },
+        { id: "PASSIVE", title: "Passive: remittance system and clients", currentValue: 0, targetValue: 3, unit: "个模块", role: "Mainline", displayTitle: "PASSIVE INCOME" },
+        { id: "HEALTH", title: "Keep weight within 5KG", currentValue: 0, targetValue: 52, unit: "周", role: "Habit" },
+        { id: "MINDSET", title: "Daily meditation", currentValue: 0, targetValue: 365, unit: "次", role: "Habit" },
+        { id: "FAMILY", title: "Girl friend and family life", currentValue: 0, targetValue: 2, unit: "模块", role: "Life" },
+        { id: "SOCIAL", title: "Meet people and find mentor", currentValue: 0, targetValue: 2, unit: "模块", role: "Sideline", displayTitle: "SOCIAL NETWORK" },
+        { id: "INTERESTS", title: "Master one hobby", currentValue: 0, targetValue: 1, unit: "个爱好", role: "Sideline" },
+        { id: "NEW", title: "AI automation for daily work", currentValue: 0, targetValue: 10, unit: "个自动化", role: "Sideline", displayTitle: "NEW THINGS" }
+      ],
+      quests: [
+        { id: "Q-001", name: "DFK 赚钱", type: "Main", goal: "BUSINESS", target: "每月约 50 个货柜（广州 + 义乌）", currentValue: 0, targetValue: 50, unit: "柜/月", description: "2026 两个主要目标之一：让 DFK 形成稳定出货和稳定系统。", nextMove: "先把稳定系统和培训系统拆清楚", status: "In Progress", gmn: "G", priority: "High", icon: "🚚" },
+        { id: "Q-009", parentQuestId: "Q-001", name: "稳定系统", type: "Main", goal: "BUSINESS", target: "财务、打印、人员管理三条分支稳定运行", description: "DFK 的底层系统章节，先把日常不会乱的系统搭起来。", nextMove: "选一个分支写出流程和检查点", status: "In Progress", gmn: "G", priority: "High", icon: "⚙️" },
+        { id: "Q-010", parentQuestId: "Q-009", name: "财务", type: "Main", goal: "BUSINESS", target: "费用、利润、收付款和对账清楚", description: "DFK 财务分支：记录收入、成本、利润、应收应付和月度检查。", nextMove: "整理一条财务记录/对账流程", status: "In Progress", gmn: "G", priority: "High", icon: "💰" },
+        { id: "Q-018", parentQuestId: "Q-009", name: "打印", type: "Main", goal: "BUSINESS", target: "单据、标签、交付资料打印稳定", description: "DFK 打印分支：把常用打印模板、检查点和异常处理固定下来。", nextMove: "检查一个打印模板或打印流程", status: "Not Started", gmn: "G", priority: "High", icon: "🖨️" },
+        { id: "Q-019", parentQuestId: "Q-009", name: "人员管理", type: "Main", goal: "BUSINESS", target: "岗位、责任、检查和交接清楚", description: "DFK 人员管理分支：明确谁负责什么、怎么检查、怎么培训新人。", nextMove: "写清一个岗位的责任和检查标准", status: "Not Started", gmn: "G", priority: "High", icon: "👥" },
+        { id: "Q-016", parentQuestId: "Q-001", name: "培训系统", type: "Main", goal: "BUSINESS", target: "把 DFK 每个关键环节做成可培训流程", currentValue: 0, targetValue: 1, unit: "套", description: "培训系统还在设计中，先作为独立章节收集流程、教材和验收标准。", nextMove: "选择一个环节，写出培训动作和验收标准", status: "Not Started", gmn: "G", priority: "High", icon: "📚" },
+        { id: "Q-003", name: "INSO 稳定客户收入", type: "Main", goal: "BUSINESS", target: "稳定客户每月收入 1WRMB", currentValue: 0, targetValue: 10000, unit: "RMB/月", description: "2026 两个主要目标之一：INSO 只保留订单跟进、客户开发、客户维护三条复盘主线。", nextMove: "从订单跟进、客户开发或客户维护里推进一个真实机会", status: "In Progress", gmn: "G", priority: "High", icon: "🔩" },
+        { id: "Q-011", parentQuestId: "Q-003", name: "订单跟进", type: "Main", goal: "BUSINESS", target: "订单、RFQ、报价、成交复盘清楚", description: "用于记录所有订单、RFQ、报价、成交相关复盘。每条记录尽量能看出状态、卡点、下一步和成交概率。", nextMove: "复盘一个 RFQ/报价/订单状态并写下一步", status: "In Progress", gmn: "G", priority: "High", icon: "💬" },
+        { id: "Q-012", parentQuestId: "Q-003", name: "客户开发", type: "Main", goal: "BUSINESS", target: "持续产生新客户线索和有效对话", description: "用于记录新客户开发，包括麦穗、LinkedIn、邮件、Google 搜索等来源。", nextMove: "开发一批新客户，并标记来源和下一步", status: "In Progress", gmn: "G", priority: "High", icon: "📈" },
+        { id: "Q-013", parentQuestId: "Q-003", name: "客户维护", type: "Habit", goal: "BUSINESS", target: "老客户定期互动和状态观察", description: "用于记录老客户联系、关系维护、定期互动、客户状态观察。", nextMove: "联系一个老客户并记录客户状态", status: "In Progress", gmn: "M", priority: "High", icon: "🤝" },
+        { id: "Q-002", name: "汇款系统", type: "Main", goal: "PASSIVE", target: "制作流程、稳定客户、开发客户", currentValue: 0, targetValue: 3, unit: "模块", description: "Passive income 先以汇款系统为核心，沉淀流程并形成稳定客户来源。", nextMove: "先把一个汇款流程写成可复用 SOP", status: "Not Started", gmn: "G", priority: "Medium", icon: "🏦" },
+        { id: "Q-014", parentQuestId: "Q-002", name: "制作汇款流程", type: "Main", goal: "PASSIVE", target: "汇款流程、资料、费用、限制清楚", description: "把不同通道的流程、费用、到账时间、资料要求和风险点整理成系统。", nextMove: "整理一条完整汇款流程", status: "In Progress", gmn: "G", priority: "Medium", icon: "🧩" },
+        { id: "Q-015", parentQuestId: "Q-002", name: "稳定客户", type: "Main", goal: "PASSIVE", target: "让老客户稳定复用汇款服务", description: "维护现有汇款客户，记录频率、需求、问题和下一次跟进。", nextMove: "跟进一个已有汇款客户", status: "Not Started", gmn: "M", priority: "Medium", icon: "🏛️" },
+        { id: "Q-020", parentQuestId: "Q-002", name: "开发客户", type: "Main", goal: "PASSIVE", target: "持续开发新的汇款客户", description: "寻找新的汇款客户来源，记录渠道、信任问题和转化动作。", nextMove: "新增一批汇款客户线索", status: "Not Started", gmn: "G", priority: "Medium", icon: "📣" },
+        { id: "Q-004", name: "MEDITATION", type: "Habit", goal: "MINDSET", target: "每天一次冥想", currentValue: 0, targetValue: 365, unit: "次", description: "每天做一次冥想/呼吸/冷静记录，让心态保持稳定。", nextMove: "完成 1 次 meditation/check-in", status: "Not Started", gmn: "M", priority: "Medium", icon: "🧘" },
+        { id: "Q-005", name: "HEALTH", type: "Habit", goal: "HEALTH", target: "体重保持 5KG 浮动，每周测量一次", currentValue: 0, targetValue: 52, unit: "周", description: "目标不是复杂健身系统，先保证每周测量和趋势记录。", nextMove: "记录本周体重和状态", status: "Not Started", gmn: "G", priority: "Medium", icon: "💪" },
+        { id: "Q-021", name: "GIRL FRIEND", type: "Side", goal: "FAMILY", target: "经营女朋友关系", description: "Family 里先以 girl friend 为核心，记录相处、沟通和重要计划。", nextMove: "记录一次关系维护或计划", status: "Not Started", gmn: "M", priority: "Medium", icon: "💛" },
+        { id: "Q-022", parentQuestId: "Q-021", name: "旅游", type: "Side", goal: "FAMILY", target: "一起计划和完成旅行", description: "旅行作为 girl friend 下面的一个分支，放目的地、预算、时间和行动。", nextMove: "写下一个旅行备选方案", status: "Not Started", gmn: "M", priority: "Low", icon: "🧳" },
+        { id: "Q-006", name: "SOCIAL NETWORK", type: "Side", goal: "SOCIAL", target: "认识更多关键人物，并找到导师", description: "记录认识多少人、关键联系人和导师线索。", nextMove: "复盘一个联系人或导师线索", status: "Not Started", gmn: "G", priority: "Medium", icon: "🤝" },
+        { id: "Q-007", name: "INTERESTS", type: "Side", goal: "INTERESTS", target: "精通一个爱好", description: "先把今年真正想精通的一个爱好放进来，后续可以继续细化。", nextMove: "记录一次兴趣练习和改进点", status: "Not Started", gmn: "M", priority: "Low", icon: "☕" },
+        { id: "Q-008", name: "NEW THINGS", type: "Side", goal: "NEW", target: "完成 10 个 AI 自动化工作流/MVP", currentValue: 0, targetValue: 10, unit: "个自动化", description: "今年 NEW THINGS 的核心方向：研究 AI，帮助日常工作 AI 化，让 DFK 每天 ≤2 小时、INSO 每天 ≤2 小时完成核心工作。", nextMove: "选择一个每天重复的手动动作，做成 AI 自动化 MVP", status: "In Progress", gmn: "G", priority: "High", icon: "✨" },
+        { id: "Q-023", parentQuestId: "Q-008", name: "研究 AI 日常工作自动化", type: "Side", goal: "NEW", target: "用 10 个自动化流程支撑 DFK + INSO 每天 4 小时以内", currentValue: 0, targetValue: 10, unit: "个流程", description: "研究 AI 如何嵌入自己的真实工作流，不只学习工具，而是把手动动作变成可复用系统。最终效果是 DFK 每天 ≤2 小时、INSO 每天 ≤2 小时。", nextMove: "列出 DFK 和 INSO 每天最耗时的 5 个动作", status: "In Progress", gmn: "G", priority: "High", icon: "🤖" },
+        { id: "Q-024", parentQuestId: "Q-023", name: "快速将工作模式自动化", type: "Main", goal: "NEW", target: "每月至少自动化 1 个重复工作流", description: "把报价、记录、跟进、打印、财务、客户维护等重复动作变成模板、脚本或 AI 工作流。", nextMove: "选一个手动流程，写出输入、处理、输出", status: "In Progress", gmn: "G", priority: "High", icon: "⚙️" },
+        { id: "Q-025", parentQuestId: "Q-023", name: "搭建 MVP", type: "Main", goal: "NEW", target: "做出可真实使用的 AI 自动化原型", description: "先做最小可用版本，能节省一次真实手动操作即可，不追求完美。", nextMove: "搭建一个 AI 自动化 MVP 并跑一次真实任务", status: "Not Started", gmn: "G", priority: "High", icon: "🧩" },
+        { id: "Q-026", parentQuestId: "Q-023", name: "优化", type: "Main", goal: "NEW", target: "把 MVP 优化到稳定、省时、可重复", description: "记录失败、卡点、误差和节省时间，不断把原型变成稳定工具。", nextMove: "复盘一个 MVP 的卡点并优化一次", status: "Not Started", gmn: "G", priority: "High", icon: "🔧" },
+        { id: "Q-027", parentQuestId: "Q-023", name: "可以推销", type: "Side", goal: "NEW", target: "沉淀成可展示、可销售的方案", description: "把自己用出来的 AI 自动化方案整理成案例、演示和报价逻辑，未来可以对外推销。", nextMove: "把一个内部自动化写成客户能听懂的案例", status: "Not Started", gmn: "G", priority: "Medium", icon: "📣" }
+      ],
+      tasks: [
+        { id: "T-001", questId: "Q-009", name: "拆 DFK 稳定系统", instruction: "把 DFK 稳定系统拆成财务、打印、人员管理的当前问题和下一步。", minutes: 20, standard: "三条分支各有一个问题和下一步", gmn: "G", skillIds: ["operations", "strategy"], status: "Not Started" },
+        { id: "T-002", questId: "Q-010", name: "整理 DFK 财务流程", instruction: "整理收入、成本、利润、收付款或对账中的一个流程。", minutes: 20, standard: "写出一个财务流程和检查点", gmn: "G", skillIds: ["operations", "finance"], status: "Not Started" },
+        { id: "T-003", questId: "Q-009", name: "更新 DFK 系统记录", instruction: "把 DFK 系统问题、负责人、下一步集中记录到一个可复盘的位置。", minutes: 20, standard: "完成一次系统记录更新", gmn: "G", skillIds: ["operations", "personal-system"], status: "Not Started" },
+        { id: "T-004", questId: "Q-011", name: "复盘 INSO RFQ/订单", instruction: "查看 INSO 订单、RFQ、报价或成交状态，标记卡点和下一步。", minutes: 20, standard: "更新一个订单/RFQ/报价复盘", gmn: "G", skillIds: ["revenue", "market"], status: "Not Started" },
+        { id: "T-005", questId: "Q-016", name: "设计 DFK 培训环节", instruction: "选一个 DFK 环节，拆成培训动作、演示材料和验收标准。", minutes: 20, standard: "一个环节的培训动作 + 验收标准", gmn: "G", skillIds: ["operations", "leadership"], status: "Not Started" },
+        { id: "T-011", questId: "Q-010", name: "更新财务记录", instruction: "处理一条 DFK 财务记录、费用、利润或收付款事项。", minutes: 20, standard: "处理并记录一个财务事项", gmn: "G", skillIds: ["finance", "operations"], status: "Not Started" },
+        { id: "T-012", questId: "Q-018", name: "检查打印模板", instruction: "检查一个常用单据、标签或交付资料的打印模板。", minutes: 20, standard: "更新一个打印模板或问题记录", gmn: "G", skillIds: ["operations", "personal-system"], status: "Not Started" },
+        { id: "T-013", questId: "Q-019", name: "写岗位检查标准", instruction: "选择一个岗位或人员协作点，写清责任、检查标准和交接方式。", minutes: 20, standard: "一个岗位/事项的责任清单", gmn: "G", skillIds: ["operations", "leadership"], status: "Not Started" },
+        { id: "T-014", questId: "Q-011", name: "跟进 INSO 报价/成交", instruction: "查看采购报价、客户报价、成交可能和下一步，把状态整理清楚。", minutes: 20, standard: "更新报价/成交状态", gmn: "G", skillIds: ["revenue", "operations"], status: "Not Started" },
+        { id: "T-015", questId: "Q-011", name: "整理 INSO 订单下一步", instruction: "把正在推进的订单或 RFQ 写清楚当前状态、责任人和下一步。", minutes: 20, standard: "完成一批订单跟进记录", gmn: "G", skillIds: ["revenue", "communication"], status: "Not Started" },
+        { id: "T-016", questId: "Q-012", name: "开发 INSO 新客户", instruction: "从麦穗、LinkedIn、邮件或 Google 搜索找一批新客户，记录来源和可推进对象。", minutes: 20, standard: "新增一批带来源的客户线索", gmn: "G", skillIds: ["revenue", "market"], status: "Not Started" },
+        { id: "T-017", questId: "Q-012", name: "发送 INSO 开发消息", instruction: "给新客户发送开发消息，并记录来源、回复状态和下一步。", minutes: 20, standard: "完成一轮客户开发", gmn: "G", skillIds: ["revenue", "communication"], status: "Not Started" },
+        { id: "T-018", questId: "Q-013", name: "联系 INSO 老客户", instruction: "联系已有客户，维护关系并确认近期需求或状态变化。", minutes: 20, standard: "完成一批老客户互动", gmn: "M", skillIds: ["communication", "revenue"], status: "Not Started" },
+        { id: "T-019", questId: "Q-013", name: "记录 INSO 客户状态", instruction: "把老客户状态、关系温度、定期互动、下一步动作写清楚。", minutes: 20, standard: "更新客户维护记录", gmn: "M", skillIds: ["communication", "personal-system"], status: "Not Started" },
+        { id: "T-006", questId: "Q-015", name: "跟进汇款稳定客户", instruction: "联系一个已有汇款客户，确认需求、问题和下一次使用可能。", minutes: 20, standard: "完成一个客户跟进记录", gmn: "M", skillIds: ["finance", "communication"], status: "Not Started" },
+        { id: "T-020", questId: "Q-014", name: "制作汇款流程", instruction: "整理一个汇款流程的步骤、资料、费用、到账时间和限制。", minutes: 20, standard: "完成一条汇款流程 SOP", gmn: "G", skillIds: ["finance", "operations"], status: "Not Started" },
+        { id: "T-021", questId: "Q-014", name: "更新汇款通道规则", instruction: "把一个通道的规则、风险、限制和当前可用状态写清楚。", minutes: 20, standard: "完成一条通道规则更新", gmn: "G", skillIds: ["finance", "operations"], status: "Not Started" },
+        { id: "T-022", questId: "Q-020", name: "开发汇款客户", instruction: "寻找一批新的汇款客户线索，并记录来源、信任问题和下一步。", minutes: 20, standard: "新增一批汇款客户线索", gmn: "G", skillIds: ["finance", "communication"], status: "Not Started" },
+        { id: "T-023", questId: "Q-018", name: "测试打印流程", instruction: "从数据到打印成品走一遍，记录卡点和修复动作。", minutes: 20, standard: "完成一次打印流程测试", gmn: "G", skillIds: ["operations", "personal-system"], status: "Not Started" },
+        { id: "T-024", questId: "Q-019", name: "整理人员交接", instruction: "整理一个人员交接事项：输入、输出、责任人和检查方式。", minutes: 20, standard: "完成一条交接标准", gmn: "G", skillIds: ["operations", "leadership"], status: "Not Started" },
+        { id: "T-025", questId: "Q-016", name: "写培训验收标准", instruction: "为一个 DFK 培训环节写清楚合格标准和常见错误。", minutes: 20, standard: "一份验收标准草稿", gmn: "G", skillIds: ["operations", "leadership"], status: "Not Started" },
+        { id: "T-026", questId: "Q-021", name: "关系维护记录", instruction: "记录一次沟通、约会、计划或需要注意的关系细节。", minutes: 20, standard: "完成一条 girl friend 关系记录", gmn: "M", skillIds: ["communication", "personal-system"], status: "Not Started" },
+        { id: "T-027", questId: "Q-022", name: "旅行备选方案", instruction: "写一个旅行目的地、预算、时间和下一步动作。", minutes: 20, standard: "完成一个旅行备选方案", gmn: "M", skillIds: ["communication", "personal-system"], status: "Not Started" },
+        { id: "T-028", questId: "Q-008", name: "记录 AI 自动化机会", instruction: "写下一个每天重复、耗时、适合 AI 化的工作动作。", minutes: 20, standard: "完成一个自动化机会记录", gmn: "G", skillIds: ["strategy", "operations"], status: "Not Started" },
+        { id: "T-029", questId: "Q-024", name: "拆一个手动工作流", instruction: "选择一个 DFK 或 INSO 手动流程，写出输入、处理、输出、耗时和卡点。", minutes: 20, standard: "一条可自动化流程清单", gmn: "G", skillIds: ["operations", "strategy"], status: "Not Started" },
+        { id: "T-030", questId: "Q-025", name: "搭建 AI 自动化 MVP", instruction: "用最简单方式做一个能跑通真实任务的 AI 自动化原型。", minutes: 20, standard: "MVP 跑通一次真实任务", gmn: "G", skillIds: ["operations", "market"], status: "Not Started" },
+        { id: "T-031", questId: "Q-026", name: "优化自动化流程", instruction: "复盘一个 AI 自动化 MVP 的错误、卡点、耗时和下一步优化。", minutes: 20, standard: "完成一次优化记录或修正", gmn: "G", skillIds: ["operations", "personal-system"], status: "Not Started" },
+        { id: "T-032", questId: "Q-027", name: "整理可推销案例", instruction: "把一个内部 AI 自动化方案写成客户能懂的案例：问题、方案、效果、报价方向。", minutes: 20, standard: "完成一版案例草稿", gmn: "G", skillIds: ["communication", "market"], status: "Not Started" },
+        { id: "T-007", questId: "Q-004", name: "每日冥想记录", instruction: "冥想/呼吸后描述场景和感受。", minutes: 10, standard: "写下冥想场景和身体/情绪感受", gmn: "M", skillIds: ["personal-system"], status: "Not Started" },
+        { id: "T-008", questId: "Q-005", name: "每周体重测量", instruction: "记录本周体重、变化原因、饮食/运动状态。", minutes: 10, standard: "完成一次体重趋势记录", gmn: "G", skillIds: ["personal-system"], status: "Not Started" },
+        { id: "T-009", questId: "Q-006", name: "复盘一个联系人", instruction: "写下一个人能帮什么、你能提供什么、下一步联系。", minutes: 20, standard: "完成联系人卡片", gmn: "G", skillIds: ["communication", "leadership"], status: "Not Started" },
+        { id: "T-010", questId: "Q-007", name: "V60/兴趣记录", instruction: "记录一次咖啡/运动体验和改进点。", minutes: 20, standard: "完成一条兴趣日志", gmn: "M", skillIds: ["personal-system"], status: "Not Started" },
+        { id: "T-RND-001", questId: "Q-011", name: "紧急回复重要客户 RFQ", instruction: "突发客户请求，快速判断是否值得推进。", minutes: 20, standard: "完成判断并记录下一步", gmn: "G", skillIds: ["revenue", "communication"], status: "Not Started", is_random_event: true, quest_type: "main", estimated_sessions: 1, reason: "重要客户临时询价，可能影响元器件业务收入。", source: "emergency", linked_goal_id: "BUSINESS", priority: "urgent", pivot_status: "none", original_title: "紧急回复重要客户 RFQ", current_title: "紧急回复重要客户 RFQ", pivot_reason: "", discovery_note: "", generated_task_id: "" }
+      ],
+      skills: [
+        { id: "strategy", name: "Strategy / 战略判断", level: 1, xp: 35, maxXp: 100, description: "把长期方向翻译成目标、取舍、优先级和执行路线。", requirements: ["Define and execute long-term strategy", "Translate strategy into measurable operating plans"], unlock: "战略 memo 模板" },
+        { id: "revenue", name: "Revenue / 增长与销售", level: 1, xp: 20, maxXp: 100, description: "客户开发、GTM、销售流程、渠道和 pipeline。", requirements: ["Own revenue generation", "Build sales playbook and customer acquisition strategy"], unlock: "客户开发地图" },
+        { id: "finance", name: "Finance / 财务与资本", level: 1, xp: 12, maxXp: 100, description: "现金流、预算、财务模型、融资和银行/投资人沟通。", requirements: ["Lead capital raising", "Financial planning and scenario analysis"], unlock: "现金流仪表盘" },
+        { id: "operations", name: "Operations / 运营系统", level: 1, xp: 42, maxXp: 100, description: "SOP、KPI、流程优化、跨部门协同。", requirements: ["Build scalable operating model", "Monitor KPIs and remove bottlenecks"], unlock: "SOP 任务工坊" },
+        { id: "leadership", name: "Leadership / 团队领导", level: 1, xp: 16, maxXp: 100, description: "组织设计、招聘、绩效、沟通、责任感。", requirements: ["Build and lead high-caliber teams", "Create accountability and alignment"], unlock: "团队任务面板" },
+        { id: "communication", name: "Communication / 影响力表达", level: 1, xp: 25, maxXp: 100, description: "pitch、决策文档、board update、LinkedIn 内容。", requirements: ["Serve as external face", "Write strategic memos and investor updates"], unlock: "Pitch 训练场" },
+        { id: "market", name: "Market Insight / 市场洞察", level: 1, xp: 18, maxXp: 100, description: "竞品、客户需求、行业趋势、市场进入。", requirements: ["Market entry and partnerships", "Use customer and market data for decisions"], unlock: "市场侦察地图" },
+        { id: "personal-system", name: "Personal System / 自我系统", level: 2, xp: 65, maxXp: 120, description: "精力、专注、GMN 判断、复盘、稳定执行。", requirements: ["Prioritize what gets done now vs later", "Unblock execution and follow-through"], unlock: "AI 周复盘" }
+      ],
+      logs: [
+        { id: "L-001", date: "2026-05-10", minutes: 20, gmn: "G", questId: "Q-009", taskId: "T-001", whatDone: "梳理 DFK 当前系统问题", problem: "报价、客户、订单记录分散，复盘成本高", solution: "先集中记录关键流程和卡点", good: "找到了业务系统问题", bad: "流程还不够统一", nextStep: "优化报价和订单流程", skillXp: [{ skillId: "operations", xp: 30 }, { skillId: "strategy", xp: 10 }] },
+        { id: "L-002", date: "2026-05-10", minutes: 20, gmn: "G", questId: "Q-009", taskId: "T-002", whatDone: "整理报价和订单流程", problem: "不同客户跟进方式不一致", solution: "先写出标准动作", good: "流程更清楚", bad: "还需要真实订单测试", nextStep: "调整 DFK 业务记录方式", skillXp: [{ skillId: "operations", xp: 30 }, { skillId: "revenue", xp: 10 }] },
+        { id: "L-003", date: "2026-05-10", minutes: 10, gmn: "M", questId: "Q-004", taskId: "T-007", whatDone: "安静坐下，做了一次短冥想", problem: "呼吸慢下来后，焦虑感有下降", solution: "", good: "", bad: "", nextStep: "每天做一次短记录", skillXp: [{ skillId: "personal-system", xp: 15 }], is_pivoted: false, original_task_id: "T-007", actual_task_id: "T-007", pivot_note: "" },
+        { id: "L-004", date: "2026-05-10", minutes: 20, gmn: "G", questId: "Q-011", taskId: "T-RND-001", whatDone: "处理客户临时 RFQ，并判断为可推进机会", problem: "规格信息不完整", solution: "先回确认清单", good: "没有把突发事件当成打乱计划，而是归入 main/G", bad: "", nextStep: "等待客户补规格后报价", skillXp: [{ skillId: "revenue", xp: 30 }, { skillId: "communication", xp: 10 }], is_random_event: true, is_pivoted: false, original_task_id: "T-RND-001", actual_task_id: "T-RND-001", pivot_note: "" }
+      ],
+      todos: [],
+      model: [
+        ["5-Year", "2030 Goal", "长期方向/人生地图", "Goal ID, 2030 target, unit, achieved, description", "决定哪些时间算真实成长"],
+        ["Annual", "2026 Goal/KR", "今年关键结果", "Goal ID, Type, target, current, Next Move", "把长期目标落到今年"],
+        ["Weekly", "Quest", "本周主线/支线", "Quest ID, linked goal, objective, next move, GMN default", "像游戏关卡一样推进"],
+        ["Session", "20min Task", "一次可启动小战斗", "Task ID, output standard, skillIds", "降低启动成本，并映射到技能 XP"],
+        ["Log", "Session Log", "真实执行过程记录", "GMN, content, problem, solution, good/bad, next action", "为周复盘和 AI 分析提供数据"],
+        ["Skill", "CEO Skill", "专项能力成长", "skillId, level, xp, requirements, unlock", "把执行任务转化成长期职业技能"],
+        ["Review", "Weekly Review", "复盘并生成下周路线", "G/M/N占比、输出、问题、下一步", "形成计划-执行-复盘闭环"],
+        ["Inbox", "Todo Reminder", "待办收件箱和今日提醒", "title, dueDate, questId, gmn, priority, convertedTaskId", "先收集事情，自动/手动归类，晚点再转成 20min Task"],
+        ["Dynamic", "Random Event", "突发任务收编", "quest_type, gmn_type, source, reason, priority", "把临时事件判断为机会、风险、维护或噪音"],
+        ["Dynamic", "Task Pivot", "任务转向轨迹", "pivot_status, original_task_id, actual_task_id, pivot_note", "保留探索过程，不覆盖历史"]
+      ]
+    };
+
+    
+    
+    
+    /* defaultSheetSyncConfig moved to APP_CONFIG */
+    let data = loadData();
+    let selectedCampaignId = "Q-001";
+    let selectedQuestId = "Q-009";
+    let selectedTaskId = "T-003";
+    let selectedGoalId = "BUSINESS";
+    let selectedSkillId = "personal-system";
+    let editingLogId = null;
+    let lastSession = null;
+    let seconds = APP_CONFIG.SESSION_DURATION_SECONDS;
+    let timerTaskId = selectedTaskId;
+    let timer = null;
+    let timerEndsAt = 0;
+    let running = false;
+    let timerSessionActive = false;
+    let pendingAfterSessionSave = null;
+    let selectedPivotType = "renamed";
+
+    const $ = (id) => document.getElementById(id);
+    const questById = (id) => data.quests.find(q => q.id === id);
+    const taskById = (id) => data.tasks.find(t => t.id === id);
+    const skillById = (id) => data.skills.find(s => s.id === id);
+    const tasksForQuest = (id) => data.tasks.filter(t => t.questId === id);
+    const pct = (n) => Math.round(n) + "%";
+    const escapeHtml = (value = "") => String(value).replace(/[&<>"']/g, ch => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[ch]));
+    const goalLabel = (goal) => goal?.displayTitle || goal?.id || "";
+    function sheetSyncConfig() {
+      const saved = JSON.parse(localStorage.getItem(APP_CONFIG.SHEET_SYNC_CONFIG_KEY) || "{}");
+      return {
+        url: saved.url || APP_CONFIG.DEFAULT_GAS_URL,
+        token: saved.token || APP_CONFIG.DEFAULT_SYNC_TOKEN
+      };
+    }
+    function saveSheetSyncConfig() {
+      const config = {
+        url: $("sheetSyncUrl").value.trim(),
+        token: $("sheetSyncToken").value.trim()
+      };
+      localStorage.setItem(APP_CONFIG.SHEET_SYNC_CONFIG_KEY, JSON.stringify(config));
+      renderSheetSyncConfig();
+    }
+    function renderSheetSyncConfig(message = "") {
+      const config = sheetSyncConfig();
+      if ($("sheetSyncUrl")) $("sheetSyncUrl").value = config.url || "";
+      if ($("sheetSyncToken")) $("sheetSyncToken").value = config.token || "";
+      if ($("sheetSyncBadge")) $("sheetSyncBadge").textContent = config.url ? "已配置" : "未配置";
+      if ($("sheetSyncStatus")) $("sheetSyncStatus").textContent = message || (config.url ? "打开网页会自动读取，完成专注会自动写入 Session_Logs。" : "先部署 Apps Script，再填 URL 和 Token。");
+    }
+    function todayISO() {
+      return new Date().toISOString().slice(0, 10);
+    }
+
+    function loadData() {
+      const current = JSON.parse(localStorage.getItem(APP_CONFIG.STORAGE_KEY) || "null");
+      if (current) return normalizeData(current);
+      const legacy = JSON.parse(localStorage.getItem(APP_CONFIG.LEGACY_KEY) || "null");
+      if (!legacy) return normalizeData(seed);
+      const migrated = structuredClone(seed);
+      if (Array.isArray(legacy.logs)) migrated.logs = legacy.logs.map((log, index) => normalizeLog(log, index, migrated.tasks));
+      return normalizeData(migrated);
+    }
+    function normalizeData(raw) {
+      const merged = { ...structuredClone(seed), ...raw };
+      merged.goals2030 = normalizeGoals(mergeById(seed.goals2030, merged.goals2030 || []));
+      merged.quests = normalizeQuests(mergeById(seed.quests, merged.quests || []));
+      merged.tasks = normalizeTasks(mergeById(seed.tasks, merged.tasks || []));
+      merged.logs = (merged.logs || []).map((log, index) => normalizeLog(log, index, merged.tasks));
+      merged.todos = normalizeTodos(merged.todos || []);
+      return merged;
+    }
+    function mergeById(defaultRows, savedRows) {
+      const rows = [...defaultRows];
+      savedRows.forEach(row => {
+        const index = rows.findIndex(item => item.id === row.id);
+        if (index >= 0) rows[index] = { ...rows[index], ...row };
+        else rows.push(row);
+      });
+      return rows;
+    }
+    function normalizeGoals(goals) {
+      return goals.map(goal => {
+        const fixed = seed.goals2030.find(item => item.id === goal.id);
+        return fixed ? { ...goal, ...fixed } : goal;
+      });
+    }
+    function normalizeTodos(todos) {
+      return todos.map((todo, index) => {
+        const suggestion = classifyTodo(`${todo.title || ""} ${todo.note || ""}`);
+        return {
+          id: todo.id || `TODO-${index + 1}`,
+          title: todo.title || "",
+          note: todo.note || "",
+          dueDate: todo.dueDate || todayISO(),
+          priority: todo.priority || "medium",
+          status: todo.status || "open",
+          questId: todo.questId || suggestion.questId,
+          gmn: todo.gmn || suggestion.gmn,
+          createdAt: todo.createdAt || new Date().toISOString(),
+          convertedTaskId: todo.convertedTaskId || ""
+        };
+      });
+    }
+    function normalizeQuests(quests) {
+      return quests.map(quest => {
+        const fixed = seed.quests.find(item => item.id === quest.id);
+        return fixed ? { ...quest, ...fixed } : quest;
+      });
+    }
+    function normalizeTasks(tasks) {
+      return tasks.map(task => {
+        const fixed = seed.tasks.find(item => item.id === task.id);
+        const base = {
+          is_random_event: false,
+          quest_type: questTypeFromQuestId(fixed?.questId || task.questId),
+          estimated_sessions: 1,
+          reason: "",
+          source: "manual",
+          linked_goal_id: "",
+          priority: (task.priority || "medium").toLowerCase(),
+          pivot_status: "none",
+          original_title: task.name,
+          current_title: task.name,
+          pivot_reason: "",
+          discovery_note: "",
+          generated_task_id: ""
+        };
+        if (fixed && !task.is_random_event) {
+          return {
+            ...base,
+            ...task,
+            ...fixed,
+            current_title: fixed.name,
+            original_title: fixed.name,
+            minutes: Number(fixed.minutes || 20),
+            quest_type: fixed.quest_type || questTypeFromQuestId(fixed.questId)
+          };
+        }
+        return { ...base, ...task, minutes: Number(task.minutes || 20) };
+      });
+    }
+    function normalizeLog(log, index, tasks = seed.tasks) {
+      const task = taskByIdFromRows(log.taskId, tasks);
+      return {
+        id: log.id || `L-${String(index + 1).padStart(3, "0")}`,
+        date: log.date || new Date().toISOString().slice(0, 10),
+        minutes: Number(log.minutes || 20),
+        gmn: log.gmn || task?.gmn || "G",
+        questId: log.questId || task?.questId || "Q-009",
+        taskId: log.taskId || "T-003",
+        whatDone: log.whatDone || "",
+        problem: log.problem || "",
+        solution: log.solution || "",
+        good: log.good || "",
+        bad: log.bad || "",
+        nextStep: log.nextStep || "",
+        skillXp: log.skillXp || buildSkillXp(task || seed.tasks[2]),
+        is_random_event: Boolean(log.is_random_event || task?.is_random_event),
+        is_pivoted: Boolean(log.is_pivoted),
+        original_task_id: log.original_task_id || log.taskId || "T-003",
+        actual_task_id: log.actual_task_id || log.taskId || "T-003",
+        pivot_note: log.pivot_note || ""
+      };
+    }
+    function taskByIdFromSeed(id) {
+      return seed.tasks.find(t => t.id === id);
+    }
+    function taskByIdFromRows(id, rows) {
+      return rows.find(t => t.id === id) || taskByIdFromSeed(id);
+    }
+    function save() {
+      data.version = APP_CONFIG.VERSION;
+      localStorage.setItem(APP_CONFIG.STORAGE_KEY, JSON.stringify(data));
+    }
+    function newId(prefix) {
+      return `${prefix}-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 6)}`;
+    }
+    function valueProgress(row) {
+      const target = Number(row?.targetValue || 0);
+      if (!target) return null;
+      return Math.max(0, Math.min(100, Math.round((Number(row.currentValue || 0) / target) * 100)));
+    }
+    function displayProgress(row) {
+      const valueBased = valueProgress(row);
+      return valueBased === null ? Number(row?.progress || 0) : valueBased;
+    }
+    function goalProgress(goal) {
+      const campaigns = campaignQuestsForGoal(goal.id);
+      const metricCampaigns = campaigns.filter(q => valueProgress(q) !== null);
+      if (metricCampaigns.length) {
+        return Math.round(metricCampaigns.reduce((sum, q) => sum + valueProgress(q), 0) / metricCampaigns.length);
+      }
+      return displayProgress(goal);
+    }
+    function overallAnnualProgress() {
+      const topLevel = data.quests.filter(q => !q.parentQuestId && valueProgress(q) !== null);
+      if (topLevel.length) {
+        return Math.round(topLevel.reduce((sum, q) => sum + valueProgress(q), 0) / topLevel.length);
+      }
+      return data.quests.reduce((s, q) => s + computedQuestProgress(q), 0) / data.quests.length;
+    }
+    function computedQuestProgress(q) {
+      const valueBased = valueProgress(q);
+      if (valueBased !== null) return valueBased;
+      const tasks = tasksForQuest(q.id);
+      if (!tasks.length) return q.status === "In Progress" ? 35 : 8;
+      const done = data.logs.filter(l => l.questId === q.id).length;
+      return Math.min(100, Math.round((done / Math.max(tasks.length, 1)) * 100));
+    }
+    function computedTaskProgress(task) {
+      return task.status === "Done" || data.logs.some(l => (l.actual_task_id || l.taskId) === task.id) ? 100 : 0;
+    }
+    function buildSkillXp(task) {
+      const base = task.gmn === "G" ? 30 : task.gmn === "M" ? 15 : 0;
+      return (task.skillIds || ["personal-system"]).map((skillId, index) => ({ skillId, xp: index === 0 ? base : Math.max(5, Math.round(base / 3)) }));
+    }
+    function questTypeFromQuestId(questId) {
+      const q = seed.quests.find(item => item.id === questId);
+      if (!q) return "side";
+      if (q.type === "Main") return "main";
+      if (q.type === "Habit") return "maintenance";
+      return "side";
+    }
+    function questTypeForTask(task) {
+      if (!task) return "side";
+      if (task.is_random_event && !["Promoted", "Filed as Maintenance", "Filed as Noise"].includes(task.status)) return "emergency";
+      if (task.pivot_status && task.pivot_status !== "none") return "pivot";
+      return task.quest_type || questTypeFromQuestId(task.questId);
+    }
+    function questTypeForQuest(quest) {
+      const tasks = tasksForQuest(quest.id);
+      const random = tasks.some(t => t.is_random_event);
+      const pivot = tasks.some(t => t.pivot_status && t.pivot_status !== "none");
+      if (random) return "emergency";
+      if (pivot) return "pivot";
+      return questTypeFromQuestId(quest.id);
+    }
+    function typeBadge(type) {
+      return ({
+        main: "主线",
+        side: "支线",
+        maintenance: "维护",
+        noise: "噪音",
+        emergency: "突发",
+        pivot: "转向"
+      })[type] || "支线";
+    }
+    function roleBadge(role) {
+      return ({
+        Mainline: "主线",
+        Habit: "习惯",
+        Sideline: "支线",
+        Life: "生活"
+      })[role] || role || "目标";
+    }
+    function gmnText(gmn) {
+      return ({ G: "G 成长", M: "M 维护", N: "N 噪音" })[gmn] || gmn || "G 成长";
+    }
+    function gmnClass(gmn) {
+      return `gmn-${String(gmn || "G").toLowerCase()}`;
+    }
+    function typeClass(type) {
+      return `type-${type || "side"}`;
+    }
+    function questGoalIds(quest) {
+      return String(quest?.goal || "").split("/").map(id => id.trim()).filter(Boolean);
+    }
+    function questMatchesGoal(quest, goalId) {
+      return questGoalIds(quest).includes(goalId);
+    }
+    function rootQuestId(questId) {
+      let quest = questById(questId);
+      const seen = new Set();
+      while (quest?.parentQuestId && !seen.has(quest.id)) {
+        seen.add(quest.id);
+        quest = questById(quest.parentQuestId);
+      }
+      return quest?.id || questId;
+    }
+    function syncGoalForQuest(questId) {
+      const quest = questById(questId);
+      const firstGoal = questGoalIds(quest)[0];
+      if (firstGoal) selectedGoalId = firstGoal;
+      selectedCampaignId = rootQuestId(questId) || selectedCampaignId;
+    }
+    function campaignQuestsForGoal(goalId) {
+      return data.quests.filter(q => !q.parentQuestId && questMatchesGoal(q, goalId));
+    }
+    function chapterQuestsForCampaign(campaignId) {
+      const collect = (parentId, depth = 0) => data.quests
+        .filter(q => q.parentQuestId === parentId)
+        .flatMap(q => [{ ...q, mapDepth: depth }, ...collect(q.id, depth + 1)]);
+      const chapters = collect(campaignId);
+      return chapters.length ? chapters : data.quests.filter(q => q.id === campaignId);
+    }
+    function questIdForType(type, goalId = "") {
+      if (type === "main") {
+        if (goalId === "PASSIVE") return "Q-002";
+        if (goalId === "BUSINESS") return "Q-001";
+        return "Q-001";
+      }
+      if (type === "maintenance") return "Q-005";
+      if (type === "noise") return "Q-008";
+      return "Q-009";
+    }
+    function isMeditationTask(task) {
+      return task?.questId === "Q-004" || task?.id === "T-007";
+    }
+    function selectedDurationMinutes() {
+      const t = taskById(selectedTaskId);
+      const value = Number($("durationInput")?.value || t?.minutes || 20);
+      return Math.min(180, Math.max(1, Math.round(value)));
+    }
+    function setTimerForTask(task, force = false) {
+      const minutes = Number(task?.minutes || 20);
+      if (!force && (running || timerSessionActive)) return;
+      if (force || timerTaskId !== task.id) {
+        timerTaskId = task.id;
+        timerSessionActive = false;
+        seconds = minutes * 60;
+        timerEndsAt = 0;
+        if ($("durationInput")) $("durationInput").value = String(Math.max(1, minutes));
+      }
+    }
+
+    function renderGoals() {
+      $("goalList").innerHTML = data.goals2030.map(g => `
+        <div class="goal-row">
+          <div class="goal-head"><span>${escapeHtml(g.id)}</span><span>${goalProgress(g)}%</span></div>
+          <div class="bar"><div class="fill" style="--value:${goalProgress(g)}%"></div></div>
+        </div>
+      `).join("");
+    }
+    function renderSkillMini() {
+      $("skillMini").innerHTML = data.skills.slice(0, 4).map(s => `
+        <div class="skill-mini">
+          <div class="goal-head"><span>${escapeHtml(s.name.split(" / ")[0])}</span><span>Lv.${s.level}</span></div>
+          <div class="bar"><div class="fill" style="--value:${Math.min(100, s.xp / s.maxXp * 100)}%"></div></div>
+        </div>
+      `).join("");
+    }
+    function renderMap() {
+      syncTimerWithClock();
+      renderLifeGrid();
+      renderCampaignGrid();
+      renderWeeklyMap();
+      renderTaskRail();
+      renderActiveTimerPanel();
+      const avg = overallAnnualProgress();
+      $("annualProgress").textContent = pct(avg);
+      $("annualFill").style.setProperty("--value", pct(avg));
+      $("weekSessions").textContent = data.logs.length;
+      $("weekLogs").textContent = data.logs.length;
+    }
+    function renderActiveTimerPanel() {
+      const panel = $("activeTimerPanel");
+      if (!panel) return;
+      const task = taskById(timerTaskId || selectedTaskId);
+      const show = Boolean(task && timerSessionActive && seconds > 0);
+      panel.classList.toggle("hide", !show);
+      if (!show) return;
+      $("activeTimerLeft").textContent = `${String(Math.floor(seconds / 60)).padStart(2, "0")}:${String(seconds % 60).padStart(2, "0")}`;
+      $("activeTimerState").textContent = running ? "计时中" : "已暂停";
+      $("activeTimerTask").textContent = task.current_title || task.name;
+      $("returnFocusBtn").onclick = () => {
+        selectedTaskId = task.id;
+        selectedQuestId = task.questId;
+        syncGoalForQuest(selectedQuestId);
+        showScreen("focus");
+      };
+    }
+    function renderLifeGrid() {
+      $("lifeGrid").innerHTML = data.goals2030.map(goal => `
+        <button class="life-cell ${goal.id === selectedGoalId ? "active" : ""}" data-goal="${goal.id}">
+          <span class="node-title">${escapeHtml(goalLabel(goal))}</span>
+          <span class="node-compact"><span class="type-badge">${escapeHtml(roleBadge(goal.role))}</span><span>${goalProgress(goal)}%</span></span>
+          <div class="bar"><div class="fill" style="--value:${goalProgress(goal)}%"></div></div>
+        </button>
+      `).join("");
+      document.querySelectorAll("[data-goal]").forEach(btn => btn.onclick = () => {
+        selectedGoalId = btn.dataset.goal;
+        const campaign = campaignQuestsForGoal(selectedGoalId)[0];
+        if (campaign) {
+          selectedCampaignId = campaign.id;
+          const chapter = chapterQuestsForCampaign(campaign.id)[0];
+          selectedQuestId = chapter.id;
+          const task = tasksForQuest(chapter.id)[0];
+          if (task) selectedTaskId = task.id;
+        }
+        renderAll();
+      });
+    }
+    function renderCampaignGrid() {
+      const campaigns = campaignQuestsForGoal(selectedGoalId);
+      $("campaignGrid").innerHTML = campaigns.map(q => {
+        const children = chapterQuestsForCampaign(q.id);
+        const progress = computedQuestProgress(q);
+        const type = questTypeForQuest(q);
+        return `
+          <button class="campaign-card ${typeClass(type)} ${q.id === selectedCampaignId ? "active" : ""} ${progress >= 100 ? "state-done" : "state-todo"}" data-campaign="${q.id}">
+            <span class="node-title">${escapeHtml(q.name)}</span>
+            <span class="node-compact"><span class="type-badge">年度目标</span><span>${Math.round(progress)}%</span></span>
+            <div class="bar"><div class="fill" style="--value:${progress}%"></div></div>
+            <small>${escapeHtml(q.target)}</small>
+          </button>
+        `;
+      }).join("") || `<p>这个 2030 分类下还没有 2026 战役。</p>`;
+      document.querySelectorAll("[data-campaign]").forEach(btn => btn.onclick = () => {
+        selectedCampaignId = btn.dataset.campaign;
+        syncGoalForQuest(selectedCampaignId);
+        const chapter = chapterQuestsForCampaign(selectedCampaignId)[0];
+        selectedQuestId = chapter.id;
+        const task = tasksForQuest(selectedQuestId)[0];
+        if (task) selectedTaskId = task.id;
+        renderAll();
+      });
+    }
+    function renderWeeklyMap() {
+      const visibleQuests = chapterQuestsForCampaign(selectedCampaignId);
+      $("weeklyMap").innerHTML = visibleQuests.map(q => questNodeHtml(q)).join("") || `<p>选择其他 2030 分类查看本周关卡。</p>`;
+      document.querySelectorAll("[data-quest-node]").forEach(btn => btn.onclick = () => {
+        selectedQuestId = btn.dataset.questNode;
+        syncGoalForQuest(selectedQuestId);
+        const task = tasksForQuest(selectedQuestId)[0];
+        if (task) selectedTaskId = task.id;
+        renderAll();
+      });
+    }
+    function questNodeHtml(q) {
+      const progress = computedQuestProgress(q);
+      const type = questTypeForQuest(q);
+      const estimated = tasksForQuest(q.id).reduce((s, t) => s + Number(t.estimated_sessions || 1), 0);
+      const discovery = tasksForQuest(q.id).some(t => t.status === "Discovery" || t.pivot_status === "completed_as_discovery");
+      const pivotLinks = tasksForQuest(q.id).filter(t => t.generated_task_id).map(t => {
+        const generated = taskById(t.generated_task_id);
+        return `<div class="pivot-link">${escapeHtml(t.current_title || t.name)} ⇢ ${escapeHtml(generated?.current_title || generated?.name || "新任务")}</div>`;
+      }).join("");
+      return `
+        <button class="quest-map-node ${typeClass(type)} ${gmnClass(q.gmn)} ${q.id === selectedQuestId ? "active" : ""} ${discovery ? "discovery" : ""} ${progress >= 100 ? "state-done" : "state-todo"}" data-quest-node="${q.id}">
+          <span class="node-title">${escapeHtml(`${q.mapDepth ? "- " : ""}${q.name}`)}</span>
+          <span class="node-compact"><span class="type-badge">${typeBadge(discovery ? "pivot" : type)}</span><span class="gmn-tag ${gmnClass(q.gmn)}">${q.gmn}</span></span>
+          <small>${progress}% · ${estimated || 1} 次</small>
+          ${pivotLinks}
+        </button>
+      `;
+    }
+    function renderTaskRail() {
+      const tasks = tasksForQuest(selectedQuestId);
+      $("taskRail").innerHTML = tasks.map(t => taskMapHtml(t)).join("") || `<p>这个关卡还没有 20min task。</p>`;
+      document.querySelectorAll("[data-task-node]").forEach(btn => btn.onclick = () => {
+        selectedTaskId = btn.dataset.taskNode;
+        selectedQuestId = taskById(selectedTaskId).questId;
+        syncGoalForQuest(selectedQuestId);
+        renderAll();
+      });
+    }
+    function taskMapHtml(t) {
+      const type = questTypeForTask(t);
+      const progress = data.logs.some(l => (l.actual_task_id || l.taskId) === t.id) ? 100 : 0;
+      const generated = t.generated_task_id ? taskById(t.generated_task_id) : null;
+      return `
+        <button class="task-map-card ${typeClass(type)} ${gmnClass(t.gmn)} ${t.id === selectedTaskId ? "active" : ""} ${progress >= 100 ? "state-done" : "state-todo"}" data-task-node="${t.id}">
+          <span class="node-title">${escapeHtml(t.current_title || t.name)}</span>
+          <span class="node-compact"><span class="type-badge">${t.status === "Discovery" ? "Discovery" : typeBadge(type)}</span><span class="gmn-tag ${gmnClass(t.gmn)}">${t.gmn}</span></span>
+          <small>${progress >= 100 ? "已完成" : "未完成"} · ${t.estimated_sessions || 1} 次</small>
+          ${generated ? `<div class="pivot-link">⇢ ${escapeHtml(generated.current_title || generated.name)}</div>` : ""}
+        </button>
+      `;
+    }
+    function renderDetail() {
+      const q = questById(selectedQuestId);
+      const tasks = tasksForQuest(q.id);
+      const selectedTask = taskById(selectedTaskId) || tasks[0];
+      const taskLogs = selectedTask ? data.logs.filter(l => [selectedTask.id, selectedTask.generated_task_id].includes(l.taskId) || [selectedTask.id, selectedTask.generated_task_id].includes(l.actual_task_id)) : [];
+      const taskType = questTypeForTask(selectedTask);
+      $("questDetail").innerHTML = `
+        <div class="simple-detail">
+          <span class="pill">${typeBadge(taskType)} · ${gmnText(selectedTask?.gmn || q.gmn)}</span>
+          <h3>${escapeHtml(q.name)}</h3>
+          <button class="primary full" id="detailStart">开始记录</button>
+          <details class="custom-task-box">
+            <summary class="secondary full">修改 GMN</summary>
+            <div class="form-grid">
+              <label>章节属于
+                <select id="detailQuestGmn">
+                  <option value="G" ${q.gmn === "G" ? "selected" : ""}>G 成长</option>
+                  <option value="M" ${q.gmn === "M" ? "selected" : ""}>M 维护</option>
+                  <option value="N" ${q.gmn === "N" ? "selected" : ""}>N 噪音</option>
+                </select>
+              </label>
+              ${selectedTask ? `
+              <label>当前任务属于
+                <select id="detailTaskGmn">
+                  <option value="G" ${selectedTask.gmn === "G" ? "selected" : ""}>G 成长</option>
+                  <option value="M" ${selectedTask.gmn === "M" ? "selected" : ""}>M 维护</option>
+                  <option value="N" ${selectedTask.gmn === "N" ? "selected" : ""}>N 噪音</option>
+                </select>
+              </label>
+              ` : ""}
+            </div>
+            <div class="actions">
+              <button class="secondary" id="saveQuestGmnBtn">保存章节判断</button>
+              ${selectedTask ? `<button class="secondary" id="saveTaskGmnBtn">保存任务判断</button>` : ""}
+            </div>
+          </details>
+          <details class="custom-task-box">
+            <summary class="secondary full">更多记录设置</summary>
+            <div class="progress-number"><span>完成情况</span><span>${tasks.filter(t => computedTaskProgress(t) >= 100).length}/${tasks.length}</span></div>
+            <div class="bar"><div class="fill" style="--value:${computedQuestProgress(q)}%"></div></div>
+            ${valueProgress(q) !== null ? `
+            <div class="custom-task-box">
+              <h4>更新目标进度</h4>
+              <div class="form-grid">
+                <label>当前值<input id="metricCurrent" type="number" step="0.01" value="${Number(q.currentValue || 0)}" /></label>
+                <label>目标值<input id="metricTarget" type="number" step="0.01" value="${Number(q.targetValue || 0)}" /></label>
+              </div>
+              <small>单位：${escapeHtml(q.unit || "")}。</small>
+              <button class="secondary full" id="saveMetricBtn">保存进度</button>
+            </div>
+            ` : ""}
+            <h4>预设任务</h4>
+            <div class="task-list">
+            ${tasks.map(t => `
+              <button class="task-card ${t.id === selectedTaskId ? "selected" : ""} ${computedTaskProgress(t) >= 100 ? "done" : "todo"}" data-task="${t.id}">
+                <div class="task-head"><span>${escapeHtml(t.current_title || t.name)}</span><span class="pill">${computedTaskProgress(t) >= 100 ? "已完成" : "未完成"}</span></div>
+                <small>${gmnText(t.gmn)} · ${t.minutes || 20} 分钟</small>
+              </button>
+            `).join("")}
+            </div>
+            <div class="custom-task-box">
+              <h4>自己写一个任务</h4>
+              <label>任务标题<input id="quickTaskTitle" placeholder="例如：更新 DFK 系统" /></label>
+              <label>记录重点<textarea id="quickTaskNote" placeholder="这次 20 分钟主要做什么？"></textarea></label>
+              <div class="form-grid">
+                <label>时间<input id="quickTaskMinutes" type="number" min="1" max="180" value="20" /></label>
+                <label>类型<select id="quickTaskGmn"><option value="G">G 成长</option><option value="M">M 维护</option><option value="N">N 噪音</option></select></label>
+              </div>
+              <button class="secondary full" id="quickTaskStart">加入并开始记录</button>
+            </div>
+            <h4>最近记录</h4>
+            <div class="route">
+              ${taskLogs.length ? taskLogs.slice(0, 3).map(log => `<div class="route-item"><b>${escapeHtml(log.date)} · ${log.minutes} 分钟 · ${gmnText(log.gmn)}</b><br><small>${escapeHtml(log.whatDone || "已记录")}</small></div>`).join("") : `<div class="route-item"><small>还没有记录。</small></div>`}
+            </div>
+            ${selectedTask?.is_random_event ? `<div class="route-item"><b>突发任务归类</b><div class="actions"><button class="secondary" data-classify-random="main">主线</button><button class="secondary" data-classify-random="side">支线</button><button class="secondary" data-classify-random="maintenance">维护</button><button class="secondary" data-classify-random="noise">噪音</button></div></div>` : ""}
+          </details>
+        </div>
+      `;
+      document.querySelectorAll(".task-card").forEach(btn => {
+        btn.addEventListener("click", () => {
+          selectedTaskId = btn.dataset.task;
+          selectedQuestId = taskById(selectedTaskId).questId;
+          syncGoalForQuest(selectedQuestId);
+          renderAll();
+        });
+      });
+      if ($("saveMetricBtn")) $("saveMetricBtn").onclick = () => updateQuestMetric(q.id);
+      if ($("saveQuestGmnBtn")) $("saveQuestGmnBtn").onclick = () => updateQuestGmn(q.id, $("detailQuestGmn").value);
+      if ($("saveTaskGmnBtn")) $("saveTaskGmnBtn").onclick = () => updateTaskGmn(selectedTask.id, $("detailTaskGmn").value);
+      $("detailStart").addEventListener("click", startDefaultRecordFromDetail);
+      if ($("quickTaskStart")) $("quickTaskStart").addEventListener("click", createQuickTask);
+      document.querySelectorAll("[data-classify-random]").forEach(btn => btn.onclick = () => classifyRandomEvent(selectedTask.id, btn.dataset.classifyRandom));
+    }
+    function startDefaultRecordFromDetail() {
+      const tasks = tasksForQuest(selectedQuestId);
+      const current = taskById(selectedTaskId);
+      const task = current && current.questId === selectedQuestId ? current : tasks[0];
+      if (!task) return;
+      if (!confirmStartNewSession(task.id)) return;
+      selectedTaskId = task.id;
+      setTimerForTask({ ...task, minutes: 20 }, true);
+      showScreen("focus");
+      if ($("durationInput")) $("durationInput").value = "20";
+      seconds = 20 * 60;
+      renderTimer();
+      if (!running) toggleTimer();
+    }
+    function confirmStartNewSession(nextTaskId) {
+      if (!timerSessionActive || !timerTaskId) return true;
+      if (timerTaskId === nextTaskId) {
+        showScreen("focus");
+        return false;
+      }
+      const current = taskById(timerTaskId);
+      const next = taskById(nextTaskId);
+      const choice = prompt(
+        `已有一个进行中的记录：${current?.current_title || current?.name || "当前任务"}\n\n输入 1：回到之前的计时\n输入 2：先结束之前的记录，再开始「${next?.current_title || next?.name || "新任务"}」\n输入 3：放弃之前的计时，开始新记录`,
+        "1"
+      );
+      if (choice === "1" || choice === null || choice === "") {
+        selectedTaskId = timerTaskId;
+        const task = taskById(timerTaskId);
+        if (task) {
+          selectedQuestId = task.questId;
+          syncGoalForQuest(selectedQuestId);
+        }
+        showScreen("focus");
+        return false;
+      }
+      if (choice === "2") {
+        pendingAfterSessionSave = nextTaskId;
+        selectedTaskId = timerTaskId;
+        const task = taskById(timerTaskId);
+        if (task) {
+          selectedQuestId = task.questId;
+          syncGoalForQuest(selectedQuestId);
+        }
+        showScreen("focus");
+        alert("请先补充当前记录，然后点击「完成并结算」。结算后会自动开始新记录。");
+        return false;
+      }
+      if (choice === "3") {
+        abandonActiveSession();
+        return true;
+      }
+      return false;
+    }
+    function abandonActiveSession() {
+      running = false;
+      timerSessionActive = false;
+      clearInterval(timer);
+      timer = null;
+      timerEndsAt = 0;
+      seconds = 20 * 60;
+      renderTimer();
+    }
+    function continuePendingSessionIfNeeded() {
+      if (!pendingAfterSessionSave) return;
+      const nextTaskId = pendingAfterSessionSave;
+      pendingAfterSessionSave = null;
+      const task = taskById(nextTaskId);
+      if (!task) return;
+      selectedTaskId = task.id;
+      selectedQuestId = task.questId;
+      syncGoalForQuest(selectedQuestId);
+      setTimerForTask({ ...task, minutes: 20 }, true);
+      showScreen("focus");
+      if ($("durationInput")) $("durationInput").value = "20";
+      seconds = 20 * 60;
+      renderTimer();
+      if (!running) toggleTimer();
+    }
+    function renderFocus() {
+      if (timerSessionActive && timerTaskId) {
+        const activeTask = taskById(timerTaskId);
+        if (activeTask) {
+          selectedTaskId = activeTask.id;
+          selectedQuestId = activeTask.questId;
+          syncGoalForQuest(selectedQuestId);
+        }
+      }
+      $("taskSelect").innerHTML = data.tasks.map(t => {
+        const q = questById(t.questId);
+        return `<option value="${t.id}" ${t.id === selectedTaskId ? "selected" : ""}>${escapeHtml(q.name)} · ${escapeHtml(t.current_title || t.name)} · ${gmnText(t.gmn)}</option>`;
+      }).join("");
+      const t = taskById(selectedTaskId);
+      const q = questById(t.questId);
+      selectedQuestId = q.id;
+      setTimerForTask(t);
+      $("sessionGmn").value = t.gmn || "G";
+      $("sessionGmn").onchange = (e) => updateTaskGmn(t.id, e.target.value);
+      $("focusTaskName").textContent = t.current_title || t.name;
+      $("focusTaskInfo").textContent = `${q.name} / ${t.instruction} 完成标准：${t.standard}`;
+      $("sessionTypePill").textContent = `${selectedDurationMinutes()}min Session`;
+      $("durationInput").onchange = () => {
+        const minutes = selectedDurationMinutes();
+        $("durationInput").value = String(minutes);
+        $("sessionTypePill").textContent = `${minutes}min Session`;
+        if (!isMeditationTask(t)) $("whatDone").placeholder = `这 ${minutes} 分钟具体推进了什么？`;
+        if (!running) {
+          seconds = minutes * 60;
+          renderTimer();
+        }
+      };
+      renderRecordBoardMode(t);
+      $("skillRewardPreview").innerHTML = `
+        <div class="reward-line">
+          ${buildSkillXp(t).map(x => `<div class="reward"><span>${escapeHtml(skillById(x.skillId).name.split(" / ")[0])}</span><b>+${x.xp} XP</b></div>`).join("")}
+          <div class="reward"><span>GMN</span><b>${t.gmn}</b></div>
+          ${t.is_random_event ? `<div class="reward"><span>突发</span><b>${typeBadge(t.quest_type)}</b></div>` : ""}
+        </div>
+      `;
+      $("taskSelect").onchange = (e) => {
+        const nextTaskId = e.target.value;
+        if (!confirmStartNewSession(nextTaskId)) {
+          $("taskSelect").value = selectedTaskId;
+          return;
+        }
+        selectedTaskId = nextTaskId;
+        selectedQuestId = taskById(selectedTaskId).questId;
+        syncGoalForQuest(selectedQuestId);
+        renderAll();
+      };
+      renderTimer();
+    }
+    function renderRecordBoardMode(task) {
+      const meditation = isMeditationTask(task);
+      $("recordBoardTitle").textContent = meditation ? "冥想记录板" : "战斗记录板";
+      $("recordBoardHelp").textContent = meditation ? "简单记录场景和感受即可，不需要写成完整复盘。" : "先写关键内容，结束时再补全。保存后可以编辑。";
+      $("whatDoneLabel").firstChild.textContent = meditation ? "场景" : "做了什么";
+      $("problemLabel").firstChild.textContent = meditation ? "感受" : "遇到什么问题";
+      $("whatDone").placeholder = meditation ? "在哪里、什么姿势、周围环境、冥想前的状态..." : `这 ${selectedDurationMinutes()} 分钟具体推进了什么？`;
+      $("problem").placeholder = meditation ? "身体、呼吸、情绪、念头有没有变化？" : "卡点、阻力、情绪、信息缺口...";
+      ["solutionLabel", "goodLabel", "badLabel", "nextStepLabel"].forEach(id => $(id).classList.toggle("hide", meditation));
+    }
+    function renderTimer() {
+      $("timerValue").textContent = `${String(Math.floor(seconds / 60)).padStart(2, "0")}:${String(seconds % 60).padStart(2, "0")}`;
+      $("startPauseBtn").textContent = running ? "暂停" : "开始";
+      renderActiveTimerPanel();
+    }
+    function syncTimerWithClock() {
+      if (!running || !timerEndsAt) return;
+      const remainingMs = Math.max(0, timerEndsAt - Date.now());
+      seconds = Math.ceil(remainingMs / 1000);
+      renderTimer();
+      if (remainingMs <= 0) {
+        running = false;
+        timerSessionActive = false;
+        clearInterval(timer);
+        timer = null;
+        timerEndsAt = 0;
+        seconds = 0;
+        renderTimer();
+      }
+    }
+    function toggleTimer() {
+      if (running) {
+        syncTimerWithClock();
+        running = false;
+        clearInterval(timer);
+        timer = null;
+        timerEndsAt = 0;
+      } else {
+        if (seconds <= 0) seconds = selectedDurationMinutes() * 60;
+        running = true;
+        timerSessionActive = true;
+        timerEndsAt = Date.now() + seconds * 1000;
+        syncTimerWithClock();
+        timer = setInterval(syncTimerWithClock, 250);
+      }
+      renderTimer();
+    }
+    function resetTimer() {
+      running = false;
+      timerSessionActive = false;
+      clearInterval(timer);
+      timer = null;
+      timerEndsAt = 0;
+      seconds = selectedDurationMinutes() * 60;
+      renderTimer();
+    }
+    function readForm() {
+      const t = taskById(selectedTaskId);
+      const q = questById(t.questId);
+      return {
+        id: newId("L"),
+        date: new Date().toISOString().slice(0, 10),
+        minutes: selectedDurationMinutes(),
+        gmn: t.gmn,
+        questId: q.id,
+        taskId: t.id,
+        whatDone: $("whatDone").value.trim() || (isMeditationTask(t) ? "完成一次冥想" : (t.current_title || t.name)),
+        problem: $("problem").value.trim(),
+        solution: isMeditationTask(t) ? "" : $("solution").value.trim(),
+        good: isMeditationTask(t) ? "" : $("good").value.trim(),
+        bad: isMeditationTask(t) ? "" : $("bad").value.trim(),
+        nextStep: isMeditationTask(t) ? ($("nextStep").value.trim() || "下次继续短冥想") : ($("nextStep").value.trim() || q.nextMove),
+        skillXp: buildSkillXp(t),
+        is_random_event: Boolean(t.is_random_event),
+        is_pivoted: false,
+        original_task_id: t.original_task_id || t.id,
+        actual_task_id: t.id,
+        pivot_note: ""
+      };
+    }
+    function logToSheetRow(log) {
+      const quest = questById(log.questId) || {};
+      return {
+        log_id: log.id,
+        date: log.date,
+        user: "38029",
+        device: navigator.userAgent || "browser",
+        goal_id: quest.goal || "",
+        quest_id: log.questId,
+        task_id: log.actual_task_id || log.taskId,
+        gmn: log.gmn,
+        minutes: log.minutes,
+        what_done: log.whatDone,
+        problem: log.problem,
+        solution: log.solution,
+        good: log.good,
+        bad: log.bad,
+        next_step: log.nextStep,
+        skill_xp_json: JSON.stringify(log.skillXp || []),
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString()
+      };
+    }
+    function sheetRowToLog(row, index = 0) {
+      const skillXp = (() => {
+        try {
+          return row.skill_xp_json ? JSON.parse(row.skill_xp_json) : [];
+        } catch (error) {
+          return [];
+        }
+      })();
+      return normalizeLog({
+        id: row.log_id,
+        date: row.date,
+        questId: row.quest_id,
+        taskId: row.task_id,
+        actual_task_id: row.task_id,
+        original_task_id: row.task_id,
+        gmn: row.gmn,
+        minutes: row.minutes,
+        whatDone: row.what_done,
+        problem: row.problem,
+        solution: row.solution,
+        good: row.good,
+        bad: row.bad,
+        nextStep: row.next_step,
+        skillXp
+      }, index, data.tasks);
+    }
+    function mergeRemoteSessionLogs(rows = []) {
+      const remoteLogs = rows
+        .filter(row => row && row.log_id)
+        .map((row, index) => sheetRowToLog(row, index));
+      if (!remoteLogs.length) return 0;
+      const byId = new Map(data.logs.map(log => [log.id, log]));
+      remoteLogs.forEach(log => byId.set(log.id, { ...(byId.get(log.id) || {}), ...log }));
+      data.logs = Array.from(byId.values()).sort((a, b) => String(b.date || "").localeCompare(String(a.date || "")));
+      save();
+      return remoteLogs.filter(log => !data.logs.some(local => local.id === log.id)).length || remoteLogs.length;
+    }
+    function jsonp(url, params = {}) {
+      return new Promise((resolve, reject) => {
+        const callbackName = `planRpgSheetCallback_${Date.now()}_${Math.random().toString(36).slice(2)}`;
+        const script = document.createElement("script");
+        const timerId = setTimeout(() => {
+          cleanup();
+          reject(new Error("timeout"));
+        }, 15000);
+        function cleanup() {
+          clearTimeout(timerId);
+          delete window[callbackName];
+          script.remove();
+        }
+        window[callbackName] = (payload) => {
+          cleanup();
+          resolve(payload);
+        };
+        const target = new URL(url);
+        Object.entries({ ...params, callback: callbackName }).forEach(([key, value]) => target.searchParams.set(key, value));
+        script.onerror = () => {
+          cleanup();
+          reject(new Error("script_load_failed"));
+        };
+        script.src = target.toString();
+        document.body.appendChild(script);
+      });
+    }
+    async function pullSessionLogsFromSheet({ silent = false } = {}) {
+      const config = sheetSyncConfig();
+      if (!config.url) {
+        if (!silent) renderSheetSyncConfig("先填写 Apps Script URL。");
+        return;
+      }
+      if (!silent) renderSheetSyncConfig("正在从 Google Sheet 拉取专注记录...");
+      try {
+        const payload = await jsonp(config.url, { action: "get_session_logs", token: config.token || "" });
+        if (!payload || !payload.ok) throw new Error(payload?.error || "unknown_error");
+        const before = data.logs.length;
+        mergeRemoteSessionLogs(payload.rows || []);
+        renderAll();
+        const added = Math.max(0, data.logs.length - before);
+        renderSheetSyncConfig(added ? `已从 Google Sheet 拉取 ${added} 条新记录。` : "Google Sheet 已同步，没有新记录。");
+      } catch (error) {
+        if (!silent) renderSheetSyncConfig("拉取失败，请确认 Apps Script 已更新并重新部署。");
+      }
+    }
+    async function syncSessionLogToSheet(log) {
+      const config = sheetSyncConfig();
+      if (!config.url) {
+        renderSheetSyncConfig("未配置 Google Sheet 同步；本次只保存到当前浏览器。");
+        return;
+      }
+      const payload = {
+        token: config.token || "",
+        action: "append_session_log",
+        module: "Session_Logs",
+        row: logToSheetRow(log)
+      };
+      try {
+        await fetch(config.url, {
+          method: "POST",
+          mode: "no-cors",
+          headers: { "Content-Type": "text/plain;charset=utf-8" },
+          body: JSON.stringify(payload)
+        });
+        renderSheetSyncConfig("已发送到 Google Sheet。刷新表格后查看 Session_Logs。");
+      } catch (error) {
+        const pending = JSON.parse(localStorage.getItem(APP_CONFIG.PENDING_SYNC_KEY) || "[]");
+        pending.push(payload);
+        localStorage.setItem(APP_CONFIG.PENDING_SYNC_KEY, JSON.stringify(pending));
+        renderSheetSyncConfig("同步失败，已暂存到本机待重试队列。");
+      }
+    }
+    async function testSheetSync() {
+      const config = sheetSyncConfig();
+      if (!config.url) {
+        renderSheetSyncConfig("先填写 Apps Script URL。");
+        return;
+      }
+      const payload = { token: config.token || "", action: "ping", module: "Settings", created_at: new Date().toISOString() };
+      try {
+        await fetch(config.url, { method: "POST", mode: "no-cors", headers: { "Content-Type": "text/plain;charset=utf-8" }, body: JSON.stringify(payload) });
+        renderSheetSyncConfig("测试请求已发送。去 Google Sheet 的 Settings 查看 sync_ping。");
+      } catch (error) {
+        renderSheetSyncConfig("测试失败，请检查 URL。");
+      }
+    }
+    function clearForm() {
+      ["whatDone", "problem", "solution", "good", "bad", "nextStep"].forEach(id => $(id).value = "");
+    }
+    function saveDraft() {
+      localStorage.setItem(APP_CONFIG.FOCUS_DRAFT_KEY, JSON.stringify({ taskId: selectedTaskId, ...readForm() }));
+      $("sessionResult").innerHTML = `<span class="pill">草稿已保存</span><h3>可以先离开</h3><p>当前记录已暂存在本机浏览器，完成后再结算。</p>`;
+    }
+    function saveSession() {
+      const log = readForm();
+      data.logs.unshift(log);
+      const task = taskById(log.actual_task_id || log.taskId);
+      if (task) task.status = "Done";
+      applySkillXp(log.skillXp);
+      lastSession = log;
+      save();
+      clearForm();
+      resetTimer();
+      renderAll();
+      renderSessionResult(log);
+      syncSessionLogToSheet(log);
+      continuePendingSessionIfNeeded();
+    }
+    function applySkillXp(events) {
+      events.forEach(event => {
+        const skill = skillById(event.skillId);
+        if (!skill) return;
+        skill.xp += event.xp;
+        while (skill.xp >= skill.maxXp) {
+          skill.xp -= skill.maxXp;
+          skill.level += 1;
+          skill.maxXp = Math.round(skill.maxXp * 1.25);
+        }
+      });
+    }
+    function renderSessionResult(log) {
+      const q = questById(log.questId);
+      const t = taskById(log.taskId);
+      const meditation = isMeditationTask(t);
+      $("sessionResult").innerHTML = `
+        <span class="pill">Session 结算完成</span>
+        <h3>${escapeHtml(t.current_title || t.name)}</h3>
+        <div class="reward-line">
+          <div class="reward"><span>专注时长</span><b>+${log.minutes} min</b></div>
+          <div class="reward"><span>GMN</span><b>${log.gmn}</b></div>
+          <div class="reward"><span>Quest</span><b>${computedQuestProgress(q)}%</b></div>
+          ${log.is_random_event ? `<div class="reward"><span>突发任务</span><b>${typeBadge(t.quest_type || "side")}</b></div>` : ""}
+          ${log.is_pivoted ? `<div class="reward"><span>任务转向</span><b>Discovery</b></div>` : ""}
+        </div>
+        <p><b>${meditation ? "场景" : "做了什么"}：</b>${escapeHtml(log.whatDone)}</p>
+        <p><b>${meditation ? "感受" : "问题"}：</b>${escapeHtml(log.problem || "未填写")}</p>
+        ${meditation ? "" : `<p><b>下一步：</b>${escapeHtml(log.nextStep || "未填写")}</p>`}
+        ${log.is_pivoted ? `<p><b>转向说明：</b>${escapeHtml(log.pivot_note || "已记录转向")}</p>` : ""}
+        ${log.is_random_event ? `
+          <div class="route-item">
+            <b>这个突发事件要怎么归档？</b>
+            <div class="actions">
+              <button class="secondary" data-result-classify="main">转为正式主线</button>
+              <button class="secondary" data-result-classify="side">转为支线</button>
+              <button class="secondary" data-result-classify="maintenance">只是维护</button>
+              <button class="secondary" data-result-classify="noise">归类噪音</button>
+            </div>
+          </div>
+        ` : ""}
+        <div class="actions">
+          <button class="secondary" id="editLastBtn">修改记录</button>
+          <button class="secondary" id="continueBtn">继续 ${log.minutes} 分钟</button>
+          <button class="primary" id="resultMapBtn">返回地图</button>
+          <button class="secondary" id="resultReviewBtn">查看复盘</button>
+        </div>
+      `;
+      $("editLastBtn").onclick = () => editLog(log.id);
+      $("continueBtn").onclick = () => showScreen("focus");
+      $("resultMapBtn").onclick = () => showScreen("map");
+      $("resultReviewBtn").onclick = () => showScreen("review");
+      document.querySelectorAll("[data-result-classify]").forEach(btn => btn.onclick = () => classifyRandomEvent(log.actual_task_id || log.taskId, btn.dataset.resultClassify));
+    }
+    function renderReview() {
+      const logs = data.logs;
+      const total = logs.length;
+      const g = logs.filter(l => l.gmn === "G").length;
+      const m = logs.filter(l => l.gmn === "M").length;
+      const n = logs.filter(l => l.gmn === "N").length;
+      const randomLogs = logs.filter(l => l.is_random_event || taskById(l.actual_task_id || l.taskId)?.is_random_event);
+      const pivotLogs = logs.filter(l => l.is_pivoted);
+      const maintenanceLogs = logs.filter(l => taskById(l.actual_task_id || l.taskId)?.quest_type === "maintenance" || l.gmn === "M");
+      const noiseLogs = logs.filter(l => taskById(l.actual_task_id || l.taskId)?.quest_type === "noise" || l.gmn === "N");
+      $("metricTotal").textContent = total;
+      $("metricG").textContent = g;
+      $("metricM").textContent = m;
+      $("metricN").textContent = n;
+      $("metricRandomCount").textContent = randomLogs.length;
+      $("metricRandomMinutes").textContent = randomLogs.reduce((s, l) => s + Number(l.minutes || 0), 0);
+      $("metricPivotCount").textContent = pivotLogs.length;
+      $("metricMaintNoise").textContent = maintenanceLogs.length + noiseLogs.length;
+      $("totalMinutes").textContent = `${logs.reduce((s, l) => s + Number(l.minutes || 0), 0)} min`;
+      $("gRatio").textContent = total ? pct(g / total * 100) : "0%";
+      renderDynamicReview(randomLogs, pivotLogs, maintenanceLogs, noiseLogs);
+      $("logList").innerHTML = logs.map(logCard).join("") || `<p>还没有日志。先开始一次 20 分钟。</p>`;
+      document.querySelectorAll("[data-edit-log]").forEach(btn => btn.onclick = () => editLog(btn.dataset.editLog));
+      document.querySelectorAll("[data-delete-log]").forEach(btn => btn.onclick = () => deleteLog(btn.dataset.deleteLog));
+      const active = data.quests
+        .map(q => ({ q, progress: computedQuestProgress(q) }))
+        .filter(x => x.progress < 100)
+        .sort((a, b) => (a.q.priority === "High" ? -1 : 1) - (b.q.priority === "High" ? -1 : 1))
+        .slice(0, 4);
+      $("nextRoute").innerHTML = active.map((x, i) => `
+        <div class="route-item"><div><b>${i + 1}. ${escapeHtml(x.q.name)}</b><br><small>${escapeHtml(x.q.nextMove)}</small></div></div>
+      `).join("");
+      $("weeklyFocus").innerHTML = `
+        <p style="margin:0 0 8px;color:#cbd5e1;">DFK：更新系统</p>
+        <div class="bar"><div class="fill" style="--value:${computedQuestProgress(questById("Q-009"))}%"></div></div>
+      `;
+    }
+    function renderDynamicReview(randomLogs, pivotLogs, maintenanceLogs, noiseLogs) {
+      const randomMinutes = randomLogs.reduce((s, l) => s + Number(l.minutes || 0), 0);
+      const randomG = randomLogs.filter(l => l.gmn === "G").length;
+      const randomM = randomLogs.filter(l => l.gmn === "M").length;
+      const randomN = randomLogs.filter(l => l.gmn === "N").length;
+      const randomWorthPromoting = data.tasks
+        .filter(t => t.is_random_event && t.gmn === "G" && ["main", "side"].includes(t.quest_type))
+        .slice(0, 5);
+      $("dynamicReview").innerHTML = `
+        <div class="route-item">
+          <b>突发任务 GMN</b>
+          <p>共 ${randomLogs.length} 次，${randomMinutes} min。G ${randomG} / M ${randomM} / N ${randomN}。</p>
+        </div>
+        <div class="route-item">
+          <b>任务转向轨迹</b>
+          ${pivotLogs.length ? pivotLogs.slice(0, 5).map(l => {
+            const original = taskById(l.original_task_id);
+            const actual = taskById(l.actual_task_id);
+            return `<p>${escapeHtml(original?.original_title || original?.name || l.original_task_id)} → ${escapeHtml(actual?.current_title || actual?.name || l.actual_task_id)}<br><small>${escapeHtml(l.pivot_note || "")}</small></p>`;
+          }).join("") : `<p>本周没有任务转向。</p>`}
+        </div>
+        <div class="route-item">
+          <b>维护 / 噪音</b>
+          <p>维护 ${maintenanceLogs.length} 次，噪音 ${noiseLogs.length} 次。</p>
+          ${noiseLogs.length ? `<small>噪音事件：${noiseLogs.slice(0, 4).map(l => escapeHtml(taskById(l.taskId)?.current_title || taskById(l.taskId)?.name || l.whatDone)).join("、")}</small>` : ""}
+        </div>
+        <div class="route-item">
+          <b>值得转正式任务</b>
+          ${randomWorthPromoting.length ? randomWorthPromoting.map(t => `<p>${escapeHtml(t.current_title || t.name)} <small>${typeBadge(t.quest_type)} / ${escapeHtml(t.reason || "突发但有产出")}</small></p>`).join("") : `<p>暂时没有明显需要升级的突发任务。</p>`}
+        </div>
+      `;
+    }
+    function logCard(log) {
+      const q = questById(log.questId);
+      const t = taskById(log.taskId);
+      const meditation = isMeditationTask(t);
+      return `
+        <div class="log-card">
+          <div class="row"><span class="pill">${log.date} · ${log.minutes || 20}min · ${log.gmn}${log.is_random_event ? " · 突发" : ""}${log.is_pivoted ? " · 转向" : ""}</span><small>${escapeHtml(q?.name || log.questId)} / ${escapeHtml(t?.current_title || t?.name || log.taskId)}</small></div>
+          <p><b>${meditation ? "场景" : "做了什么"}：</b>${escapeHtml(log.whatDone || "未填写")}</p>
+          <p><b>${meditation ? "感受" : "问题"}：</b>${escapeHtml(log.problem || "未填写")} ${meditation ? "" : `<br><b>下一步：</b>${escapeHtml(log.nextStep || "未填写")}`}</p>
+          ${log.is_pivoted ? `<p><b>转向：</b>${escapeHtml(log.pivot_note || "已记录转向")}</p>` : ""}
+          <div class="log-actions">
+            <button class="secondary" data-edit-log="${log.id}">查看/修改</button>
+            <button class="danger" data-delete-log="${log.id}">删除</button>
+          </div>
+        </div>
+      `;
+    }
+    function editLog(id) {
+      const log = data.logs.find(l => l.id === id);
+      if (!log) return;
+      editingLogId = id;
+      $("editPanel").classList.remove("hide");
+      $("editTask").innerHTML = data.tasks.map(t => `<option value="${t.id}" ${t.id === log.taskId ? "selected" : ""}>${t.id} · ${escapeHtml(t.name)}</option>`).join("");
+      $("editGmn").value = log.gmn;
+      $("editWhat").value = log.whatDone || "";
+      $("editProblem").value = log.problem || "";
+      $("editSolution").value = log.solution || "";
+      $("editGood").value = log.good || "";
+      $("editBad").value = log.bad || "";
+      $("editNext").value = log.nextStep || "";
+      showScreen("review");
+      $("editPanel").scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+    function updateLog() {
+      const index = data.logs.findIndex(l => l.id === editingLogId);
+      if (index < 0) return;
+      const task = taskById($("editTask").value);
+      data.logs[index] = {
+        ...data.logs[index],
+        gmn: $("editGmn").value,
+        taskId: task.id,
+        questId: task.questId,
+        whatDone: $("editWhat").value.trim(),
+        problem: $("editProblem").value.trim(),
+        solution: $("editSolution").value.trim(),
+        good: $("editGood").value.trim(),
+        bad: $("editBad").value.trim(),
+        nextStep: $("editNext").value.trim()
+      };
+      editingLogId = null;
+      $("editPanel").classList.add("hide");
+      save();
+      renderAll();
+    }
+    function deleteLog(id) {
+      if (!confirm("确定删除这条日志吗？")) return;
+      data.logs = data.logs.filter(l => l.id !== id);
+      save();
+      renderAll();
+    }
+    function openRandomEventModal() {
+      $("randomGoal").innerHTML = `<option value="">不关联</option>` + data.goals2030.map(g => `<option value="${g.id}">${g.id} · ${escapeHtml(g.title)}</option>`).join("");
+      $("randomEventModal").classList.remove("hide");
+      $("randomTitle").focus();
+    }
+    function classifyTodo(text) {
+      const value = String(text || "").toLowerCase();
+      const has = (...words) => words.some(word => value.includes(word.toLowerCase()));
+      if (has("汇款流程", "通道规则", "收款流程")) return { questId: "Q-014", gmn: "G", reason: "汇款流程/通道系统" };
+      if (has("汇款客户", "稳定客户", "银行", "汇款", "收款", "付款", "通道", "bank", "payment")) return { questId: "Q-015", gmn: "M", reason: "汇款系统/客户维护" };
+      if (has("订单", "rfq", "报价", "询价", "采购", "成交", "元器件", "ic", "bom")) return { questId: "Q-011", gmn: "G", reason: "INSO 订单跟进" };
+      if (has("麦穗", "开发客户", "新客户", "linkedin", "whatsapp", "邮件开发", "google", "搜索", "销售")) return { questId: "Q-012", gmn: "G", reason: "INSO 客户开发" };
+      if (has("联系客户", "老客户", "跟进客户", "客户关系", "定期互动", "客户状态")) return { questId: "Q-013", gmn: "M", reason: "INSO 客户维护" };
+      if (has("打印", "标签", "单据")) return { questId: "Q-018", gmn: "G", reason: "DFK 打印系统" };
+      if (has("人员", "岗位", "交接", "员工")) return { questId: "Q-019", gmn: "G", reason: "DFK 人员管理" };
+      if (has("财务", "利润", "对账", "成本", "费用")) return { questId: "Q-010", gmn: "G", reason: "DFK 财务系统" };
+      if (has("物流", "发货", "货柜", "船", "资料", "报关", "仓库", "广州", "义乌")) return { questId: "Q-009", gmn: "G", reason: "DFK 稳定系统" };
+      if (has("推广", "培训", "sop", "系统", "流程", "记录")) return { questId: "Q-016", gmn: "G", reason: "DFK 培训/系统" };
+      if (has("冥想", "焦虑", "呼吸", "冷静")) return { questId: "Q-004", gmn: "M", reason: "心态维护" };
+      if (has("健康", "体重", "训练", "饮食", "健身")) return { questId: "Q-005", gmn: "G", reason: "健康系统" };
+      if (has("女朋友", "girlfriend", "约会", "旅行", "旅游")) return { questId: "Q-021", gmn: "M", reason: "Family / girl friend" };
+      if (has("优化ai", "优化自动化", "流程优化")) return { questId: "Q-026", gmn: "G", reason: "AI 自动化优化" };
+      if (has("推销ai", "ai方案", "案例", "演示")) return { questId: "Q-027", gmn: "G", reason: "AI 自动化可推销方案" };
+      if (has("ai", "自动化", "自动", "mvp", "工作流", "省时间", "脚本")) return { questId: "Q-024", gmn: "G", reason: "AI 工作自动化" };
+      if (has("咖啡", "兴趣", "爱好")) return { questId: "Q-007", gmn: "M", reason: "兴趣/爱好" };
+      if (has("体验", "第一次", "新事物")) return { questId: "Q-008", gmn: "M", reason: "新体验" };
+      return { questId: "Q-009", gmn: "M", reason: "默认进入 DFK 稳定系统，稍后手动归类" };
+    }
+    function questPathLabel(questId) {
+      const parts = [];
+      let quest = questById(questId);
+      const seen = new Set();
+      while (quest && !seen.has(quest.id)) {
+        seen.add(quest.id);
+        parts.unshift(quest.name);
+        quest = quest.parentQuestId ? questById(quest.parentQuestId) : null;
+      }
+      return parts.join(" / ");
+    }
+    function questDepth(questId) {
+      let depth = 0;
+      let quest = questById(questId);
+      const seen = new Set();
+      while (quest?.parentQuestId && !seen.has(quest.id)) {
+        seen.add(quest.id);
+        depth += 1;
+        quest = questById(quest.parentQuestId);
+      }
+      return depth;
+    }
+    function goalIdForQuestId(questId) {
+      return questGoalIds(questById(questId))[0] || "BUSINESS";
+    }
+    function populateTodoGoalSelect(goalId = $("todoGoal")?.value || selectedGoalId) {
+      $("todoGoal").innerHTML = data.goals2030.map(goal => `<option value="${goal.id}">${goalLabel(goal)}</option>`).join("");
+      $("todoGoal").value = data.goals2030.some(goal => goal.id === goalId) ? goalId : "BUSINESS";
+    }
+    function populateTodoQuestSelect(goalId = $("todoGoal")?.value || "BUSINESS", selectedQuestId = $("todoQuest")?.value) {
+      const quests = data.quests.filter(q => questMatchesGoal(q, goalId));
+      $("todoQuest").innerHTML = quests.map(q => {
+        const prefix = "- ".repeat(questDepth(q.id));
+        return `<option value="${q.id}">${escapeHtml(prefix + questPathLabel(q.id))}</option>`;
+      }).join("");
+      const fallback = quests[0]?.id || "";
+      $("todoQuest").value = quests.some(q => q.id === selectedQuestId) ? selectedQuestId : fallback;
+    }
+    function setTodoClassification(questId, gmn = $("todoGmn").value) {
+      const goalId = goalIdForQuestId(questId);
+      populateTodoGoalSelect(goalId);
+      populateTodoQuestSelect(goalId, questId);
+      $("todoGmn").value = gmn;
+    }
+    function updateTodoSuggestion(apply = false) {
+      const text = `${$("todoTitle").value} ${$("todoNote").value}`;
+      const suggestion = classifyTodo(text);
+      const quest = questById(suggestion.questId);
+      if (apply) setTodoClassification(suggestion.questId, suggestion.gmn);
+      $("todoSuggestion").innerHTML = `<b>归类建议</b><p>${escapeHtml(questPathLabel(suggestion.questId) || quest?.name || suggestion.questId)} · ${suggestion.gmn} · ${escapeHtml(suggestion.reason)}</p>`;
+    }
+    function applyTodoSuggestion() {
+      updateTodoSuggestion(true);
+    }
+    function createTodo() {
+      const title = $("todoTitle").value.trim();
+      if (!title) {
+        alert("先写一个待办事项。");
+        return;
+      }
+      const todo = {
+        id: newId("TODO"),
+        title,
+        note: $("todoNote").value.trim(),
+        dueDate: $("todoDueDate").value || todayISO(),
+        priority: $("todoPriority").value,
+        status: "open",
+        questId: $("todoQuest").value,
+        gmn: $("todoGmn").value,
+        createdAt: new Date().toISOString(),
+        convertedTaskId: ""
+      };
+      data.todos.unshift(todo);
+      clearTodoForm();
+      save();
+      renderAll();
+      showScreen("todos");
+    }
+    function clearTodoForm() {
+      $("todoTitle").value = "";
+      $("todoNote").value = "";
+      $("todoDueDate").value = todayISO();
+      $("todoPriority").value = "medium";
+      setTodoClassification("Q-001", "G");
+      updateTodoSuggestion();
+    }
+    function renderTodos() {
+      populateTodoGoalSelect($("todoGoal").value || "BUSINESS");
+      populateTodoQuestSelect($("todoGoal").value || "BUSINESS", $("todoQuest").value || "Q-001");
+      if (!$("todoDueDate").value) $("todoDueDate").value = todayISO();
+      const openTodos = data.todos.filter(todo => todo.status !== "done" && todo.status !== "deleted");
+      const today = openTodos.filter(todo => todo.dueDate <= todayISO());
+      const later = openTodos.filter(todo => todo.dueDate > todayISO());
+      $("todayTodoList").innerHTML = today.map(todoCard).join("") || `<p>今天没有提醒。可以先把事情丢进待办收件箱。</p>`;
+      $("laterTodoList").innerHTML = later.map(todoCard).join("") || `<p>晚点做列表为空。</p>`;
+      document.querySelectorAll("[data-todo-start]").forEach(btn => btn.onclick = () => startTodo(btn.dataset.todoStart));
+      document.querySelectorAll("[data-todo-done]").forEach(btn => btn.onclick = () => finishTodo(btn.dataset.todoDone));
+      document.querySelectorAll("[data-todo-later]").forEach(btn => btn.onclick = () => moveTodoLater(btn.dataset.todoLater));
+      document.querySelectorAll("[data-todo-delete]").forEach(btn => btn.onclick = () => deleteTodo(btn.dataset.todoDelete));
+    }
+    function todoCard(todo) {
+      const quest = questById(todo.questId);
+      const goal = data.goals2030.find(item => item.id === goalIdForQuestId(todo.questId));
+      return `
+        <div class="log-card">
+          <div class="row"><span class="pill">${escapeHtml(todo.dueDate)} · ${escapeHtml(todo.priority)} · ${todo.gmn}</span><small>${escapeHtml(goalLabel(goal))} / ${escapeHtml(questPathLabel(todo.questId) || quest?.name || todo.questId)}</small></div>
+          <p><b>${escapeHtml(todo.title)}</b></p>
+          ${todo.note ? `<p>${escapeHtml(todo.note)}</p>` : ""}
+          <div class="log-actions">
+            <button class="primary" data-todo-start="${todo.id}">开始20分钟</button>
+            <button class="secondary" data-todo-later="${todo.id}">明天提醒</button>
+            <button class="secondary" data-todo-done="${todo.id}">完成</button>
+            <button class="danger" data-todo-delete="${todo.id}">删除</button>
+          </div>
+        </div>
+      `;
+    }
+    function startTodo(todoId) {
+      const todo = data.todos.find(item => item.id === todoId);
+      if (!todo) return;
+      let task = todo.convertedTaskId ? taskById(todo.convertedTaskId) : null;
+      if (!task) {
+        task = {
+          id: newId("T-TODO"),
+          questId: todo.questId,
+          name: todo.title,
+          current_title: todo.title,
+          original_title: todo.title,
+          instruction: todo.note || todo.title,
+          minutes: 20,
+          standard: "完成并记录这条待办",
+          gmn: todo.gmn,
+          skillIds: todo.gmn === "G" ? ["operations", "strategy"] : ["personal-system"],
+          status: "Not Started",
+          is_random_event: false,
+          quest_type: questTypeFromQuestId(todo.questId),
+          estimated_sessions: 1,
+          reason: "待办收件箱",
+          source: "todo",
+          linked_goal_id: questGoalIds(questById(todo.questId))[0] || selectedGoalId,
+          priority: todo.priority,
+          pivot_status: "none",
+          pivot_reason: "",
+          discovery_note: "",
+          generated_task_id: "",
+          source_todo_id: todo.id
+        };
+        data.tasks.unshift(task);
+        todo.convertedTaskId = task.id;
+      }
+      todo.status = "started";
+      selectedTaskId = task.id;
+      selectedQuestId = task.questId;
+      syncGoalForQuest(selectedQuestId);
+      save();
+      renderAll();
+      showScreen("focus");
+    }
+    function finishTodo(todoId) {
+      const todo = data.todos.find(item => item.id === todoId);
+      if (!todo) return;
+      todo.status = "done";
+      save();
+      renderAll();
+    }
+    function moveTodoLater(todoId) {
+      const todo = data.todos.find(item => item.id === todoId);
+      if (!todo) return;
+      const date = new Date();
+      date.setDate(date.getDate() + 1);
+      todo.dueDate = date.toISOString().slice(0, 10);
+      todo.status = "open";
+      save();
+      renderAll();
+    }
+    function deleteTodo(todoId) {
+      const todo = data.todos.find(item => item.id === todoId);
+      if (!todo || !confirm("确定删除这条待办吗？")) return;
+      todo.status = "deleted";
+      save();
+      renderAll();
+    }
+    function createRandomEvent(startNow = false) {
+      const title = $("randomTitle").value.trim();
+      const reason = $("randomReason").value.trim();
+      if (!title || !reason) {
+        alert("请至少填写任务标题和为什么要做。");
+        return;
+      }
+      const questType = $("randomQuestType").value;
+      const goalId = $("randomGoal").value;
+      const gmn = $("randomGmn").value;
+      const task = {
+        id: newId("T-RND"),
+        questId: questIdForType(questType, goalId),
+        name: title,
+        instruction: $("randomDescription").value.trim() || reason,
+        minutes: 20,
+        standard: `完成 ${Math.max(1, Number($("randomEstimated").value || 1))} 个 session 并记录结果`,
+        gmn,
+        skillIds: gmn === "G" ? ["operations", "strategy"] : ["personal-system"],
+        status: "Not Started",
+        is_random_event: true,
+        quest_type: questType,
+        estimated_sessions: Math.max(1, Number($("randomEstimated").value || 1)),
+        reason,
+        source: $("randomSource").value,
+        linked_goal_id: goalId,
+        priority: $("randomPriority").value,
+        pivot_status: "none",
+        original_title: title,
+        current_title: title,
+        pivot_reason: "",
+        discovery_note: "",
+        generated_task_id: ""
+      };
+      data.tasks.unshift(task);
+      selectedTaskId = task.id;
+      selectedQuestId = task.questId;
+      selectedGoalId = goalId || questGoalIds(questById(task.questId))[0] || selectedGoalId;
+      closeModal("randomEventModal");
+      clearRandomEventForm();
+      save();
+      renderAll();
+      if (startNow) showScreen("focus");
+    }
+    function createQuickTask() {
+      const title = $("quickTaskTitle").value.trim();
+      if (!title) {
+        alert("先写一个任务标题。");
+        return;
+      }
+      const q = questById(selectedQuestId);
+      const gmn = $("quickTaskGmn").value;
+      const minutes = Math.min(180, Math.max(1, Math.round(Number($("quickTaskMinutes").value || 20))));
+      const task = {
+        id: newId("T-CUSTOM"),
+        questId: q.id,
+        name: title,
+        current_title: title,
+        original_title: title,
+        instruction: $("quickTaskNote").value.trim() || title,
+        minutes,
+        standard: "完成并记录这次行动",
+        gmn,
+        skillIds: gmn === "G" ? ["operations", "strategy"] : ["personal-system"],
+        status: "Not Started",
+        is_random_event: false,
+        quest_type: questTypeFromQuestId(q.id),
+        estimated_sessions: 1,
+        reason: "手动新增",
+        source: "manual",
+        linked_goal_id: questGoalIds(q)[0] || selectedGoalId,
+        priority: "medium",
+        pivot_status: "none",
+        pivot_reason: "",
+        discovery_note: "",
+        generated_task_id: ""
+      };
+      data.tasks.unshift(task);
+      selectedTaskId = task.id;
+      selectedQuestId = task.questId;
+      syncGoalForQuest(selectedQuestId);
+      save();
+      renderAll();
+      showScreen("focus");
+    }
+    function updateQuestMetric(questId) {
+      const quest = questById(questId);
+      if (!quest) return;
+      const current = Number($("metricCurrent").value || 0);
+      const target = Number($("metricTarget").value || 0);
+      if (target <= 0) {
+        alert("目标值必须大于 0。");
+        return;
+      }
+      quest.currentValue = current;
+      quest.targetValue = target;
+      save();
+      renderAll();
+    }
+    function updateTaskGmn(taskId, gmn) {
+      const task = taskById(taskId);
+      if (!task || !["G", "M", "N"].includes(gmn)) return;
+      task.gmn = gmn;
+      if (!task.is_random_event) task.quest_type = questTypeFromQuestId(task.questId);
+      save();
+      renderAll();
+    }
+    function updateQuestGmn(questId, gmn) {
+      const quest = questById(questId);
+      if (!quest || !["G", "M", "N"].includes(gmn)) return;
+      quest.gmn = gmn;
+      save();
+      renderAll();
+    }
+    function classifyRandomEvent(taskId, type) {
+      const task = taskById(taskId);
+      if (!task) return;
+      task.quest_type = type;
+      task.questId = questIdForType(type, task.linked_goal_id);
+      task.status = type === "noise" ? "Filed as Noise" : type === "maintenance" ? "Filed as Maintenance" : "Promoted";
+      if (selectedTaskId === task.id) {
+        selectedQuestId = task.questId;
+        selectedGoalId = task.linked_goal_id || questGoalIds(questById(task.questId))[0] || selectedGoalId;
+      }
+      save();
+      renderAll();
+    }
+    function clearRandomEventForm() {
+      ["randomTitle", "randomReason", "randomDescription"].forEach(id => $(id).value = "");
+      $("randomQuestType").value = "main";
+      $("randomGmn").value = "G";
+      $("randomEstimated").value = "1";
+      $("randomSource").value = "manual";
+      $("randomPriority").value = "medium";
+      $("randomGoal").value = "";
+    }
+    function openPivotModal() {
+      const task = taskById(selectedTaskId);
+      $("pivotNewTitle").value = task?.current_title || task?.name || "";
+      $("pivotReason").value = "";
+      $("pivotDiscovery").value = "";
+      setPivotType("renamed");
+      $("pivotModal").classList.remove("hide");
+      $("pivotNewTitle").focus();
+    }
+    function setPivotType(type) {
+      selectedPivotType = type;
+      document.querySelectorAll(".pivot-option").forEach(btn => btn.classList.toggle("active", btn.dataset.pivotType === type));
+    }
+    function applyPivot() {
+      const originalTask = taskById(selectedTaskId);
+      const newTitle = $("pivotNewTitle").value.trim();
+      const reason = $("pivotReason").value.trim();
+      const discovery = $("pivotDiscovery").value.trim();
+      if (!originalTask || !newTitle || !reason) {
+        alert("请填写转向类型、新任务标题和转向原因。");
+        return;
+      }
+      const originalTaskId = originalTask.id;
+      const originalTitle = originalTask.original_title || originalTask.name;
+      let actualTaskId = originalTask.id;
+      let actualTask = originalTask;
+      if (selectedPivotType === "renamed") {
+        Object.assign(originalTask, {
+          name: newTitle,
+          current_title: newTitle,
+          original_title: originalTitle,
+          pivot_status: "renamed",
+          pivot_reason: reason,
+          discovery_note: discovery
+        });
+      } else {
+        actualTask = {
+          ...originalTask,
+          id: newId("T-PVT"),
+          name: newTitle,
+          current_title: newTitle,
+          original_title: newTitle,
+          status: "Not Started",
+          pivot_status: "none",
+          pivot_reason: "",
+          discovery_note: "",
+          generated_task_id: "",
+          is_random_event: false
+        };
+        data.tasks.unshift(actualTask);
+        actualTaskId = actualTask.id;
+        Object.assign(originalTask, {
+          pivot_status: selectedPivotType,
+          original_title: originalTitle,
+          current_title: originalTask.current_title || originalTask.name,
+          pivot_reason: reason,
+          discovery_note: discovery,
+          generated_task_id: actualTaskId,
+          status: selectedPivotType === "paused_for_new_task" ? "Paused" : "Discovery"
+        });
+      }
+      const log = {
+        ...readForm(),
+        id: newId("L-PVT"),
+        whatDone: discovery || `从「${originalTitle}」发现「${newTitle}」`,
+        problem: reason,
+        nextStep: selectedPivotType === "renamed" ? "按新任务名称继续推进" : `开始处理：${newTitle}`,
+        is_random_event: Boolean(originalTask.is_random_event),
+        is_pivoted: true,
+        original_task_id: originalTaskId,
+        actual_task_id: actualTaskId,
+        pivot_note: `${pivotLabel(selectedPivotType)}：${reason}`,
+        taskId: actualTaskId,
+        questId: actualTask.questId,
+        gmn: actualTask.gmn,
+        skillXp: buildSkillXp(actualTask)
+      };
+      data.logs.unshift(log);
+      const completedTask = taskById(log.actual_task_id || log.taskId);
+      if (completedTask) completedTask.status = "Done";
+      applySkillXp(log.skillXp);
+      selectedTaskId = actualTaskId;
+      selectedQuestId = actualTask.questId;
+      syncGoalForQuest(selectedQuestId);
+      closeModal("pivotModal");
+      save();
+      clearForm();
+      resetTimer();
+      renderAll();
+      renderSessionResult(log);
+      showScreen("focus");
+    }
+    function pivotLabel(type) {
+      if (type === "renamed") return "改名继续";
+      if (type === "paused_for_new_task") return "暂停旧任务，创建新任务";
+      return "旧任务算发现问题，创建新任务";
+    }
+    function closeModal(id) {
+      $(id).classList.add("hide");
+    }
+    function renderSkills() {
+      $("skillList").innerHTML = data.skills.map(s => `
+        <button class="skill-card ${s.id === selectedSkillId ? "active" : ""}" data-skill="${s.id}">
+          <div class="row"><b>${escapeHtml(s.name)}</b><span class="pill">Lv.${s.level}</span></div>
+          <div class="bar"><div class="fill" style="--value:${Math.min(100, s.xp / s.maxXp * 100)}%"></div></div>
+          <small>${s.xp} / ${s.maxXp} XP</small>
+        </button>
+      `).join("");
+      document.querySelectorAll("[data-skill]").forEach(btn => btn.onclick = () => {
+        selectedSkillId = btn.dataset.skill;
+        renderSkills();
+      });
+      const s = skillById(selectedSkillId);
+      const relatedTasks = data.tasks.filter(t => (t.skillIds || []).includes(s.id));
+      $("skillDetail").innerHTML = `
+        <span class="pill">CEO Skill · Lv.${s.level}</span>
+        <h3>${escapeHtml(s.name)}</h3>
+        <p>${escapeHtml(s.description)}</p>
+        <div class="progress-number"><span>技能经验</span><span>${s.xp} / ${s.maxXp}</span></div>
+        <div class="bar"><div class="fill" style="--value:${Math.min(100, s.xp / s.maxXp * 100)}%"></div></div>
+        <h4>LinkedIn CEO 要求映射</h4>
+        <div class="skill-node-row">
+          ${s.requirements.map(r => `<div class="skill-node"><b>Requirement</b><p>${escapeHtml(r)}</p></div>`).join("")}
+          <div class="skill-node"><b>解锁奖励</b><p>${escapeHtml(s.unlock)}</p></div>
+        </div>
+        <h4>训练任务</h4>
+        <div class="task-list">
+          ${relatedTasks.map(t => `<button class="task-card" data-skill-task="${t.id}"><div class="task-head"><span>${escapeHtml(t.name)}</span><span class="pill">${t.gmn}</span></div><small>${escapeHtml(t.instruction)}</small></button>`).join("")}
+        </div>
+      `;
+      document.querySelectorAll("[data-skill-task]").forEach(btn => btn.onclick = () => {
+        selectedTaskId = btn.dataset.skillTask;
+        selectedQuestId = taskById(selectedTaskId).questId;
+        showScreen("focus");
+      });
+    }
+    function renderModel() {
+      $("modelTable").innerHTML = data.model.map(r => `<tr>${r.map(c => `<td>${escapeHtml(c)}</td>`).join("")}</tr>`).join("");
+    }
+    function showScreen(id) {
+      document.querySelectorAll(".screen").forEach(s => s.classList.toggle("active", s.id === id));
+      document.querySelectorAll(".nav button").forEach(b => b.classList.toggle("active", b.dataset.screen === id));
+      if (id === "map") renderMap();
+      if (id === "focus") renderFocus();
+      if (id === "todos") renderTodos();
+      if (id === "review") renderReview();
+      if (id === "skills") renderSkills();
+    }
+    function renderAll() {
+      renderGoals();
+      renderSkillMini();
+      renderMap();
+      renderDetail();
+      renderFocus();
+      renderTodos();
+      renderReview();
+      renderSkills();
+      renderModel();
+      renderSheetSyncConfig();
+      save();
+    }
+
+    document.querySelectorAll(".nav button").forEach(btn => btn.addEventListener("click", () => showScreen(btn.dataset.screen)));
+    $("backToMapBtn").addEventListener("click", () => showScreen("map"));
+    $("startPauseBtn").addEventListener("click", toggleTimer);
+    $("resetBtn").addEventListener("click", resetTimer);
+    document.addEventListener("visibilitychange", syncTimerWithClock);
+    $("randomEventBtn").addEventListener("click", openRandomEventModal);
+    $("todoTitle").addEventListener("input", () => updateTodoSuggestion(false));
+    $("todoNote").addEventListener("input", () => updateTodoSuggestion(false));
+    $("todoGoal").addEventListener("change", () => populateTodoQuestSelect($("todoGoal").value));
+    $("autoClassifyTodoBtn").addEventListener("click", applyTodoSuggestion);
+    $("addTodoBtn").addEventListener("click", createTodo);
+    $("pivotTaskBtn").addEventListener("click", openPivotModal);
+    $("saveDraftBtn").addEventListener("click", saveDraft);
+    $("saveSessionBtn").addEventListener("click", saveSession);
+    $("updateLogBtn").addEventListener("click", updateLog);
+    $("cancelEditBtn").addEventListener("click", () => {
+      editingLogId = null;
+      $("editPanel").classList.add("hide");
+    });
+    $("exportDataBtn").addEventListener("click", exportData);
+    $("importDataBtn").addEventListener("click", () => $("importDataFile").click());
+    $("importDataFile").addEventListener("change", importData);
+    $("saveSheetSyncBtn").addEventListener("click", saveSheetSyncConfig);
+    $("testSheetSyncBtn").addEventListener("click", testSheetSync);
+    $("pullSheetLogsBtn").addEventListener("click", () => pullSessionLogsFromSheet());
+    $("createRandomStartBtn").addEventListener("click", () => createRandomEvent(true));
+    $("createRandomBtn").addEventListener("click", () => createRandomEvent(false));
+    $("applyPivotBtn").addEventListener("click", applyPivot);
+    document.querySelectorAll("[data-close-modal]").forEach(btn => btn.addEventListener("click", () => closeModal(btn.dataset.closeModal)));
+    document.querySelectorAll(".pivot-option").forEach(btn => btn.addEventListener("click", () => setPivotType(btn.dataset.pivotType)));
+    renderAll();
+    pullSessionLogsFromSheet({ silent: true });
+
+    function exportData() {
+      const payload = JSON.stringify({ exportedAt: new Date().toISOString(), app: "Plan RPG", version: APP_CONFIG.VERSION, data }, null, 2);
+      const blob = new Blob([payload], { type: "application/json" });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = `plan-rpg-backup-${new Date().toISOString().slice(0, 10)}.json`;
+      link.click();
+      URL.revokeObjectURL(url);
+    }
+    function importData(event) {
+      const file = event.target.files && event.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = () => {
+        try {
+          const parsed = JSON.parse(reader.result);
+          const imported = parsed.data || parsed;
+          data = normalizeData(imported);
+          save();
+          renderAll();
+          alert("导入完成。");
+        } catch (error) {
+          alert("导入失败：JSON 文件格式不正确。");
+        } finally {
+          event.target.value = "";
+        }
+      };
+      reader.readAsText(file, "utf-8");
+    }
+  </script>
+</body>
+</html>
