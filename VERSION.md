@@ -1,5 +1,19 @@
 # Plan RPG Version Notes
 
+## v0.3.18 - 2026-05-14
+
+### Goal
+
+Read shared focus session logs back from Google Sheet.
+
+### Main Changes
+
+- Added a `拉取记录` button in the Google Sheet sync panel.
+- Added automatic `Session_Logs` pull on page load when sync is configured.
+- Added a JSONP read path for Apps Script so GitHub Pages can read sheet rows without CORS blocking.
+- Added Apps Script `doGet` action `get_session_logs`.
+- Updated README to explain that focus logs now write to and read from Google Sheet.
+
 ## v0.3.17 - 2026-05-14
 
 ### Goal

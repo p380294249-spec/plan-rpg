@@ -2,7 +2,7 @@
 
 本项目是一个本地网页软件 MVP，用来把年度计划、每周计划、主线任务、支线任务、20 分钟专注、执行日志、奖励、技能成长和每周复盘串成一个游戏化系统。
 
-当前版本：`v0.3.17`
+当前版本：`v0.3.18`
 
 ## 文件说明
 
@@ -102,7 +102,7 @@ docs/data-modules.md
 
 ### 专注记录自动同步
 
-当前网页已支持在完成专注后自动发送到 Google Sheet 的 `Session_Logs`。
+当前网页已支持打开时自动读取 Google Sheet 的 `Session_Logs`，并在完成专注后自动写入 `Session_Logs`。
 
 需要先部署 Apps Script：
 
@@ -110,7 +110,7 @@ docs/data-modules.md
 google-apps-script/Code.gs
 ```
 
-部署后，把 Web App URL 和同一个 token 填到网页左侧 `Google Sheet 同步` 区域。
+部署后，把 Web App URL 和同一个 token 填到网页左侧 `Google Sheet 同步` 区域。更新 Apps Script 后，需要重新点一次 `部署`，网页里的 `拉取记录` 才能读到表格。
 
 注意：GitHub Pages 是静态公开网页，Apps Script URL 和 token 属于轻量保护，不适合直接同步敏感客户资料。当前阶段只用于地图系统的专注记录。
 
@@ -118,7 +118,7 @@ google-apps-script/Code.gs
 
 代码文件在项目目录里。
 
-你的实际使用数据，包括 Session Log、编辑后的日志、技能 XP，保存在浏览器的 `localStorage` 里。它不会自动进入 GitHub。
+你的实际使用数据，包括 Session Log、编辑后的日志、技能 XP，默认保存在浏览器的 `localStorage` 里。配置 Google Sheet 同步后，专注记录会写入 Google Sheet，并在其他电脑打开网页时拉回本机显示。
 
 所以换电脑前一定要：
 

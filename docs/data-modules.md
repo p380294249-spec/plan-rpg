@@ -170,9 +170,11 @@ Script source in this repo:
 
 `google-apps-script/Code.gs`
 
-First deployed action:
+Deployed actions:
 
 `append_session_log`
+
+`get_session_logs`
 
 Expected frontend payload:
 
@@ -207,6 +209,12 @@ Expected frontend payload:
 Frontend config is stored per browser in localStorage key:
 
 `plan-rpg-sheet-sync-config-v1`
+
+Read sync:
+
+- GitHub Pages uses a JSONP request to `get_session_logs`.
+- The browser merges rows by `log_id`.
+- Local browser data remains the fast fallback cache.
 
 GitHub Pages cannot securely hide the endpoint or token. Use a low-risk token and do not put private customer data in this sync layer until access control is improved.
 

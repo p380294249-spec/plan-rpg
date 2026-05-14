@@ -1,6 +1,17 @@
 const SPREADSHEET_ID = '1Yz-RswNvBxJ9GFWfcU2KDAFh23NCWLS-HS2_g_07rAg';
 const SYNC_TOKEN = 'CHANGE_ME_PLAN_RPG_TOKEN';
 
+function doGet(e) {
+  const params = e && e.parameter ? e.parameter : {};
+  if (SYNC_TOKEN && params.token !== SYNC_TOKEN) return jsonp_(params.callback, { ok: false, error: 'invalid_token' });
+
+  if (params.action === 'get_session_logs') {
+    return jsonp_(params.callback, { ok: true, action: params.action, rows: readRows_('Session_Logs') });
+  }
+
+  return jsonp_(params.callback, { ok: false, error: 'unknown_action' });
+}
+
 function doPost(e) {
   const payload = parsePayload_(e);
   if (!payload) return json_({ ok: false, error: 'invalid_payload' });
@@ -34,9 +45,36 @@ function appendSessionLog_(row) {
   sheet.appendRow(values);
 }
 
+function readRows_(sheetName) {
+  const sheet = SpreadsheetApp.openById(SPREADSHEET_ID).getSheetByName(sheetName);
+  if (!sheet) return [];
+  const lastRow = sheet.getLastRow();
+  const lastColumn = sheet.getLastColumn();
+  if (lastRow < 2 || lastColumn < 1) return [];
+  const values = sheet.getRange(1, 1, lastRow, lastColumn).getValues();
+  const headers = values[0];
+  return values.slice(1)
+    .filter(row => row.some(cell => cell !== ''))
+    .map(row => {
+      const obj = {};
+      headers.forEach((header, index) => {
+        obj[header] = row[index] instanceof Date ? row[index].toISOString() : row[index];
+      });
+      return obj;
+    });
+}
+
 function appendSetting_(key, value, notes) {
   const sheet = SpreadsheetApp.openById(SPREADSHEET_ID).getSheetByName('Settings');
   sheet.appendRow([key, value, new Date().toISOString(), notes || '']);
+}
+
+function jsonp_(callback, obj) {
+  const safeCallback = String(callback || '').match(/^[A-Za-z_$][0-9A-Za-z_$]*$/) ? callback : '';
+  if (!safeCallback) return json_(obj);
+  return ContentService
+    .createTextOutput(safeCallback + '(' + JSON.stringify(obj) + ');')
+    .setMimeType(ContentService.MimeType.JAVASCRIPT);
 }
 
 function json_(obj) {
@@ -44,4 +82,3 @@ function json_(obj) {
     .createTextOutput(JSON.stringify(obj))
     .setMimeType(ContentService.MimeType.JSON);
 }
-

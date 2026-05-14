@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Plan RPG v0.3.17 / 计划 RPG</title>
+  <title>Plan RPG v0.3.18 / 计划 RPG</title>
   <style>
     :root {
       --ink: #111827;
@@ -853,7 +853,7 @@
         <div>
           <h1>计划 RPG</h1>
           <p>把目标变成冒险</p>
-          <span class="version">v0.3.17 本地网页软件</span>
+          <span class="version">v0.3.18 本地网页软件</span>
         </div>
       </div>
 
@@ -897,8 +897,9 @@
         <div class="utility-actions">
           <button id="saveSheetSyncBtn">保存同步设置</button>
           <button id="testSheetSyncBtn">测试</button>
+          <button id="pullSheetLogsBtn">拉取记录</button>
         </div>
-        <small id="sheetSyncStatus">完成专注后会自动写入 Session_Logs。</small>
+        <small id="sheetSyncStatus">打开网页会自动读取，完成专注会自动写入 Session_Logs。</small>
       </div>
 
       <div class="quote">
@@ -914,9 +915,9 @@
           <p>2030 方向 → 2026 Quest → 20min Session → Log → Review → Skill XP</p>
         </div>
         <div class="stats">
-          <div class="stat"><b>⚡</b><div><strong id="totalMinutes">0 min</strong><span>本地专注时长</span></div></div>
+          <div class="stat"><b>⚡</b><div><strong id="totalMinutes">0 min</strong><span>同步专注时长</span></div></div>
           <div class="stat"><b>◆</b><div><strong id="gRatio">0%</strong><span>Growth 占比</span></div></div>
-          <div class="stat"><b>Lv</b><div><strong>探索者 28</strong><span>Plan RPG v0.3.17</span></div></div>
+          <div class="stat"><b>Lv</b><div><strong>探索者 28</strong><span>Plan RPG v0.3.18</span></div></div>
         </div>
       </header>
 
@@ -1193,7 +1194,7 @@
   </div>
 
   <script>
-    const appVersion = "0.3.17";
+    const appVersion = "0.3.18";
     const seed = {
       version: appVersion,
       goals2030: [
@@ -1343,7 +1344,7 @@
       if ($("sheetSyncUrl")) $("sheetSyncUrl").value = config.url || "";
       if ($("sheetSyncToken")) $("sheetSyncToken").value = config.token || "";
       if ($("sheetSyncBadge")) $("sheetSyncBadge").textContent = config.url ? "已配置" : "未配置";
-      if ($("sheetSyncStatus")) $("sheetSyncStatus").textContent = message || (config.url ? "完成专注后会自动写入 Session_Logs。" : "先部署 Apps Script，再填 URL 和 Token。");
+      if ($("sheetSyncStatus")) $("sheetSyncStatus").textContent = message || (config.url ? "打开网页会自动读取，完成专注会自动写入 Session_Logs。" : "先部署 Apps Script，再填 URL 和 Token。");
     }
     function todayISO() {
       return new Date().toISOString().slice(0, 10);
@@ -2004,6 +2005,89 @@
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString()
       };
+    }
+    function sheetRowToLog(row, index = 0) {
+      const skillXp = (() => {
+        try {
+          return row.skill_xp_json ? JSON.parse(row.skill_xp_json) : [];
+        } catch (error) {
+          return [];
+        }
+      })();
+      return normalizeLog({
+        id: row.log_id,
+        date: row.date,
+        questId: row.quest_id,
+        taskId: row.task_id,
+        actual_task_id: row.task_id,
+        original_task_id: row.task_id,
+        gmn: row.gmn,
+        minutes: row.minutes,
+        whatDone: row.what_done,
+        problem: row.problem,
+        solution: row.solution,
+        good: row.good,
+        bad: row.bad,
+        nextStep: row.next_step,
+        skillXp
+      }, index, data.tasks);
+    }
+    function mergeRemoteSessionLogs(rows = []) {
+      const remoteLogs = rows
+        .filter(row => row && row.log_id)
+        .map((row, index) => sheetRowToLog(row, index));
+      if (!remoteLogs.length) return 0;
+      const byId = new Map(data.logs.map(log => [log.id, log]));
+      remoteLogs.forEach(log => byId.set(log.id, { ...(byId.get(log.id) || {}), ...log }));
+      data.logs = Array.from(byId.values()).sort((a, b) => String(b.date || "").localeCompare(String(a.date || "")));
+      save();
+      return remoteLogs.filter(log => !data.logs.some(local => local.id === log.id)).length || remoteLogs.length;
+    }
+    function jsonp(url, params = {}) {
+      return new Promise((resolve, reject) => {
+        const callbackName = `planRpgSheetCallback_${Date.now()}_${Math.random().toString(36).slice(2)}`;
+        const script = document.createElement("script");
+        const timerId = setTimeout(() => {
+          cleanup();
+          reject(new Error("timeout"));
+        }, 15000);
+        function cleanup() {
+          clearTimeout(timerId);
+          delete window[callbackName];
+          script.remove();
+        }
+        window[callbackName] = (payload) => {
+          cleanup();
+          resolve(payload);
+        };
+        const target = new URL(url);
+        Object.entries({ ...params, callback: callbackName }).forEach(([key, value]) => target.searchParams.set(key, value));
+        script.onerror = () => {
+          cleanup();
+          reject(new Error("script_load_failed"));
+        };
+        script.src = target.toString();
+        document.body.appendChild(script);
+      });
+    }
+    async function pullSessionLogsFromSheet({ silent = false } = {}) {
+      const config = sheetSyncConfig();
+      if (!config.url) {
+        if (!silent) renderSheetSyncConfig("先填写 Apps Script URL。");
+        return;
+      }
+      if (!silent) renderSheetSyncConfig("正在从 Google Sheet 拉取专注记录...");
+      try {
+        const payload = await jsonp(config.url, { action: "get_session_logs", token: config.token || "" });
+        if (!payload || !payload.ok) throw new Error(payload?.error || "unknown_error");
+        const before = data.logs.length;
+        mergeRemoteSessionLogs(payload.rows || []);
+        renderAll();
+        const added = Math.max(0, data.logs.length - before);
+        renderSheetSyncConfig(added ? `已从 Google Sheet 拉取 ${added} 条新记录。` : "Google Sheet 已同步，没有新记录。");
+      } catch (error) {
+        if (!silent) renderSheetSyncConfig("拉取失败，请确认 Apps Script 已更新并重新部署。");
+      }
     }
     async function syncSessionLogToSheet(log) {
       const config = sheetSyncConfig();
@@ -2782,12 +2866,14 @@
     $("importDataFile").addEventListener("change", importData);
     $("saveSheetSyncBtn").addEventListener("click", saveSheetSyncConfig);
     $("testSheetSyncBtn").addEventListener("click", testSheetSync);
+    $("pullSheetLogsBtn").addEventListener("click", () => pullSessionLogsFromSheet());
     $("createRandomStartBtn").addEventListener("click", () => createRandomEvent(true));
     $("createRandomBtn").addEventListener("click", () => createRandomEvent(false));
     $("applyPivotBtn").addEventListener("click", applyPivot);
     document.querySelectorAll("[data-close-modal]").forEach(btn => btn.addEventListener("click", () => closeModal(btn.dataset.closeModal)));
     document.querySelectorAll(".pivot-option").forEach(btn => btn.addEventListener("click", () => setPivotType(btn.dataset.pivotType)));
     renderAll();
+    pullSessionLogsFromSheet({ silent: true });
 
     function exportData() {
       const payload = JSON.stringify({ exportedAt: new Date().toISOString(), app: "Plan RPG", version: appVersion, data }, null, 2);
