@@ -11,6 +11,6 @@ const APP_CONFIG = {
   DEFAULT_MINUTES: 20,
   PENDING_SYNC_KEY: "plan-rpg-sheet-sync-pending-v1",
   FOCUS_DRAFT_KEY: "plan-rpg-focus-draft",
-  DEFAULT_GAS_URL: "https://script.google.com/macros/s/AKfycby6PAN6jVJrL7Z9QGzIdr_aaeyE8kpTjjBtWQXQMvP621P_CyfrW5R-M0gNPQQt9PHU/exec",
+  DEFAULT_GAS_URL: "",
   DEFAULT_SYNC_TOKEN: "CHANGE_ME_PLAN_RPG_TOKEN"
 };
