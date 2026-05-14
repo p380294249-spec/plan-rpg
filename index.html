@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Plan RPG v0.3.20 / 计划 RPG</title>
+  <title>Plan RPG v0.3.21 / 计划 RPG</title>
   <style>
     :root {
       --ink: #111827;
@@ -853,7 +853,7 @@
         <div>
           <h1>计划 RPG</h1>
           <p>把目标变成冒险</p>
-          <span class="version">v0.3.20 在线网页软件</span>
+          <span class="version">v0.3.21 在线网页软件</span>
         </div>
       </div>
 
@@ -917,7 +917,7 @@
         <div class="stats">
           <div class="stat"><b>⚡</b><div><strong id="totalMinutes">0 min</strong><span>同步专注时长</span></div></div>
           <div class="stat"><b>◆</b><div><strong id="gRatio">0%</strong><span>Growth 占比</span></div></div>
-          <div class="stat"><b>Lv</b><div><strong>探索者 28</strong><span>Plan RPG v0.3.20</span></div></div>
+          <div class="stat"><b>Lv</b><div><strong>探索者 28</strong><span>Plan RPG v0.3.21</span></div></div>
         </div>
       </header>
 
@@ -1194,7 +1194,7 @@
   </div>
 
   <script>
-    const appVersion = "0.3.20";
+    const appVersion = "0.3.21";
     const seed = {
       version: appVersion,
       goals2030: [
@@ -1322,6 +1322,7 @@
     let timerEndsAt = 0;
     let running = false;
     let timerSessionActive = false;
+    let pendingAfterSessionSave = null;
     let selectedPivotType = "renamed";
 
     const $ = (id) => document.getElementById(id);
@@ -1620,7 +1621,7 @@
     }
     function setTimerForTask(task, force = false) {
       const minutes = Number(task?.minutes || 20);
-      if (!force && running) return;
+      if (!force && (running || timerSessionActive)) return;
       if (force || timerTaskId !== task.id) {
         timerTaskId = task.id;
         timerSessionActive = false;
@@ -1872,6 +1873,7 @@
       const current = taskById(selectedTaskId);
       const task = current && current.questId === selectedQuestId ? current : tasks[0];
       if (!task) return;
+      if (!confirmStartNewSession(task.id)) return;
       selectedTaskId = task.id;
       setTimerForTask({ ...task, minutes: 20 }, true);
       showScreen("focus");
@@ -1880,7 +1882,80 @@
       renderTimer();
       if (!running) toggleTimer();
     }
+    function confirmStartNewSession(nextTaskId) {
+      if (!timerSessionActive || !timerTaskId) return true;
+      if (timerTaskId === nextTaskId) {
+        showScreen("focus");
+        return false;
+      }
+      const current = taskById(timerTaskId);
+      const next = taskById(nextTaskId);
+      const choice = prompt(
+        `已有一个进行中的记录：${current?.current_title || current?.name || "当前任务"}\n\n输入 1：回到之前的计时\n输入 2：先结束之前的记录，再开始「${next?.current_title || next?.name || "新任务"}」\n输入 3：放弃之前的计时，开始新记录`,
+        "1"
+      );
+      if (choice === "1" || choice === null || choice === "") {
+        selectedTaskId = timerTaskId;
+        const task = taskById(timerTaskId);
+        if (task) {
+          selectedQuestId = task.questId;
+          syncGoalForQuest(selectedQuestId);
+        }
+        showScreen("focus");
+        return false;
+      }
+      if (choice === "2") {
+        pendingAfterSessionSave = nextTaskId;
+        selectedTaskId = timerTaskId;
+        const task = taskById(timerTaskId);
+        if (task) {
+          selectedQuestId = task.questId;
+          syncGoalForQuest(selectedQuestId);
+        }
+        showScreen("focus");
+        alert("请先补充当前记录，然后点击「完成并结算」。结算后会自动开始新记录。");
+        return false;
+      }
+      if (choice === "3") {
+        abandonActiveSession();
+        return true;
+      }
+      return false;
+    }
+    function abandonActiveSession() {
+      running = false;
+      timerSessionActive = false;
+      clearInterval(timer);
+      timer = null;
+      timerEndsAt = 0;
+      seconds = 20 * 60;
+      renderTimer();
+    }
+    function continuePendingSessionIfNeeded() {
+      if (!pendingAfterSessionSave) return;
+      const nextTaskId = pendingAfterSessionSave;
+      pendingAfterSessionSave = null;
+      const task = taskById(nextTaskId);
+      if (!task) return;
+      selectedTaskId = task.id;
+      selectedQuestId = task.questId;
+      syncGoalForQuest(selectedQuestId);
+      setTimerForTask({ ...task, minutes: 20 }, true);
+      showScreen("focus");
+      if ($("durationInput")) $("durationInput").value = "20";
+      seconds = 20 * 60;
+      renderTimer();
+      if (!running) toggleTimer();
+    }
     function renderFocus() {
+      if (timerSessionActive && timerTaskId) {
+        const activeTask = taskById(timerTaskId);
+        if (activeTask) {
+          selectedTaskId = activeTask.id;
+          selectedQuestId = activeTask.questId;
+          syncGoalForQuest(selectedQuestId);
+        }
+      }
       $("taskSelect").innerHTML = data.tasks.map(t => {
         const q = questById(t.questId);
         return `<option value="${t.id}" ${t.id === selectedTaskId ? "selected" : ""}>${escapeHtml(q.name)} · ${escapeHtml(t.current_title || t.name)} · ${gmnText(t.gmn)}</option>`;
@@ -1913,12 +1988,14 @@
         </div>
       `;
       $("taskSelect").onchange = (e) => {
-        selectedTaskId = e.target.value;
+        const nextTaskId = e.target.value;
+        if (!confirmStartNewSession(nextTaskId)) {
+          $("taskSelect").value = selectedTaskId;
+          return;
+        }
+        selectedTaskId = nextTaskId;
         selectedQuestId = taskById(selectedTaskId).questId;
         syncGoalForQuest(selectedQuestId);
-        running = false;
-        timerSessionActive = false;
-        clearInterval(timer);
         renderAll();
       };
       renderTimer();
@@ -2170,6 +2247,7 @@
       renderAll();
       renderSessionResult(log);
       syncSessionLogToSheet(log);
+      continuePendingSessionIfNeeded();
     }
     function applySkillXp(events) {
       events.forEach(event => {

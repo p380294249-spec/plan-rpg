@@ -1,5 +1,19 @@
 # Plan RPG Version Notes
 
+## v0.3.21 - 2026-05-14
+
+### Goal
+
+Keep an active 20-minute session recoverable after returning to the map, and prevent accidental timer resets when starting another task.
+
+### Main Changes
+
+- Preserved the active timer when the user returns to the map or re-renders the focus page.
+- Kept the map `正在专注` panel as the return entry for the current timer.
+- When starting a different task while a session is active, the page now asks whether to return, finish the previous log first, or abandon it and start a new one.
+- If the user chooses to finish the previous log first, the pending new session starts automatically after saving.
+- Updated visible version labels to `v0.3.21`.
+
 ## v0.3.20 - 2026-05-14
 
 ### Goal
