@@ -1,5 +1,23 @@
 # Plan RPG Version Notes
 
+## v0.3.20 - 2026-05-14
+
+### Goal
+
+Simplify the chapter detail panel so it only supports fast recording at first glance.
+
+### Main Changes
+
+- Reduced the chapter/detail first view to:
+  - Chapter title
+  - Current GMN type
+  - `开始记录`
+  - `修改 GMN`
+- Moved progress editing, task list, custom task form, recent logs, and random-event classification into collapsed `更多记录设置`.
+- Moved GMN selectors behind collapsed `修改 GMN`.
+- Changed `开始记录` to use the selected/default task and start a default 20-minute timer immediately.
+- Removed chapter description and explanatory text from the first visible detail area.
+
 ## v0.3.19 - 2026-05-14
 
 ### Goal

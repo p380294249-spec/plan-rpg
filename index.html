@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Plan RPG v0.3.19 / 计划 RPG</title>
+  <title>Plan RPG v0.3.20 / 计划 RPG</title>
   <style>
     :root {
       --ink: #111827;
@@ -853,7 +853,7 @@
         <div>
           <h1>计划 RPG</h1>
           <p>把目标变成冒险</p>
-          <span class="version">v0.3.19 在线网页软件</span>
+          <span class="version">v0.3.20 在线网页软件</span>
         </div>
       </div>
 
@@ -917,7 +917,7 @@
         <div class="stats">
           <div class="stat"><b>⚡</b><div><strong id="totalMinutes">0 min</strong><span>同步专注时长</span></div></div>
           <div class="stat"><b>◆</b><div><strong id="gRatio">0%</strong><span>Growth 占比</span></div></div>
-          <div class="stat"><b>Lv</b><div><strong>探索者 28</strong><span>Plan RPG v0.3.19</span></div></div>
+          <div class="stat"><b>Lv</b><div><strong>探索者 28</strong><span>Plan RPG v0.3.20</span></div></div>
         </div>
       </header>
 
@@ -1194,7 +1194,7 @@
   </div>
 
   <script>
-    const appVersion = "0.3.19";
+    const appVersion = "0.3.20";
     const seed = {
       version: appVersion,
       goals2030: [
@@ -1784,73 +1784,72 @@
         <div class="simple-detail">
           <span class="pill">${typeBadge(taskType)} · ${gmnText(selectedTask?.gmn || q.gmn)}</span>
           <h3>${escapeHtml(q.name)}</h3>
-          <p>${escapeHtml(q.description)}</p>
-          <div class="custom-task-box">
-            <h4>修改章节 GMN</h4>
+          <button class="primary full" id="detailStart">开始记录</button>
+          <details class="custom-task-box">
+            <summary class="secondary full">修改 GMN</summary>
             <div class="form-grid">
-              <label>这个章节属于
+              <label>章节属于
                 <select id="detailQuestGmn">
                   <option value="G" ${q.gmn === "G" ? "selected" : ""}>G 成长</option>
                   <option value="M" ${q.gmn === "M" ? "selected" : ""}>M 维护</option>
                   <option value="N" ${q.gmn === "N" ? "selected" : ""}>N 噪音</option>
                 </select>
               </label>
-            </div>
-            <button class="secondary full" id="saveQuestGmnBtn">保存章节判断</button>
-          </div>
-          ${selectedTask ? `
-          <div class="custom-task-box">
-            <h4>修改当前任务 GMN</h4>
-            <div class="form-grid">
-              <label>这个任务属于
+              ${selectedTask ? `
+              <label>当前任务属于
                 <select id="detailTaskGmn">
                   <option value="G" ${selectedTask.gmn === "G" ? "selected" : ""}>G 成长</option>
                   <option value="M" ${selectedTask.gmn === "M" ? "selected" : ""}>M 维护</option>
                   <option value="N" ${selectedTask.gmn === "N" ? "selected" : ""}>N 噪音</option>
                 </select>
               </label>
+              ` : ""}
             </div>
-            <button class="secondary full" id="saveTaskGmnBtn">保存这个判断</button>
-          </div>
-          ` : ""}
-          <div class="progress-number"><span>完成情况</span><span>${tasks.filter(t => computedTaskProgress(t) >= 100).length}/${tasks.length}</span></div>
-          <div class="bar"><div class="fill" style="--value:${computedQuestProgress(q)}%"></div></div>
-          ${valueProgress(q) !== null ? `
-          <div class="custom-task-box">
-            <h4>更新目标进度</h4>
-            <div class="form-grid">
-              <label>当前值<input id="metricCurrent" type="number" step="0.01" value="${Number(q.currentValue || 0)}" /></label>
-              <label>目标值<input id="metricTarget" type="number" step="0.01" value="${Number(q.targetValue || 0)}" /></label>
+            <div class="actions">
+              <button class="secondary" id="saveQuestGmnBtn">保存章节判断</button>
+              ${selectedTask ? `<button class="secondary" id="saveTaskGmnBtn">保存任务判断</button>` : ""}
             </div>
-            <small>单位：${escapeHtml(q.unit || "")}。保存后进度会按 当前值 / 目标值 自动计算。</small>
-            <button class="secondary full" id="saveMetricBtn">保存进度</button>
-          </div>
-          ` : ""}
-          <h4>预设任务</h4>
-          <div class="task-list">
-          ${tasks.map(t => `
-            <button class="task-card ${t.id === selectedTaskId ? "selected" : ""} ${computedTaskProgress(t) >= 100 ? "done" : "todo"}" data-task="${t.id}">
-              <div class="task-head"><span>${escapeHtml(t.current_title || t.name)}</span><span class="pill">${computedTaskProgress(t) >= 100 ? "已完成" : "未完成"}</span></div>
-              <small>${gmnText(t.gmn)} · ${t.minutes || 20} 分钟</small>
-            </button>
-          `).join("")}
-          </div>
-          <button class="primary full" id="detailStart">开始记录：${escapeHtml(selectedTask?.current_title || selectedTask?.name || "当前任务")}</button>
-          <div class="custom-task-box">
-            <h4>自己写一个任务</h4>
-            <label>任务标题<input id="quickTaskTitle" placeholder="例如：更新 DFK 系统" /></label>
-            <label>记录重点<textarea id="quickTaskNote" placeholder="这次 20 分钟主要做什么？"></textarea></label>
-            <div class="form-grid">
-              <label>时间<input id="quickTaskMinutes" type="number" min="1" max="180" value="20" /></label>
-              <label>类型<select id="quickTaskGmn"><option value="G">G 成长</option><option value="M">M 维护</option><option value="N">N 噪音</option></select></label>
+          </details>
+          <details class="custom-task-box">
+            <summary class="secondary full">更多记录设置</summary>
+            <div class="progress-number"><span>完成情况</span><span>${tasks.filter(t => computedTaskProgress(t) >= 100).length}/${tasks.length}</span></div>
+            <div class="bar"><div class="fill" style="--value:${computedQuestProgress(q)}%"></div></div>
+            ${valueProgress(q) !== null ? `
+            <div class="custom-task-box">
+              <h4>更新目标进度</h4>
+              <div class="form-grid">
+                <label>当前值<input id="metricCurrent" type="number" step="0.01" value="${Number(q.currentValue || 0)}" /></label>
+                <label>目标值<input id="metricTarget" type="number" step="0.01" value="${Number(q.targetValue || 0)}" /></label>
+              </div>
+              <small>单位：${escapeHtml(q.unit || "")}。</small>
+              <button class="secondary full" id="saveMetricBtn">保存进度</button>
             </div>
-            <button class="secondary full" id="quickTaskStart">加入并开始记录</button>
-          </div>
-          <h4>最近记录</h4>
-          <div class="route">
-            ${taskLogs.length ? taskLogs.slice(0, 3).map(log => `<div class="route-item"><b>${escapeHtml(log.date)} · ${log.minutes} 分钟 · ${gmnText(log.gmn)}</b><br><small>${escapeHtml(log.whatDone || "已记录")}</small></div>`).join("") : `<div class="route-item"><small>还没有记录，开始一次就会出现在这里。</small></div>`}
-          </div>
-          ${selectedTask?.is_random_event ? `<div class="route-item"><b>突发任务归类</b><div class="actions"><button class="secondary" data-classify-random="main">主线</button><button class="secondary" data-classify-random="side">支线</button><button class="secondary" data-classify-random="maintenance">维护</button><button class="secondary" data-classify-random="noise">噪音</button></div></div>` : ""}
+            ` : ""}
+            <h4>预设任务</h4>
+            <div class="task-list">
+            ${tasks.map(t => `
+              <button class="task-card ${t.id === selectedTaskId ? "selected" : ""} ${computedTaskProgress(t) >= 100 ? "done" : "todo"}" data-task="${t.id}">
+                <div class="task-head"><span>${escapeHtml(t.current_title || t.name)}</span><span class="pill">${computedTaskProgress(t) >= 100 ? "已完成" : "未完成"}</span></div>
+                <small>${gmnText(t.gmn)} · ${t.minutes || 20} 分钟</small>
+              </button>
+            `).join("")}
+            </div>
+            <div class="custom-task-box">
+              <h4>自己写一个任务</h4>
+              <label>任务标题<input id="quickTaskTitle" placeholder="例如：更新 DFK 系统" /></label>
+              <label>记录重点<textarea id="quickTaskNote" placeholder="这次 20 分钟主要做什么？"></textarea></label>
+              <div class="form-grid">
+                <label>时间<input id="quickTaskMinutes" type="number" min="1" max="180" value="20" /></label>
+                <label>类型<select id="quickTaskGmn"><option value="G">G 成长</option><option value="M">M 维护</option><option value="N">N 噪音</option></select></label>
+              </div>
+              <button class="secondary full" id="quickTaskStart">加入并开始记录</button>
+            </div>
+            <h4>最近记录</h4>
+            <div class="route">
+              ${taskLogs.length ? taskLogs.slice(0, 3).map(log => `<div class="route-item"><b>${escapeHtml(log.date)} · ${log.minutes} 分钟 · ${gmnText(log.gmn)}</b><br><small>${escapeHtml(log.whatDone || "已记录")}</small></div>`).join("") : `<div class="route-item"><small>还没有记录。</small></div>`}
+            </div>
+            ${selectedTask?.is_random_event ? `<div class="route-item"><b>突发任务归类</b><div class="actions"><button class="secondary" data-classify-random="main">主线</button><button class="secondary" data-classify-random="side">支线</button><button class="secondary" data-classify-random="maintenance">维护</button><button class="secondary" data-classify-random="noise">噪音</button></div></div>` : ""}
+          </details>
         </div>
       `;
       document.querySelectorAll(".task-card").forEach(btn => {
@@ -1864,9 +1863,22 @@
       if ($("saveMetricBtn")) $("saveMetricBtn").onclick = () => updateQuestMetric(q.id);
       if ($("saveQuestGmnBtn")) $("saveQuestGmnBtn").onclick = () => updateQuestGmn(q.id, $("detailQuestGmn").value);
       if ($("saveTaskGmnBtn")) $("saveTaskGmnBtn").onclick = () => updateTaskGmn(selectedTask.id, $("detailTaskGmn").value);
-      $("detailStart").addEventListener("click", () => showScreen("focus"));
-      $("quickTaskStart").addEventListener("click", createQuickTask);
+      $("detailStart").addEventListener("click", startDefaultRecordFromDetail);
+      if ($("quickTaskStart")) $("quickTaskStart").addEventListener("click", createQuickTask);
       document.querySelectorAll("[data-classify-random]").forEach(btn => btn.onclick = () => classifyRandomEvent(selectedTask.id, btn.dataset.classifyRandom));
+    }
+    function startDefaultRecordFromDetail() {
+      const tasks = tasksForQuest(selectedQuestId);
+      const current = taskById(selectedTaskId);
+      const task = current && current.questId === selectedQuestId ? current : tasks[0];
+      if (!task) return;
+      selectedTaskId = task.id;
+      setTimerForTask({ ...task, minutes: 20 }, true);
+      showScreen("focus");
+      if ($("durationInput")) $("durationInput").value = "20";
+      seconds = 20 * 60;
+      renderTimer();
+      if (!running) toggleTimer();
     }
     function renderFocus() {
       $("taskSelect").innerHTML = data.tasks.map(t => {
