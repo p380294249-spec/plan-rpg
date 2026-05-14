@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Plan RPG v0.3.18 / 计划 RPG</title>
+  <title>Plan RPG v0.3.19 / 计划 RPG</title>
   <style>
     :root {
       --ink: #111827;
@@ -853,7 +853,7 @@
         <div>
           <h1>计划 RPG</h1>
           <p>把目标变成冒险</p>
-          <span class="version">v0.3.18 本地网页软件</span>
+          <span class="version">v0.3.19 在线网页软件</span>
         </div>
       </div>
 
@@ -917,7 +917,7 @@
         <div class="stats">
           <div class="stat"><b>⚡</b><div><strong id="totalMinutes">0 min</strong><span>同步专注时长</span></div></div>
           <div class="stat"><b>◆</b><div><strong id="gRatio">0%</strong><span>Growth 占比</span></div></div>
-          <div class="stat"><b>Lv</b><div><strong>探索者 28</strong><span>Plan RPG v0.3.18</span></div></div>
+          <div class="stat"><b>Lv</b><div><strong>探索者 28</strong><span>Plan RPG v0.3.19</span></div></div>
         </div>
       </header>
 
@@ -1194,7 +1194,7 @@
   </div>
 
   <script>
-    const appVersion = "0.3.18";
+    const appVersion = "0.3.19";
     const seed = {
       version: appVersion,
       goals2030: [
@@ -1304,6 +1304,10 @@
     const storageKey = "plan-rpg-local-mvp-v2";
     const legacyKey = "plan-rpg-local-mvp-v1";
     const sheetSyncConfigKey = "plan-rpg-sheet-sync-config-v1";
+    const defaultSheetSyncConfig = {
+      url: "https://script.google.com/macros/s/AKfycby6PAN6jVJrL7Z9QGzIdr_aaeyE8kpTjjBtWQXQMvP621P_CyfrW5R-M0gNPQQt9PHU/exec",
+      token: "CHANGE_ME_PLAN_RPG_TOKEN"
+    };
     let data = loadData();
     let selectedCampaignId = "Q-001";
     let selectedQuestId = "Q-009";
@@ -1329,7 +1333,11 @@
     const escapeHtml = (value = "") => String(value).replace(/[&<>"']/g, ch => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[ch]));
     const goalLabel = (goal) => goal?.displayTitle || goal?.id || "";
     function sheetSyncConfig() {
-      return JSON.parse(localStorage.getItem(sheetSyncConfigKey) || "{}");
+      const saved = JSON.parse(localStorage.getItem(sheetSyncConfigKey) || "{}");
+      return {
+        url: saved.url || defaultSheetSyncConfig.url,
+        token: saved.token || defaultSheetSyncConfig.token
+      };
     }
     function saveSheetSyncConfig() {
       const config = {

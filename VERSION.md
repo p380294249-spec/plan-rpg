@@ -1,5 +1,20 @@
 # Plan RPG Version Notes
 
+## v0.3.19 - 2026-05-14
+
+### Goal
+
+Make Google Sheet sync work without manually entering the Apps Script URL every time.
+
+### Main Changes
+
+- Added a built-in default Apps Script Web App URL:
+  - `https://script.google.com/macros/s/AKfycby6PAN6jVJrL7Z9QGzIdr_aaeyE8kpTjjBtWQXQMvP621P_CyfrW5R-M0gNPQQt9PHU/exec`
+- Added a built-in default sync token matching the repository Apps Script template:
+  - `CHANGE_ME_PLAN_RPG_TOKEN`
+- Existing saved browser settings still override the defaults.
+- Updated visible version labels to `v0.3.19`.
+
 ## v0.3.18 - 2026-05-14
 
 ### Goal
