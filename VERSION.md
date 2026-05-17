@@ -1,5 +1,24 @@
 # Plan RPG Version Notes
 
+## v0.3.26 - 2026-05-17
+
+### Goal
+
+Unify the recording entry so focused work and quick result metrics are logged from one screen.
+
+### Main Changes
+
+- Added `Record Type` to the record screen:
+  - `20min Session`
+  - `Quick Metric Log`
+- Quick Metric Log hides the timer and session fields.
+- Added metric fields: Date, Goal, Metric Type, Value, Unit, and Note.
+- Added `metricLogs` to app data and normalizes old browser data safely.
+- Saving a Quick Metric Log updates the current month value for the matching Goal/Quest so Dashboard progress can move without forcing a 20-minute timer.
+- Added `Metric_Logs` read/write support to Apps Script.
+- Added Mood / Stress to 20min Session records.
+- Updated visible version labels to `v0.3.26`.
+
 ## v0.3.25 - 2026-05-17
 
 ### Goal

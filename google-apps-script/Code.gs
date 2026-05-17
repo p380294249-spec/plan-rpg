@@ -9,6 +9,10 @@ function doGet(e) {
     return jsonp_(params.callback, { ok: true, action: params.action, rows: readRows_('Session_Logs') });
   }
 
+  if (params.action === 'get_metric_logs') {
+    return jsonp_(params.callback, { ok: true, action: params.action, rows: readRows_('Metric_Logs') });
+  }
+
   return jsonp_(params.callback, { ok: false, error: 'unknown_action' });
 }
 
@@ -19,6 +23,11 @@ function doPost(e) {
 
   if (payload.action === 'append_session_log') {
     appendSessionLog_(payload.row || {});
+    return json_({ ok: true, action: payload.action });
+  }
+
+  if (payload.action === 'append_metric_log') {
+    appendMetricLog_(payload.row || {});
     return json_({ ok: true, action: payload.action });
   }
 
@@ -43,6 +52,21 @@ function appendSessionLog_(row) {
   const headers = sheet.getRange(1, 1, 1, sheet.getLastColumn()).getValues()[0];
   const values = headers.map(header => row[header] == null ? '' : row[header]);
   sheet.appendRow(values);
+}
+
+function appendMetricLog_(row) {
+  const headers = ['metric_log_id', 'date', 'month', 'goal_id', 'metric_type', 'value', 'unit', 'note', 'created_at', 'updated_at'];
+  const sheet = ensureSheet_('Metric_Logs', headers);
+  const values = headers.map(header => row[header] == null ? '' : row[header]);
+  sheet.appendRow(values);
+}
+
+function ensureSheet_(sheetName, headers) {
+  const spreadsheet = SpreadsheetApp.openById(SPREADSHEET_ID);
+  let sheet = spreadsheet.getSheetByName(sheetName);
+  if (!sheet) sheet = spreadsheet.insertSheet(sheetName);
+  if (sheet.getLastRow() === 0) sheet.appendRow(headers);
+  return sheet;
 }
 
 function readRows_(sheetName) {

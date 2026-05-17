@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Plan RPG v0.3.25 / 计划 RPG</title>
+  <title>Plan RPG v0.3.26 / 计划 RPG</title>
   <style>
     :root {
       --ink: #111827;
@@ -923,7 +923,7 @@
         <div>
           <h1>计划 RPG</h1>
           <p>把目标变成冒险</p>
-          <span class="version">v0.3.25 在线网页软件</span>
+          <span class="version">v0.3.26 在线网页软件</span>
         </div>
       </div>
 
@@ -987,7 +987,7 @@
         <div class="stats">
           <div class="stat"><b>⚡</b><div><strong id="totalMinutes">0 min</strong><span>同步专注时长</span></div></div>
           <div class="stat"><b>◆</b><div><strong id="gRatio">0%</strong><span>Growth 占比</span></div></div>
-          <div class="stat"><b>Lv</b><div><strong>探索者 28</strong><span>Plan RPG v0.3.25</span></div></div>
+          <div class="stat"><b>Lv</b><div><strong>探索者 28</strong><span>Plan RPG v0.3.26</span></div></div>
         </div>
       </header>
 
@@ -1055,6 +1055,8 @@
               <span class="pill" id="sessionTypePill">20min Session</span>
               <button class="ghost" id="backToMapBtn">返回地图</button>
             </div>
+            <label>Record Type<select id="recordTypeSelect"><option value="session">20min Session</option><option value="metric">Quick Metric Log</option></select></label>
+            <div id="sessionRecordFields">
             <h3 id="focusTaskName">选择一个任务开始</h3>
             <p id="focusTaskInfo"></p>
             <label>当前任务<select id="taskSelect"></select></label>
@@ -1074,9 +1076,32 @@
               <button class="secondary" id="saveDraftBtn">保存草稿</button>
               <button class="primary" id="saveSessionBtn">完成并结算</button>
             </div>
+            </div>
+            <div id="metricRecordFields" class="hide">
+              <h3>Quick Metric Log</h3>
+              <p>记录结果数据，不启动 20 分钟计时。</p>
+              <label>Date<input id="metricLogDate" type="date" /></label>
+              <label>Goal<select id="metricLogGoal"></select></label>
+              <label>Metric Type<input id="metricLogType" list="metricTypeOptions" placeholder="例如：体重 / RFQ / 收入 / 冥想" /></label>
+              <datalist id="metricTypeOptions">
+                <option value="Weight"></option>
+                <option value="RFQ"></option>
+                <option value="Customer Contact"></option>
+                <option value="Income"></option>
+                <option value="Book Finished"></option>
+                <option value="Meditation"></option>
+                <option value="Good Things"></option>
+              </datalist>
+              <label>Value<input id="metricLogValue" type="number" step="0.01" placeholder="例如：70.8" /></label>
+              <label>Unit<input id="metricLogUnit" placeholder="KG / 个 / RMB / 次 / 本" /></label>
+              <label>Note<textarea id="metricLogNote" placeholder="补充背景、来源或下一步。"></textarea></label>
+              <div class="actions">
+                <button class="primary" id="saveMetricLogBtn">保存 Metric Log</button>
+              </div>
+            </div>
           </div>
 
-          <div class="panel">
+          <div class="panel" id="sessionLogPanel">
             <h3 id="recordBoardTitle">战斗记录板</h3>
             <p id="recordBoardHelp">先写关键内容，结束时再补全。保存后可以编辑。</p>
             <div class="form-grid">
@@ -1086,6 +1111,7 @@
               <label id="goodLabel">好的地方<textarea id="good" placeholder="值得保留的动作、判断、节奏..."></textarea></label>
               <label id="badLabel">不好的地方<textarea id="bad" placeholder="浪费、拖延、误判、流程问题..."></textarea></label>
               <label id="nextStepLabel">下一步<textarea id="nextStep" placeholder="下一次 20 分钟应该从哪里开始？"></textarea></label>
+              <label id="moodStressLabel">Mood / Stress<textarea id="moodStress" placeholder="情绪、压力、能量状态。"></textarea></label>
             </div>
           </div>
 
@@ -1369,6 +1395,7 @@
         { id: "L-003", date: "2026-05-10", minutes: 10, gmn: "M", questId: "Q-004", taskId: "T-007", whatDone: "安静坐下，做了一次短冥想", problem: "呼吸慢下来后，焦虑感有下降", solution: "", good: "", bad: "", nextStep: "每天做一次短记录", skillXp: [{ skillId: "personal-system", xp: 15 }], is_pivoted: false, original_task_id: "T-007", actual_task_id: "T-007", pivot_note: "" },
         { id: "L-004", date: "2026-05-10", minutes: 20, gmn: "G", questId: "Q-011", taskId: "T-RND-001", whatDone: "处理客户临时 RFQ，并判断为可推进机会", problem: "规格信息不完整", solution: "先回确认清单", good: "没有把突发事件当成打乱计划，而是归入 main/G", bad: "", nextStep: "等待客户补规格后报价", skillXp: [{ skillId: "revenue", xp: 30 }, { skillId: "communication", xp: 10 }], is_random_event: true, is_pivoted: false, original_task_id: "T-RND-001", actual_task_id: "T-RND-001", pivot_note: "" }
       ],
+      metricLogs: [],
       todos: [],
       model: [
         ["5-Year", "2030 Goal", "长期方向/人生地图", "Goal ID, 2030 target, unit, achieved, description", "决定哪些时间算真实成长"],
@@ -1486,7 +1513,9 @@
       merged.quests = normalizeQuests(mergeById(seed.quests, merged.quests || []));
       merged.tasks = normalizeTasks(mergeById(seed.tasks, merged.tasks || []));
       merged.logs = (merged.logs || []).map((log, index) => normalizeLog(log, index, merged.tasks));
+      merged.metricLogs = normalizeMetricLogs(merged.metricLogs || []);
       merged.todos = normalizeTodos(merged.todos || []);
+      applyMetricLogsToDashboard(merged.metricLogs, merged);
       return merged;
     }
     function mergeById(defaultRows, savedRows) {
@@ -1501,7 +1530,7 @@
     function normalizeGoals(goals) {
       return goals.map(goal => {
         const fixed = seed.goals2030.find(item => item.id === goal.id);
-        return fixed ? { ...goal, ...fixed } : goal;
+        return fixed ? { ...fixed, ...goal } : goal;
       });
     }
     function normalizeTodos(todos) {
@@ -1524,7 +1553,7 @@
     function normalizeQuests(quests) {
       return quests.map(quest => {
         const fixed = seed.quests.find(item => item.id === quest.id);
-        return fixed ? { ...quest, ...fixed } : quest;
+        return fixed ? { ...fixed, ...quest } : quest;
       });
     }
     function normalizeTasks(tasks) {
@@ -1574,6 +1603,7 @@
         good: log.good || "",
         bad: log.bad || "",
         nextStep: log.nextStep || "",
+        moodStress: log.moodStress || log.mood_stress || "",
         skillXp: log.skillXp || buildSkillXp(task || seed.tasks[2]),
         is_random_event: Boolean(log.is_random_event || task?.is_random_event),
         is_pivoted: Boolean(log.is_pivoted),
@@ -1581,6 +1611,20 @@
         actual_task_id: log.actual_task_id || log.taskId || "T-003",
         pivot_note: log.pivot_note || ""
       };
+    }
+    function normalizeMetricLogs(metricLogs) {
+      return metricLogs.map((log, index) => ({
+        id: log.id || `ML-${String(index + 1).padStart(3, "0")}`,
+        date: log.date || todayISO(),
+        goalId: log.goalId || log.goal_id || "BUSINESS",
+        metricType: log.metricType || log.metric_type || "Metric",
+        value: Number(log.value || 0),
+        unit: log.unit || "",
+        note: log.note || "",
+        month: log.month || String(log.date || todayISO()).slice(0, 7),
+        createdAt: log.createdAt || log.created_at || new Date().toISOString(),
+        updatedAt: log.updatedAt || log.updated_at || new Date().toISOString()
+      }));
     }
     function taskByIdFromSeed(id) {
       return seed.tasks.find(t => t.id === id);
@@ -1599,6 +1643,46 @@
       const target = Number(row?.targetValue || 0);
       if (!target) return null;
       return Math.max(0, Math.min(100, Math.round((Number(row.currentValue || 0) / target) * 100)));
+    }
+    function monthKey(date = todayISO()) {
+      return String(date || todayISO()).slice(0, 7);
+    }
+    function metricQuestIdFor(goalId, metricType = "", targetData = data) {
+      const value = String(metricType).toLowerCase();
+      const has = (...words) => words.some(word => value.includes(word.toLowerCase()));
+      if (goalId === "HEALTH" || has("weight", "体重", "kg")) return "Q-005";
+      if (goalId === "MINDSET" || has("meditation", "冥想", "good things", "好事", "record bad")) return "Q-004";
+      if (goalId === "PASSIVE" || has("汇款", "remittance", "transfer")) return "Q-002";
+      if (goalId === "NEW" || has("ai", "mvp", "automation", "自动化")) return "Q-008";
+      if (has("rfq", "order", "income", "收入", "客户", "customer", "contact")) return "Q-003";
+      if (has("container", "柜", "profit", "salary", "dfk")) return "Q-001";
+      return targetData?.quests?.find(q => !q.parentQuestId && q.goal === goalId)?.id || "";
+    }
+    function applyMetricLogsToDashboard(metricLogs = data.metricLogs || [], targetData = data) {
+      const currentMonth = monthKey();
+      const monthly = metricLogs.filter(log => monthKey(log.date) === currentMonth);
+      const totals = new Map();
+      monthly.forEach(log => {
+        const key = `${log.goalId}|${log.metricType}`;
+        const current = totals.get(key) || { goalId: log.goalId, metricType: log.metricType, value: 0, unit: log.unit };
+        current.value += Number(log.value || 0);
+        if (log.unit) current.unit = log.unit;
+        totals.set(key, current);
+      });
+      totals.forEach(total => {
+        const goal = targetData.goals2030?.find(item => item.id === total.goalId);
+        if (goal) {
+          goal.currentValue = total.value;
+          goal.unit = total.unit || goal.unit;
+        }
+        const questId = metricQuestIdFor(total.goalId, total.metricType, targetData);
+        const quest = targetData.quests?.find(item => item.id === questId);
+        if (quest) {
+          quest.currentValue = total.value;
+          quest.unit = total.unit || quest.unit;
+          if (total.value > 0 && quest.status === "Not Started") quest.status = "In Progress";
+        }
+      });
     }
     function displayProgress(row) {
       const valueBased = valueProgress(row);
@@ -2060,6 +2144,9 @@
       if (!running) toggleTimer();
     }
     function renderFocus() {
+      populateMetricGoalSelect();
+      if (!$("metricLogDate").value) $("metricLogDate").value = todayISO();
+      setRecordType($("recordTypeSelect")?.value || "session");
       if (timerSessionActive && timerTaskId) {
         const activeTask = taskById(timerTaskId);
         if (activeTask) {
@@ -2111,6 +2198,22 @@
         renderAll();
       };
       renderTimer();
+      setRecordType($("recordTypeSelect")?.value || "session");
+    }
+    function setRecordType(type) {
+      const isMetric = type === "metric";
+      if ($("recordTypeSelect")) $("recordTypeSelect").value = isMetric ? "metric" : "session";
+      $("sessionRecordFields")?.classList.toggle("hide", isMetric);
+      $("sessionLogPanel")?.classList.toggle("hide", isMetric);
+      $("sessionResult")?.classList.toggle("hide", isMetric);
+      $("metricRecordFields")?.classList.toggle("hide", !isMetric);
+      if ($("sessionTypePill")) $("sessionTypePill").textContent = isMetric ? "Quick Metric Log" : `${selectedDurationMinutes()}min Session`;
+    }
+    function populateMetricGoalSelect() {
+      if (!$("metricLogGoal")) return;
+      const current = $("metricLogGoal").value || selectedGoalId;
+      $("metricLogGoal").innerHTML = data.goals2030.map(goal => `<option value="${goal.id}">${escapeHtml(goalLabel(goal))}</option>`).join("");
+      $("metricLogGoal").value = data.goals2030.some(goal => goal.id === current) ? current : selectedGoalId;
     }
     function renderRecordBoardMode(task) {
       const meditation = isMeditationTask(task);
@@ -2184,6 +2287,7 @@
         good: isMeditationTask(t) ? "" : $("good").value.trim(),
         bad: isMeditationTask(t) ? "" : $("bad").value.trim(),
         nextStep: isMeditationTask(t) ? ($("nextStep").value.trim() || "下次继续短冥想") : ($("nextStep").value.trim() || q.nextMove),
+        moodStress: $("moodStress").value.trim(),
         skillXp: buildSkillXp(t),
         is_random_event: Boolean(t.is_random_event),
         is_pivoted: false,
@@ -2210,6 +2314,7 @@
         good: log.good,
         bad: log.bad,
         next_step: log.nextStep,
+        mood_stress: log.moodStress || "",
         skill_xp_json: JSON.stringify(log.skillXp || []),
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString()
@@ -2238,6 +2343,7 @@
         good: row.good,
         bad: row.bad,
         nextStep: row.next_step,
+        moodStress: row.mood_stress,
         skillXp
       }, index, data.tasks);
     }
@@ -2251,6 +2357,47 @@
       data.logs = Array.from(byId.values()).sort((a, b) => String(b.date || "").localeCompare(String(a.date || "")));
       save();
       return remoteLogs.filter(log => !data.logs.some(local => local.id === log.id)).length || remoteLogs.length;
+    }
+    function metricLogToSheetRow(log) {
+      return {
+        metric_log_id: log.id,
+        date: log.date,
+        month: log.month || monthKey(log.date),
+        goal_id: log.goalId,
+        metric_type: log.metricType,
+        value: log.value,
+        unit: log.unit,
+        note: log.note,
+        created_at: log.createdAt || new Date().toISOString(),
+        updated_at: new Date().toISOString()
+      };
+    }
+    function sheetRowToMetricLog(row, index = 0) {
+      return normalizeMetricLogs([{
+        id: row.metric_log_id,
+        date: row.date,
+        month: row.month,
+        goalId: row.goal_id,
+        metricType: row.metric_type,
+        value: row.value,
+        unit: row.unit,
+        note: row.note,
+        createdAt: row.created_at,
+        updatedAt: row.updated_at
+      }])[0] || normalizeMetricLogs([{ id: `ML-REMOTE-${index + 1}` }])[0];
+    }
+    function mergeRemoteMetricLogs(rows = []) {
+      const remoteLogs = rows
+        .filter(row => row && row.metric_log_id)
+        .map((row, index) => sheetRowToMetricLog(row, index));
+      if (!remoteLogs.length) return 0;
+      const beforeIds = new Set(data.metricLogs.map(log => log.id));
+      const byId = new Map(data.metricLogs.map(log => [log.id, log]));
+      remoteLogs.forEach(log => byId.set(log.id, { ...(byId.get(log.id) || {}), ...log }));
+      data.metricLogs = Array.from(byId.values()).sort((a, b) => String(b.date || "").localeCompare(String(a.date || "")));
+      applyMetricLogsToDashboard();
+      save();
+      return remoteLogs.filter(log => !beforeIds.has(log.id)).length;
     }
     function jsonp(url, params = {}) {
       return new Promise((resolve, reject) => {
@@ -2331,6 +2478,51 @@
         renderSheetSyncConfig("同步失败，已暂存到本机待重试队列。");
       }
     }
+    async function pullMetricLogsFromSheet({ silent = false } = {}) {
+      const config = sheetSyncConfig();
+      if (!config.url) return;
+      try {
+        const { token } = await resolveWorkingSheetToken(config);
+        const payload = await jsonp(config.url, { action: "get_metric_logs", token });
+        if (!payload || !payload.ok) throw new Error(payload?.error || "unknown_error");
+        const added = mergeRemoteMetricLogs(payload.rows || []);
+        renderAll();
+        if (!silent) renderSheetSyncConfig(added ? `已从 Google Sheet 拉取 ${added} 条 Metric Log。` : "Metric Log 已同步。");
+      } catch (error) {
+        if (!silent) renderSheetSyncConfig("Metric Log 拉取失败，请确认 Apps Script 已重新部署。");
+      }
+    }
+    async function syncMetricLogToSheet(log) {
+      const config = sheetSyncConfig();
+      if (!config.url) return;
+      let token = config.token || "";
+      try {
+        token = (await resolveWorkingSheetToken(config)).token;
+      } catch (error) {
+        renderSheetSyncConfig("Metric Log 同步失败：Apps Script URL 或 Token 不可用。");
+        return;
+      }
+      const payload = {
+        token,
+        action: "append_metric_log",
+        module: "Metric_Logs",
+        row: metricLogToSheetRow(log)
+      };
+      try {
+        await fetch(config.url, {
+          method: "POST",
+          mode: "no-cors",
+          headers: { "Content-Type": "text/plain;charset=utf-8" },
+          body: JSON.stringify(payload)
+        });
+        renderSheetSyncConfig("Metric Log 已发送到 Google Sheet。");
+      } catch (error) {
+        const pending = JSON.parse(localStorage.getItem(APP_CONFIG.PENDING_SYNC_KEY) || "[]");
+        pending.push(payload);
+        localStorage.setItem(APP_CONFIG.PENDING_SYNC_KEY, JSON.stringify(pending));
+        renderSheetSyncConfig("Metric Log 同步失败，已暂存到本机待重试队列。");
+      }
+    }
     async function testSheetSync() {
       const config = sheetSyncConfig();
       if (!config.url) {
@@ -2353,7 +2545,47 @@
       }
     }
     function clearForm() {
-      ["whatDone", "problem", "solution", "good", "bad", "nextStep"].forEach(id => $(id).value = "");
+      ["whatDone", "problem", "solution", "good", "bad", "nextStep", "moodStress"].forEach(id => $(id).value = "");
+    }
+    function saveMetricLog() {
+      const goalId = $("metricLogGoal").value || selectedGoalId;
+      const metricType = $("metricLogType").value.trim();
+      const value = Number($("metricLogValue").value || 0);
+      if (!metricType) {
+        alert("先填写 Metric Type。");
+        return;
+      }
+      if (!Number.isFinite(value)) {
+        alert("Value 必须是数字。");
+        return;
+      }
+      const log = {
+        id: newId("ML"),
+        date: $("metricLogDate").value || todayISO(),
+        goalId,
+        metricType,
+        value,
+        unit: $("metricLogUnit").value.trim(),
+        note: $("metricLogNote").value.trim(),
+        month: monthKey($("metricLogDate").value || todayISO()),
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
+      };
+      data.metricLogs.unshift(log);
+      selectedGoalId = goalId;
+      applyMetricLogsToDashboard();
+      save();
+      clearMetricLogForm();
+      renderAll();
+      syncMetricLogToSheet(log);
+      showScreen("map");
+    }
+    function clearMetricLogForm() {
+      $("metricLogDate").value = todayISO();
+      $("metricLogType").value = "";
+      $("metricLogValue").value = "";
+      $("metricLogUnit").value = "";
+      $("metricLogNote").value = "";
     }
     function saveDraft() {
       localStorage.setItem(APP_CONFIG.FOCUS_DRAFT_KEY, JSON.stringify({ taskId: selectedTaskId, ...readForm() }));
@@ -3169,6 +3401,7 @@
       if (id === "skills") renderSkills();
     }
     function renderAll() {
+      applyMetricLogsToDashboard();
       renderGoals();
       renderSkillMini();
       renderMap();
@@ -3207,6 +3440,8 @@
     $("saveSheetSyncBtn").addEventListener("click", saveSheetSyncConfig);
     $("testSheetSyncBtn").addEventListener("click", testSheetSync);
     $("pullSheetLogsBtn").addEventListener("click", () => pullSessionLogsFromSheet());
+    $("recordTypeSelect").addEventListener("change", (event) => setRecordType(event.target.value));
+    $("saveMetricLogBtn").addEventListener("click", saveMetricLog);
     $("createRandomStartBtn").addEventListener("click", () => createRandomEvent(true));
     $("createRandomBtn").addEventListener("click", () => createRandomEvent(false));
     $("applyPivotBtn").addEventListener("click", applyPivot);
@@ -3214,6 +3449,7 @@
     document.querySelectorAll(".pivot-option").forEach(btn => btn.addEventListener("click", () => setPivotType(btn.dataset.pivotType)));
     renderAll();
     pullSessionLogsFromSheet({ silent: true });
+    pullMetricLogsFromSheet({ silent: true });
 
     function exportData() {
       const payload = JSON.stringify({ exportedAt: new Date().toISOString(), app: "Plan RPG", version: APP_CONFIG.VERSION, data }, null, 2);
