@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Plan RPG v0.3.28 / 计划 RPG</title>
+  <title>Plan RPG v0.3.29 / 计划 RPG</title>
   <style>
     :root {
       --ink: #111827;
@@ -944,7 +944,7 @@
         <div>
           <h1>计划 RPG</h1>
           <p>把目标变成冒险</p>
-          <span class="version">v0.3.28 在线网页软件</span>
+          <span class="version">v0.3.29 在线网页软件</span>
         </div>
       </div>
 
@@ -1008,7 +1008,7 @@
         <div class="stats">
           <div class="stat"><b>⚡</b><div><strong id="totalMinutes">0 min</strong><span>同步专注时长</span></div></div>
           <div class="stat"><b>◆</b><div><strong id="gRatio">0%</strong><span>Growth 占比</span></div></div>
-          <div class="stat"><b>Lv</b><div><strong>探索者 28</strong><span>Plan RPG v0.3.28</span></div></div>
+          <div class="stat"><b>Lv</b><div><strong>探索者 28</strong><span>Plan RPG v0.3.29</span></div></div>
         </div>
       </header>
 
@@ -1112,6 +1112,8 @@
                 <option value="RFQ"></option>
                 <option value="Customer Contact"></option>
                 <option value="Income"></option>
+                <option value="装柜数量"></option>
+                <option value="INSO 收入"></option>
                 <option value="Book Finished"></option>
                 <option value="Meditation"></option>
                 <option value="Good Things"></option>
@@ -2024,16 +2026,27 @@
         </button>
       `;
     }
+    function quickMetricConfigForQuest(questId) {
+      if (questId === "Q-001") {
+        return { label: "记录装柜数量", goalId: "BUSINESS", metricType: "装柜数量", unit: "柜" };
+      }
+      if (questId === "Q-003") {
+        return { label: "记录 INSO 收入", goalId: "BUSINESS", metricType: "INSO 收入", unit: "RMB" };
+      }
+      return null;
+    }
     function renderDetail() {
       const q = questById(selectedQuestId);
       const tasks = tasksForQuest(q.id);
       const selectedTask = taskById(selectedTaskId) || tasks[0];
       const taskLogs = selectedTask ? data.logs.filter(l => [selectedTask.id, selectedTask.generated_task_id].includes(l.taskId) || [selectedTask.id, selectedTask.generated_task_id].includes(l.actual_task_id)) : [];
       const taskType = questTypeForTask(selectedTask);
+      const quickMetric = quickMetricConfigForQuest(q.id);
       $("questDetail").innerHTML = `
         <div class="simple-detail">
           <span class="pill">${typeBadge(taskType)} · ${gmnText(selectedTask?.gmn || q.gmn)}</span>
           <h3>${escapeHtml(q.name)}</h3>
+          ${quickMetric ? `<button class="secondary full" id="detailQuickMetric">${escapeHtml(quickMetric.label)}</button>` : ""}
           <button class="primary full" id="detailStart">开始记录</button>
           <details class="custom-task-box">
             <summary class="secondary full">修改 GMN</summary>
@@ -2062,8 +2075,6 @@
           </details>
           <details class="custom-task-box">
             <summary class="secondary full">更多记录设置</summary>
-            <div class="progress-number"><span>完成情况</span><span>${tasks.filter(t => computedTaskProgress(t) >= 100).length}/${tasks.length}</span></div>
-            <div class="bar"><div class="fill" style="--value:${computedQuestProgress(q)}%"></div></div>
             ${valueProgress(q) !== null ? `
             <div class="custom-task-box">
               <h4>更新目标进度</h4>
@@ -2075,15 +2086,6 @@
               <button class="secondary full" id="saveMetricBtn">保存进度</button>
             </div>
             ` : ""}
-            <h4>预设任务</h4>
-            <div class="task-list">
-            ${tasks.map(t => `
-              <button class="task-card ${t.id === selectedTaskId ? "selected" : ""} ${computedTaskProgress(t) >= 100 ? "done" : "todo"}" data-task="${t.id}">
-                <div class="task-head"><span>${escapeHtml(t.current_title || t.name)}</span><span class="pill">${computedTaskProgress(t) >= 100 ? "已完成" : "未完成"}</span></div>
-                <small>${gmnText(t.gmn)} · ${t.minutes || 20} 分钟</small>
-              </button>
-            `).join("")}
-            </div>
             <div class="custom-task-box">
               <h4>自己写一个任务</h4>
               <label>任务标题<input id="quickTaskTitle" placeholder="例如：更新 DFK 系统" /></label>
@@ -2113,9 +2115,24 @@
       if ($("saveMetricBtn")) $("saveMetricBtn").onclick = () => updateQuestMetric(q.id);
       if ($("saveQuestGmnBtn")) $("saveQuestGmnBtn").onclick = () => updateQuestGmn(q.id, $("detailQuestGmn").value);
       if ($("saveTaskGmnBtn")) $("saveTaskGmnBtn").onclick = () => updateTaskGmn(selectedTask.id, $("detailTaskGmn").value);
+      if ($("detailQuickMetric")) $("detailQuickMetric").onclick = () => startQuickMetricFromQuest(q.id);
       $("detailStart").addEventListener("click", startDefaultRecordFromDetail);
       if ($("quickTaskStart")) $("quickTaskStart").addEventListener("click", createQuickTask);
       document.querySelectorAll("[data-classify-random]").forEach(btn => btn.onclick = () => classifyRandomEvent(selectedTask.id, btn.dataset.classifyRandom));
+    }
+    function startQuickMetricFromQuest(questId) {
+      const config = quickMetricConfigForQuest(questId);
+      if (!config) return;
+      selectedQuestId = questId;
+      selectedGoalId = config.goalId;
+      showScreen("focus");
+      populateMetricGoalSelect();
+      setRecordType("metric");
+      $("metricLogDate").value = todayISO();
+      $("metricLogGoal").value = config.goalId;
+      $("metricLogType").value = config.metricType;
+      $("metricLogUnit").value = config.unit;
+      $("metricLogValue").focus();
     }
     function startDefaultRecordFromDetail() {
       const tasks = tasksForQuest(selectedQuestId);

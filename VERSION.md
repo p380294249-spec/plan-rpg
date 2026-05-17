@@ -1,5 +1,18 @@
 # Plan RPG Version Notes
 
+## v0.3.29 - 2026-05-17
+
+### Goal
+
+Make monthly BUSINESS metrics faster to record and simplify the right-side detail panel.
+
+### Main Changes
+
+- Added quick metric entry buttons for DFK monthly container count and INSO monthly income.
+- Removed the right-side completion status block from the chapter detail panel.
+- Removed the right-side preset task list from the chapter detail panel.
+- Updated visible version labels to `v0.3.29`.
+
 ## v0.3.28 - 2026-05-17
 
 ### Goal
