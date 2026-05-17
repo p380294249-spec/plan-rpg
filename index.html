@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Plan RPG v0.3.26 / 计划 RPG</title>
+  <title>Plan RPG v0.3.27 / 计划 RPG</title>
   <style>
     :root {
       --ink: #111827;
@@ -923,7 +923,7 @@
         <div>
           <h1>计划 RPG</h1>
           <p>把目标变成冒险</p>
-          <span class="version">v0.3.26 在线网页软件</span>
+          <span class="version">v0.3.27 在线网页软件</span>
         </div>
       </div>
 
@@ -987,7 +987,7 @@
         <div class="stats">
           <div class="stat"><b>⚡</b><div><strong id="totalMinutes">0 min</strong><span>同步专注时长</span></div></div>
           <div class="stat"><b>◆</b><div><strong id="gRatio">0%</strong><span>Growth 占比</span></div></div>
-          <div class="stat"><b>Lv</b><div><strong>探索者 28</strong><span>Plan RPG v0.3.26</span></div></div>
+          <div class="stat"><b>Lv</b><div><strong>探索者 28</strong><span>Plan RPG v0.3.27</span></div></div>
         </div>
       </header>
 
@@ -1309,21 +1309,22 @@
       goals2030: [
         { id: "BUSINESS", title: "Business: DFK + INSO as 2026 main goals", currentValue: 0, targetValue: 2, unit: "个主目标", role: "Mainline" },
         { id: "PASSIVE", title: "Passive: remittance system and clients", currentValue: 0, targetValue: 3, unit: "个模块", role: "Mainline", displayTitle: "PASSIVE INCOME" },
-        { id: "HEALTH", title: "Keep weight within 5KG", currentValue: 0, targetValue: 52, unit: "周", role: "Habit" },
-        { id: "MINDSET", title: "Daily meditation", currentValue: 0, targetValue: 365, unit: "次", role: "Habit" },
-        { id: "FAMILY", title: "Girl friend and family life", currentValue: 0, targetValue: 2, unit: "模块", role: "Life" },
-        { id: "SOCIAL", title: "Meet people and find mentor", currentValue: 0, targetValue: 2, unit: "模块", role: "Sideline", displayTitle: "SOCIAL NETWORK" },
-        { id: "INTERESTS", title: "Master one hobby", currentValue: 0, targetValue: 1, unit: "个爱好", role: "Sideline" },
-        { id: "NEW", title: "AI automation for daily work", currentValue: 0, targetValue: 10, unit: "个自动化", role: "Sideline", displayTitle: "NEW THINGS" }
+        { id: "HEALTH", title: "Keep weight within 5KG", currentValue: 4, targetValue: 10, unit: "次", role: "Habit" },
+        { id: "MINDSET", title: "Mindset: meditation, review and emotional records", currentValue: 0, targetValue: 3, unit: "模块", role: "Habit" },
+        { id: "FAMILY", title: "Girl friend and family life", currentValue: 3, targetValue: 12, unit: "次", role: "Life" },
+        { id: "SOCIAL", title: "Meet people and find mentor", currentValue: 1, targetValue: 12, unit: "次", role: "Sideline", displayTitle: "SOCIAL NETWORK" },
+        { id: "INTERESTS", title: "Interest trial count", currentValue: 1, targetValue: 3, unit: "次", role: "Sideline" },
+        { id: "NEW", title: "AI automation for daily work", currentValue: 0, targetValue: 2, unit: "个自动化", role: "Sideline", displayTitle: "NEW THINGS" },
+        { id: "READ", title: "Read and finish books", currentValue: 1, targetValue: 30, unit: "本", role: "Habit" }
       ],
       quests: [
-        { id: "Q-001", name: "DFK 赚钱", type: "Main", goal: "BUSINESS", target: "每月约 50 个货柜（广州 + 义乌）", currentValue: 0, targetValue: 50, unit: "柜/月", description: "2026 两个主要目标之一：让 DFK 形成稳定出货和稳定系统。", nextMove: "先把稳定系统和培训系统拆清楚", status: "In Progress", gmn: "G", priority: "High", icon: "🚚" },
+        { id: "Q-001", name: "DFK 赚钱", type: "Main", goal: "BUSINESS", target: "DFK platform gets profit; Shawn gets salary + move toward 50 containers/month", currentValue: 0, targetValue: 50, unit: "柜/月", description: "Business main branch 1: DFK platform profit, container profit and salary are tracked by Project Chapters + Quick Metric.", nextMove: "negotiate and move toward 50 containers/month", status: "In Progress", gmn: "G", priority: "High", icon: "🚚" },
         { id: "Q-009", parentQuestId: "Q-001", name: "稳定系统", type: "Main", goal: "BUSINESS", target: "财务、打印、人员管理三条分支稳定运行", description: "DFK 的底层系统章节，先把日常不会乱的系统搭起来。", nextMove: "选一个分支写出流程和检查点", status: "In Progress", gmn: "G", priority: "High", icon: "⚙️" },
         { id: "Q-010", parentQuestId: "Q-009", name: "财务", type: "Main", goal: "BUSINESS", target: "费用、利润、收付款和对账清楚", description: "DFK 财务分支：记录收入、成本、利润、应收应付和月度检查。", nextMove: "整理一条财务记录/对账流程", status: "In Progress", gmn: "G", priority: "High", icon: "💰" },
         { id: "Q-018", parentQuestId: "Q-009", name: "打印", type: "Main", goal: "BUSINESS", target: "单据、标签、交付资料打印稳定", description: "DFK 打印分支：把常用打印模板、检查点和异常处理固定下来。", nextMove: "检查一个打印模板或打印流程", status: "Not Started", gmn: "G", priority: "High", icon: "🖨️" },
         { id: "Q-019", parentQuestId: "Q-009", name: "人员管理", type: "Main", goal: "BUSINESS", target: "岗位、责任、检查和交接清楚", description: "DFK 人员管理分支：明确谁负责什么、怎么检查、怎么培训新人。", nextMove: "写清一个岗位的责任和检查标准", status: "Not Started", gmn: "G", priority: "High", icon: "👥" },
         { id: "Q-016", parentQuestId: "Q-001", name: "培训系统", type: "Main", goal: "BUSINESS", target: "把 DFK 每个关键环节做成可培训流程", currentValue: 0, targetValue: 1, unit: "套", description: "培训系统还在设计中，先作为独立章节收集流程、教材和验收标准。", nextMove: "选择一个环节，写出培训动作和验收标准", status: "Not Started", gmn: "G", priority: "High", icon: "📚" },
-        { id: "Q-003", name: "INSO 稳定客户收入", type: "Main", goal: "BUSINESS", target: "稳定客户每月收入 1WRMB", currentValue: 0, targetValue: 10000, unit: "RMB/月", description: "2026 两个主要目标之一：INSO 只保留订单跟进、客户开发、客户维护三条复盘主线。", nextMove: "从订单跟进、客户开发或客户维护里推进一个真实机会", status: "In Progress", gmn: "G", priority: "High", icon: "🔩" },
+        { id: "Q-003", name: "INSO 稳定客户收入", type: "Main", goal: "BUSINESS", target: "稳定客户每月收入 1WRMB", currentValue: 2011.93, targetValue: 10000, unit: "RMB/月", description: "Components monthly profit target 10,000 RMB; stable deals and customers are tracked by monthly profit metrics + 20min sales sessions.", nextMove: "need stable deals: 3 stable customers monthly", status: "In Progress", gmn: "G", priority: "High", icon: "🔩" },
         { id: "Q-011", parentQuestId: "Q-003", name: "订单跟进", type: "Main", goal: "BUSINESS", target: "订单、RFQ、报价、成交复盘清楚", description: "用于记录所有订单、RFQ、报价、成交相关复盘。每条记录尽量能看出状态、卡点、下一步和成交概率。", nextMove: "复盘一个 RFQ/报价/订单状态并写下一步", status: "In Progress", gmn: "G", priority: "High", icon: "💬" },
         { id: "Q-012", parentQuestId: "Q-003", name: "客户开发", type: "Main", goal: "BUSINESS", target: "持续产生新客户线索和有效对话", description: "用于记录新客户开发，包括麦穗、LinkedIn、邮件、Google 搜索等来源。", nextMove: "开发一批新客户，并标记来源和下一步", status: "In Progress", gmn: "G", priority: "High", icon: "📈" },
         { id: "Q-013", parentQuestId: "Q-003", name: "客户维护", type: "Habit", goal: "BUSINESS", target: "老客户定期互动和状态观察", description: "用于记录老客户联系、关系维护、定期互动、客户状态观察。", nextMove: "联系一个老客户并记录客户状态", status: "In Progress", gmn: "M", priority: "High", icon: "🤝" },
@@ -1331,13 +1332,16 @@
         { id: "Q-014", parentQuestId: "Q-002", name: "制作汇款流程", type: "Main", goal: "PASSIVE", target: "汇款流程、资料、费用、限制清楚", description: "把不同通道的流程、费用、到账时间、资料要求和风险点整理成系统。", nextMove: "整理一条完整汇款流程", status: "In Progress", gmn: "G", priority: "Medium", icon: "🧩" },
         { id: "Q-015", parentQuestId: "Q-002", name: "稳定客户", type: "Main", goal: "PASSIVE", target: "让老客户稳定复用汇款服务", description: "维护现有汇款客户，记录频率、需求、问题和下一次跟进。", nextMove: "跟进一个已有汇款客户", status: "Not Started", gmn: "M", priority: "Medium", icon: "🏛️" },
         { id: "Q-020", parentQuestId: "Q-002", name: "开发客户", type: "Main", goal: "PASSIVE", target: "持续开发新的汇款客户", description: "寻找新的汇款客户来源，记录渠道、信任问题和转化动作。", nextMove: "新增一批汇款客户线索", status: "Not Started", gmn: "G", priority: "Medium", icon: "📣" },
-        { id: "Q-004", name: "MEDITATION", type: "Habit", goal: "MINDSET", target: "每天一次冥想", currentValue: 0, targetValue: 365, unit: "次", description: "每天做一次冥想/呼吸/冷静记录，让心态保持稳定。", nextMove: "完成 1 次 meditation/check-in", status: "Not Started", gmn: "M", priority: "Medium", icon: "🧘" },
-        { id: "Q-005", name: "HEALTH", type: "Habit", goal: "HEALTH", target: "体重保持 5KG 浮动，每周测量一次", currentValue: 0, targetValue: 52, unit: "周", description: "目标不是复杂健身系统，先保证每周测量和趋势记录。", nextMove: "记录本周体重和状态", status: "Not Started", gmn: "G", priority: "Medium", icon: "💪" },
-        { id: "Q-021", name: "GIRL FRIEND", type: "Side", goal: "FAMILY", target: "经营女朋友关系", description: "Family 里先以 girl friend 为核心，记录相处、沟通和重要计划。", nextMove: "记录一次关系维护或计划", status: "Not Started", gmn: "M", priority: "Medium", icon: "💛" },
+        { id: "Q-004", name: "MEDITATION", type: "Habit", goal: "MINDSET", target: "每天记录想法或冥想", currentValue: 10, targetValue: 365, unit: "次", description: "Meditation/thought record count. Quick Metric Log only unless it is an actual focus session.", nextMove: "记录 1 次 meditation/thought check-in", status: "In Progress", gmn: "M", priority: "Medium", icon: "🧘" },
+        { id: "Q-005", name: "HEALTH", type: "Habit", goal: "HEALTH", target: "By Saturday I send the KG", currentValue: 4, targetValue: 10, unit: "次", description: "Weight record count / stable-month count. Weight records should use Quick Metric Log, not 20min timer.", nextMove: "记录本周体重，例如 70.8 KG", status: "In Progress", gmn: "G", priority: "Medium", icon: "💪" },
+        { id: "Q-021", name: "GIRL FRIEND", type: "Side", goal: "FAMILY", target: "which plan did she like the most; what experience", currentValue: 3, targetValue: 12, unit: "次", description: "Relationship actions / shared moments can be recorded as Quick Metric or Session depending on real work.", nextMove: "make the plan to China; car fixed", status: "In Progress", gmn: "M", priority: "Medium", icon: "💛" },
         { id: "Q-022", parentQuestId: "Q-021", name: "旅游", type: "Side", goal: "FAMILY", target: "一起计划和完成旅行", description: "旅行作为 girl friend 下面的一个分支，放目的地、预算、时间和行动。", nextMove: "写下一个旅行备选方案", status: "Not Started", gmn: "M", priority: "Low", icon: "🧳" },
         { id: "Q-006", name: "SOCIAL NETWORK", type: "Side", goal: "SOCIAL", target: "认识更多关键人物，并找到导师", description: "记录认识多少人、关键联系人和导师线索。", nextMove: "复盘一个联系人或导师线索", status: "Not Started", gmn: "G", priority: "Medium", icon: "🤝" },
-        { id: "Q-007", name: "INTERESTS", type: "Side", goal: "INTERESTS", target: "精通一个爱好", description: "先把今年真正想精通的一个爱好放进来，后续可以继续细化。", nextMove: "记录一次兴趣练习和改进点", status: "Not Started", gmn: "M", priority: "Low", icon: "☕" },
-        { id: "Q-008", name: "NEW THINGS", type: "Side", goal: "NEW", target: "完成 10 个 AI 自动化工作流/MVP", currentValue: 0, targetValue: 10, unit: "个自动化", description: "今年 NEW THINGS 的核心方向：研究 AI，帮助日常工作 AI 化，让 DFK 每天 ≤2 小时、INSO 每天 ≤2 小时完成核心工作。", nextMove: "选择一个每天重复的手动动作，做成 AI 自动化 MVP", status: "In Progress", gmn: "G", priority: "High", icon: "✨" },
+        { id: "Q-007", name: "INTERESTS", type: "Side", goal: "INTERESTS", target: "Interest trial count", currentValue: 1, targetValue: 3, unit: "次", description: "Need define metric type: trial / lesson / hobby session.", nextMove: "记录一次兴趣试验或练习", status: "In Progress", gmn: "M", priority: "Low", icon: "☕" },
+        { id: "Q-008", name: "NEW THINGS", type: "Side", goal: "NEW", target: "find things that are fun for life", currentValue: 0, targetValue: 2, unit: "个", description: "Could be Habit if repeated; new experiences/research can be Quick Metric or Session depending on effort.", nextMove: "find things that are fun for life", status: "In Progress", gmn: "G", priority: "High", icon: "✨" },
+        { id: "Q-028", name: "Record the smile", type: "Habit", goal: "MINDSET", target: "Every day share 3 good things", currentValue: 6, targetValue: 300, unit: "次", description: "Count of good-things records. Not a 20min task. Quick log only.", nextMove: "record good things", status: "In Progress", gmn: "M", priority: "Medium", icon: "😊" },
+        { id: "Q-029", name: "READ", type: "Habit", goal: "READ", target: "read a book I love; know what kind", currentValue: 1, targetValue: 30, unit: "本", description: "Reading time can be Session; finished book/review is Quick Metric.", nextMove: "read a book I love; know what kind", status: "In Progress", gmn: "G", priority: "Medium", icon: "📖" },
+        { id: "Q-030", name: "Record the Bad things", type: "Habit", goal: "MINDSET", target: "Record all bad things", currentValue: 2, targetValue: 50, unit: "次", description: "Bad-things record count. Quick log only.", nextMove: "record one bad thing and lesson", status: "In Progress", gmn: "M", priority: "Medium", icon: "📝" },
         { id: "Q-023", parentQuestId: "Q-008", name: "研究 AI 日常工作自动化", type: "Side", goal: "NEW", target: "用 10 个自动化流程支撑 DFK + INSO 每天 4 小时以内", currentValue: 0, targetValue: 10, unit: "个流程", description: "研究 AI 如何嵌入自己的真实工作流，不只学习工具，而是把手动动作变成可复用系统。最终效果是 DFK 每天 ≤2 小时、INSO 每天 ≤2 小时。", nextMove: "列出 DFK 和 INSO 每天最耗时的 5 个动作", status: "In Progress", gmn: "G", priority: "High", icon: "🤖" },
         { id: "Q-024", parentQuestId: "Q-023", name: "快速将工作模式自动化", type: "Main", goal: "NEW", target: "每月至少自动化 1 个重复工作流", description: "把报价、记录、跟进、打印、财务、客户维护等重复动作变成模板、脚本或 AI 工作流。", nextMove: "选一个手动流程，写出输入、处理、输出", status: "In Progress", gmn: "G", priority: "High", icon: "⚙️" },
         { id: "Q-025", parentQuestId: "Q-023", name: "搭建 MVP", type: "Main", goal: "NEW", target: "做出可真实使用的 AI 自动化原型", description: "先做最小可用版本，能节省一次真实手动操作即可，不追求完美。", nextMove: "搭建一个 AI 自动化 MVP 并跑一次真实任务", status: "Not Started", gmn: "G", priority: "High", icon: "🧩" },
@@ -1651,7 +1655,11 @@
       const value = String(metricType).toLowerCase();
       const has = (...words) => words.some(word => value.includes(word.toLowerCase()));
       if (goalId === "HEALTH" || has("weight", "体重", "kg")) return "Q-005";
-      if (goalId === "MINDSET" || has("meditation", "冥想", "good things", "好事", "record bad")) return "Q-004";
+      if (has("good things", "smile", "好事", "开心")) return "Q-028";
+      if (has("bad things", "bad", "坏事", "教训")) return "Q-030";
+      if (has("meditation", "冥想", "thought", "想法")) return "Q-004";
+      if (goalId === "MINDSET") return "Q-004";
+      if (goalId === "READ" || has("book", "read", "reading", "读书", "读完")) return "Q-029";
       if (goalId === "PASSIVE" || has("汇款", "remittance", "transfer")) return "Q-002";
       if (goalId === "NEW" || has("ai", "mvp", "automation", "自动化")) return "Q-008";
       if (has("rfq", "order", "income", "收入", "客户", "customer", "contact")) return "Q-003";

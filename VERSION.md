@@ -1,5 +1,22 @@
 # Plan RPG Version Notes
 
+## v0.3.27 - 2026-05-17
+
+### Goal
+
+Backfill the annual goal and metric defaults from the provided planning sheet screenshot.
+
+### Main Changes
+
+- Added missing Quick Metric style goals/quests:
+  - `Record the smile`
+  - `READ`
+  - `Record the Bad things`
+- Updated several current/target values from the planning sheet, including INSO monthly profit, Health, Meditation, Girl Friend, New Things, and Interests.
+- Clarified which items should be Quick Metric Logs instead of 20-minute sessions.
+- Updated metric type routing so Weight, RFQ/Income/Customer, Reading, Meditation, Good Things, and Bad Things update the right Quest.
+- Updated visible version labels to `v0.3.27`.
+
 ## v0.3.26 - 2026-05-17
 
 ### Goal
