@@ -1,5 +1,21 @@
 # Plan RPG Version Notes
 
+## v0.3.25 - 2026-05-17
+
+### Goal
+
+Turn weekly review into a single-page direction check instead of just a raw log list.
+
+### Main Changes
+
+- Added a weekly review summary for Monday to Sunday.
+- Added this-week vs last-week minute comparison.
+- Added a simple direction badge based on how much time stayed in `G`.
+- Added a "where time went" section showing the main quests/modules of the week.
+- Added merged sections for problems, solutions, good points, and bad points from the week's logs.
+- Updated next-week route suggestions so they are based on this week's activity plus unfinished annual priorities.
+- Updated visible version labels to `v0.3.25`.
+
 ## v0.3.24 - 2026-05-17
 
 ### Goal

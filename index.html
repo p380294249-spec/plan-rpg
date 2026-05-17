@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Plan RPG v0.3.24 / 计划 RPG</title>
+  <title>Plan RPG v0.3.25 / 计划 RPG</title>
   <style>
     :root {
       --ink: #111827;
@@ -765,6 +765,49 @@
       display: grid;
       gap: 10px;
     }
+    .review-block {
+      border-radius: 8px;
+      border: 1px solid var(--line);
+      background: rgba(255, 255, 255, .72);
+      padding: 14px;
+    }
+    .review-block h4 {
+      margin: 0 0 8px;
+      font-size: 16px;
+    }
+    .summary-strip {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 12px;
+      margin: 16px 0;
+    }
+    .summary-stat {
+      border-radius: 8px;
+      border: 1px solid var(--line);
+      background: rgba(255, 255, 255, .72);
+      padding: 14px;
+    }
+    .summary-stat b {
+      display: block;
+      margin-top: 8px;
+      font-size: 24px;
+    }
+    .summary-stat span {
+      color: var(--muted);
+      font-size: 12px;
+    }
+    .review-text-list {
+      display: grid;
+      gap: 8px;
+      margin-top: 8px;
+    }
+    .review-text-item {
+      border-radius: 8px;
+      border: 1px solid rgba(148, 163, 184, .28);
+      background: rgba(248, 250, 252, .9);
+      padding: 10px 12px;
+      line-height: 1.5;
+    }
     .modal-backdrop {
       position: fixed;
       inset: 0;
@@ -867,7 +910,7 @@
       }
       .quest-lane:before { display: none; }
       .map-bottom { position: static; grid-template-columns: 1fr; margin-top: 16px; }
-      .form-grid, .review-cards, .skill-node-row, .reward-line, .option-row { grid-template-columns: 1fr; }
+      .form-grid, .review-cards, .skill-node-row, .reward-line, .option-row, .summary-strip { grid-template-columns: 1fr; }
       .timer-value { font-size: 58px; }
     }
   </style>
@@ -880,7 +923,7 @@
         <div>
           <h1>计划 RPG</h1>
           <p>把目标变成冒险</p>
-          <span class="version">v0.3.24 在线网页软件</span>
+          <span class="version">v0.3.25 在线网页软件</span>
         </div>
       </div>
 
@@ -944,7 +987,7 @@
         <div class="stats">
           <div class="stat"><b>⚡</b><div><strong id="totalMinutes">0 min</strong><span>同步专注时长</span></div></div>
           <div class="stat"><b>◆</b><div><strong id="gRatio">0%</strong><span>Growth 占比</span></div></div>
-          <div class="stat"><b>Lv</b><div><strong>探索者 28</strong><span>Plan RPG v0.3.24</span></div></div>
+          <div class="stat"><b>Lv</b><div><strong>探索者 28</strong><span>Plan RPG v0.3.25</span></div></div>
         </div>
       </header>
 
@@ -1092,19 +1135,32 @@
         <div class="review-grid">
           <div class="panel">
             <span class="pill">Weekly Review</span>
-            <h3>本周自动汇总</h3>
-            <p>这里会汇总本地 Session Log。点击日志可编辑，后续可以交给 AI 做复盘。</p>
+            <h3 id="reviewWeekTitle">本周自动汇总</h3>
+            <p id="reviewWeekSubtitle">这里会汇总本周专注记录，帮你核对方向、时间和下周重点。</p>
             <div class="review-cards">
               <div class="metric"><span>Total</span><b id="metricTotal">0</b></div>
               <div class="metric"><span>Growth</span><b id="metricG">0</b></div>
               <div class="metric"><span>维护</span><b id="metricM">0</b></div>
               <div class="metric"><span>Noise</span><b id="metricN">0</b></div>
             </div>
-            <div class="review-cards">
-              <div class="metric"><span>突发任务</span><b id="metricRandomCount">0</b></div>
-              <div class="metric"><span>突发时间</span><b id="metricRandomMinutes">0</b></div>
-              <div class="metric"><span>任务转向</span><b id="metricPivotCount">0</b></div>
-              <div class="metric"><span>维护/噪音</span><b id="metricMaintNoise">0</b></div>
+            <div class="summary-strip">
+              <div class="summary-stat"><span>本周总时长</span><b id="reviewThisWeekMinutes">0 min</b></div>
+              <div class="summary-stat"><span>对比上周</span><b id="reviewVsLastWeek">0 min</b></div>
+              <div class="summary-stat"><span>方向判断</span><b id="reviewDirectionBadge">待开始</b></div>
+            </div>
+            <div class="review-section">
+              <div class="review-block">
+                <h4>本周主要花在哪里</h4>
+                <div id="reviewFocusAreas"></div>
+              </div>
+              <div class="review-block">
+                <h4>本周问题与解决</h4>
+                <div id="reviewProblemSolve"></div>
+              </div>
+              <div class="review-block">
+                <h4>本周好的 / 不好的</h4>
+                <div id="reviewGoodBad"></div>
+              </div>
             </div>
             <div class="review-section" id="dynamicReview"></div>
             <h4>下周建议路线</h4>
@@ -2374,40 +2430,157 @@
     }
     function renderReview() {
       const logs = data.logs;
-      const total = logs.length;
-      const g = logs.filter(l => l.gmn === "G").length;
-      const m = logs.filter(l => l.gmn === "M").length;
-      const n = logs.filter(l => l.gmn === "N").length;
-      const randomLogs = logs.filter(l => l.is_random_event || taskById(l.actual_task_id || l.taskId)?.is_random_event);
-      const pivotLogs = logs.filter(l => l.is_pivoted);
-      const maintenanceLogs = logs.filter(l => taskById(l.actual_task_id || l.taskId)?.quest_type === "maintenance" || l.gmn === "M");
-      const noiseLogs = logs.filter(l => taskById(l.actual_task_id || l.taskId)?.quest_type === "noise" || l.gmn === "N");
+      const thisWeek = logsForWeek(0);
+      const lastWeek = logsForWeek(1);
+      const total = thisWeek.length;
+      const g = thisWeek.filter(l => l.gmn === "G").length;
+      const m = thisWeek.filter(l => l.gmn === "M").length;
+      const n = thisWeek.filter(l => l.gmn === "N").length;
+      const thisWeekMinutes = totalMinutesOf(thisWeek);
+      const lastWeekMinutes = totalMinutesOf(lastWeek);
+      const randomLogs = thisWeek.filter(l => l.is_random_event || taskById(l.actual_task_id || l.taskId)?.is_random_event);
+      const pivotLogs = thisWeek.filter(l => l.is_pivoted);
+      const maintenanceLogs = thisWeek.filter(l => taskById(l.actual_task_id || l.taskId)?.quest_type === "maintenance" || l.gmn === "M");
+      const noiseLogs = thisWeek.filter(l => taskById(l.actual_task_id || l.taskId)?.quest_type === "noise" || l.gmn === "N");
+      const range = weekRange(0);
+      $("reviewWeekTitle").textContent = `本周复盘 · ${formatShortDate(range.start)} - ${formatShortDate(range.end)}`;
+      $("reviewWeekSubtitle").textContent = total
+        ? "看本周时间有没有偏离年度方向，再决定下周要跟进哪里。"
+        : "本周还没有记录，开始一次 20 分钟后这里会自动汇总。";
       $("metricTotal").textContent = total;
       $("metricG").textContent = g;
       $("metricM").textContent = m;
       $("metricN").textContent = n;
-      $("metricRandomCount").textContent = randomLogs.length;
-      $("metricRandomMinutes").textContent = randomLogs.reduce((s, l) => s + Number(l.minutes || 0), 0);
-      $("metricPivotCount").textContent = pivotLogs.length;
-      $("metricMaintNoise").textContent = maintenanceLogs.length + noiseLogs.length;
+      $("reviewThisWeekMinutes").textContent = `${thisWeekMinutes} min`;
+      $("reviewVsLastWeek").textContent = formatMinuteDelta(thisWeekMinutes - lastWeekMinutes);
+      $("reviewDirectionBadge").textContent = directionLabelForWeek(thisWeek, thisWeekMinutes);
       $("totalMinutes").textContent = `${logs.reduce((s, l) => s + Number(l.minutes || 0), 0)} min`;
       $("gRatio").textContent = total ? pct(g / total * 100) : "0%";
+      renderWeeklyFocusAreas(thisWeek, lastWeek);
+      renderWeeklyMergedNotes(thisWeek);
       renderDynamicReview(randomLogs, pivotLogs, maintenanceLogs, noiseLogs);
-      $("logList").innerHTML = logs.map(logCard).join("") || `<p>还没有日志。先开始一次 20 分钟。</p>`;
+      $("logList").innerHTML = thisWeek.map(logCard).join("") || `<p>本周还没有日志。先开始一次 20 分钟。</p>`;
       document.querySelectorAll("[data-edit-log]").forEach(btn => btn.onclick = () => editLog(btn.dataset.editLog));
       document.querySelectorAll("[data-delete-log]").forEach(btn => btn.onclick = () => deleteLog(btn.dataset.deleteLog));
-      const active = data.quests
-        .map(q => ({ q, progress: computedQuestProgress(q) }))
-        .filter(x => x.progress < 100)
-        .sort((a, b) => (a.q.priority === "High" ? -1 : 1) - (b.q.priority === "High" ? -1 : 1))
-        .slice(0, 4);
-      $("nextRoute").innerHTML = active.map((x, i) => `
-        <div class="route-item"><div><b>${i + 1}. ${escapeHtml(x.q.name)}</b><br><small>${escapeHtml(x.q.nextMove)}</small></div></div>
-      `).join("");
+      renderNextRouteSuggestions(thisWeek);
       $("weeklyFocus").innerHTML = `
-        <p style="margin:0 0 8px;color:#cbd5e1;">DFK：更新系统</p>
-        <div class="bar"><div class="fill" style="--value:${computedQuestProgress(questById("Q-009"))}%"></div></div>
+        <p style="margin:0 0 8px;color:#cbd5e1;">MINDSET：每周复盘</p>
+        <div class="bar"><div class="fill" style="--value:${total ? Math.min(100, Math.round(thisWeekMinutes / 4)) : 0}%"></div></div>
       `;
+    }
+    function parseLogDate(value) {
+      if (!value) return null;
+      if (/^\d{4}-\d{2}-\d{2}$/.test(String(value))) {
+        const [year, month, day] = String(value).split("-").map(Number);
+        return new Date(year, month - 1, day);
+      }
+      const date = new Date(value);
+      return Number.isNaN(date.getTime()) ? null : date;
+    }
+    function startOfWeek(date = new Date()) {
+      const current = new Date(date.getFullYear(), date.getMonth(), date.getDate());
+      const day = current.getDay();
+      const diff = day === 0 ? -6 : 1 - day;
+      current.setDate(current.getDate() + diff);
+      current.setHours(0, 0, 0, 0);
+      return current;
+    }
+    function weekRange(weeksAgo = 0) {
+      const start = startOfWeek(new Date());
+      start.setDate(start.getDate() - weeksAgo * 7);
+      const end = new Date(start);
+      end.setDate(end.getDate() + 6);
+      end.setHours(23, 59, 59, 999);
+      return { start, end };
+    }
+    function logsForWeek(weeksAgo = 0) {
+      const range = weekRange(weeksAgo);
+      return data.logs.filter(log => {
+        const date = parseLogDate(log.date);
+        return date && date >= range.start && date <= range.end;
+      });
+    }
+    function totalMinutesOf(logs = []) {
+      return logs.reduce((sum, log) => sum + Number(log.minutes || 0), 0);
+    }
+    function formatShortDate(date) {
+      return `${date.getMonth() + 1}.${date.getDate()}`;
+    }
+    function formatMinuteDelta(delta) {
+      if (!delta) return "0 min";
+      return `${delta > 0 ? "+" : ""}${delta} min`;
+    }
+    function directionLabelForWeek(logs, minutes) {
+      if (!logs.length) return "待开始";
+      const growthMinutes = totalMinutesOf(logs.filter(log => log.gmn === "G"));
+      const ratio = minutes ? growthMinutes / minutes : 0;
+      if (ratio >= 0.6) return "方向稳定";
+      if (ratio >= 0.35) return "稍微偏了";
+      return "明显偏离";
+    }
+    function collectTopAreas(logs = []) {
+      const buckets = new Map();
+      logs.forEach(log => {
+        const quest = questById(log.questId);
+        const label = quest?.name || log.questId;
+        const current = buckets.get(label) || { label, minutes: 0, count: 0, nextMove: quest?.nextMove || "" };
+        current.minutes += Number(log.minutes || 0);
+        current.count += 1;
+        buckets.set(label, current);
+      });
+      return Array.from(buckets.values()).sort((a, b) => b.minutes - a.minutes).slice(0, 4);
+    }
+    function renderWeeklyFocusAreas(thisWeek, lastWeek) {
+      const topAreas = collectTopAreas(thisWeek);
+      const lastWeekAreas = collectTopAreas(lastWeek);
+      const lastWeekMap = new Map(lastWeekAreas.map(area => [area.label, area.minutes]));
+      $("reviewFocusAreas").innerHTML = topAreas.length ? topAreas.map(area => {
+        const delta = area.minutes - Number(lastWeekMap.get(area.label) || 0);
+        return `
+          <div class="review-text-item">
+            <b>${escapeHtml(area.label)}</b><br>
+            ${area.minutes} min / ${area.count} 次，较上周 ${formatMinuteDelta(delta)}
+            ${area.nextMove ? `<br><small>${escapeHtml(area.nextMove)}</small>` : ""}
+          </div>
+        `;
+      }).join("") : `<div class="review-text-item">本周还没有足够记录，先从一次 20 分钟开始。</div>`;
+    }
+    function collectUniqueNotes(logs, field) {
+      return [...new Set(logs.map(log => String(log[field] || "").trim()).filter(Boolean))].slice(0, 6);
+    }
+    function renderTextItems(items, emptyText) {
+      return items.length
+        ? `<div class="review-text-list">${items.map(item => `<div class="review-text-item">${escapeHtml(item)}</div>`).join("")}</div>`
+        : `<div class="review-text-item">${emptyText}</div>`;
+    }
+    function renderWeeklyMergedNotes(thisWeek) {
+      const problems = collectUniqueNotes(thisWeek, "problem");
+      const solutions = collectUniqueNotes(thisWeek, "solution");
+      const good = collectUniqueNotes(thisWeek, "good");
+      const bad = collectUniqueNotes(thisWeek, "bad");
+      $("reviewProblemSolve").innerHTML = `
+        <div><b>遇到的问题</b>${renderTextItems(problems, "本周没有记录明显问题。")}</div>
+        <div style="margin-top:12px;"><b>采取的解决方式</b>${renderTextItems(solutions, "本周还没有写出解决方式。")}</div>
+      `;
+      $("reviewGoodBad").innerHTML = `
+        <div><b>做得好的地方</b>${renderTextItems(good, "本周还没有记录明显亮点。")}</div>
+        <div style="margin-top:12px;"><b>需要调整的地方</b>${renderTextItems(bad, "本周还没有记录明显偏差。")}</div>
+      `;
+    }
+    function renderNextRouteSuggestions(thisWeek) {
+      const topQuestIds = [...new Set(thisWeek.map(log => log.questId).filter(Boolean))];
+      const focused = topQuestIds
+        .map(id => questById(id))
+        .filter(Boolean)
+        .filter(q => computedQuestProgress(q) < 100)
+        .slice(0, 2);
+      const annual = data.quests
+        .filter(q => !q.parentQuestId && q.priority === "High" && computedQuestProgress(q) < 100)
+        .slice(0, 2);
+      const suggestions = [...new Map([...focused, ...annual].map(q => [q.id, q])).values()].slice(0, 4);
+      $("nextRoute").innerHTML = suggestions.length ? suggestions.map((quest, index) => `
+        <div class="route-item"><div><b>${index + 1}. ${escapeHtml(quest.name)}</b><br><small>${escapeHtml(quest.nextMove || quest.target || "继续推进本周最重要的一步。")}</small></div></div>
+      `).join("") : `<div class="route-item"><div><b>1. 先补一条本周记录</b><br><small>有了本周数据，这里才会更像真正的路线建议。</small></div></div>`;
     }
     function renderDynamicReview(randomLogs, pivotLogs, maintenanceLogs, noiseLogs) {
       const randomMinutes = randomLogs.reduce((s, l) => s + Number(l.minutes || 0), 0);
