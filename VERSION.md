@@ -1,5 +1,18 @@
 # Plan RPG Version Notes
 
+## v0.3.28 - 2026-05-17
+
+### Goal
+
+Make active focus sessions easier to stop from the map and clean up BUSINESS mainline vs side-branch defaults.
+
+### Main Changes
+
+- Added a cancel button to the active focus floating panel so an unfinished 20-minute session can be stopped from the map.
+- Updated BUSINESS default structure: DFK 财务/培训 and INSO 客户开发 are the emphasized mainline branches; other related chapters/actions are lighter side branches.
+- Updated INSO default 20-minute actions for 客户开发、订单跟进、客户维护.
+- Updated visible version labels to `v0.3.28`.
+
 ## v0.3.27 - 2026-05-17
 
 ### Goal
