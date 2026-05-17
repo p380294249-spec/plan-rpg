@@ -1,5 +1,5 @@
 const SPREADSHEET_ID = '1Yz-RswNvBxJ9GFWfcU2KDAFh23NCWLS-HS2_g_07rAg';
-const SYNC_TOKEN = 'CHANGE_ME_PLAN_RPG_TOKEN';
+const SYNC_TOKEN = 'plan-rpg-2026';
 
 function doGet(e) {
   const params = e && e.parameter ? e.parameter : {};

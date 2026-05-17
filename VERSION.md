@@ -1,5 +1,22 @@
 # Plan RPG Version Notes
 
+## v0.3.24 - 2026-05-17
+
+### Goal
+
+Make Google Sheet sync work automatically on a new computer without manual localStorage setup.
+
+### Main Changes
+
+- Added explicit default sync constants in the frontend:
+  - `DEFAULT_APPS_SCRIPT_URL`
+  - `DEFAULT_SYNC_TOKEN = plan-rpg-2026`
+- When no sync config exists, the app now writes the default URL/token into `localStorage` automatically.
+- Opening the page still auto-runs the `Session_Logs` pull after the default config is available.
+- Added token probing so the app can use the new default token after Apps Script is redeployed while still reading/writing against the currently deployed legacy token during transition.
+- Updated `google-apps-script/Code.gs` to use `plan-rpg-2026`.
+- Updated visible version labels to `v0.3.24`.
+
 ## v0.3.23 - 2026-05-14
 
 ### Goal

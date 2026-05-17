@@ -2,7 +2,7 @@
 
 Plan RPG is a lightweight web MVP for turning yearly plans, weekly quests, 20-minute focus sessions, execution logs, rewards, skills, and reviews into a game-like personal planning system.
 
-Current version: `v0.3.23`
+Current version: `v0.3.24`
 
 Live app:
 
@@ -100,7 +100,7 @@ The script uses:
 
 ```js
 const SPREADSHEET_ID = '1Yz-RswNvBxJ9GFWfcU2KDAFh23NCWLS-HS2_g_07rAg';
-const SYNC_TOKEN = 'CHANGE_ME_PLAN_RPG_TOKEN';
+const SYNC_TOKEN = 'plan-rpg-2026';
 ```
 
 The token is lightweight protection for the MVP. Do not treat it as strong security for sensitive data.

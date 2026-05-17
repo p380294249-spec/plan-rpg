@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Plan RPG v0.3.23 / 计划 RPG</title>
+  <title>Plan RPG v0.3.24 / 计划 RPG</title>
   <style>
     :root {
       --ink: #111827;
@@ -880,7 +880,7 @@
         <div>
           <h1>计划 RPG</h1>
           <p>把目标变成冒险</p>
-          <span class="version">v0.3.23 在线网页软件</span>
+          <span class="version">v0.3.24 在线网页软件</span>
         </div>
       </div>
 
@@ -944,7 +944,7 @@
         <div class="stats">
           <div class="stat"><b>⚡</b><div><strong id="totalMinutes">0 min</strong><span>同步专注时长</span></div></div>
           <div class="stat"><b>◆</b><div><strong id="gRatio">0%</strong><span>Growth 占比</span></div></div>
-          <div class="stat"><b>Lv</b><div><strong>探索者 28</strong><span>Plan RPG v0.3.23</span></div></div>
+          <div class="stat"><b>Lv</b><div><strong>探索者 28</strong><span>Plan RPG v0.3.24</span></div></div>
         </div>
       </header>
 
@@ -1357,12 +1357,44 @@
     const pct = (n) => Math.round(n) + "%";
     const escapeHtml = (value = "") => String(value).replace(/[&<>"']/g, ch => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[ch]));
     const goalLabel = (goal) => goal?.displayTitle || goal?.id || "";
+    function readStoredSheetSyncConfig() {
+      try {
+        return JSON.parse(localStorage.getItem(APP_CONFIG.SHEET_SYNC_CONFIG_KEY) || "null") || null;
+      } catch (error) {
+        return null;
+      }
+    }
     function sheetSyncConfig() {
-      const saved = JSON.parse(localStorage.getItem(APP_CONFIG.SHEET_SYNC_CONFIG_KEY) || "{}");
-      return {
-        url: saved.url || APP_CONFIG.DEFAULT_GAS_URL,
-        token: saved.token || APP_CONFIG.DEFAULT_SYNC_TOKEN
+      const saved = readStoredSheetSyncConfig();
+      const isMissing = !saved || !saved.url || !saved.token;
+      const legacyTokens = APP_CONFIG.LEGACY_SYNC_TOKENS || [];
+      const isLegacyDefault = saved?.url === APP_CONFIG.DEFAULT_GAS_URL && legacyTokens.includes(saved?.token);
+      const config = {
+        url: saved?.url || APP_CONFIG.DEFAULT_GAS_URL,
+        token: isMissing || isLegacyDefault ? APP_CONFIG.DEFAULT_SYNC_TOKEN : saved.token
       };
+      if (isMissing || isLegacyDefault) {
+        localStorage.setItem(APP_CONFIG.SHEET_SYNC_CONFIG_KEY, JSON.stringify(config));
+      }
+      return config;
+    }
+    function syncTokenCandidates(config = sheetSyncConfig()) {
+      const tokens = [config.token || APP_CONFIG.DEFAULT_SYNC_TOKEN];
+      if (config.url === APP_CONFIG.DEFAULT_GAS_URL) tokens.push(...(APP_CONFIG.LEGACY_SYNC_TOKENS || []));
+      return [...new Set(tokens.filter(Boolean))];
+    }
+    async function resolveWorkingSheetToken(config = sheetSyncConfig()) {
+      let lastError = null;
+      for (const token of syncTokenCandidates(config)) {
+        try {
+          const payload = await jsonp(config.url, { action: "get_session_logs", token });
+          if (payload?.ok) return { token, payload };
+          lastError = new Error(payload?.error || "unknown_error");
+        } catch (error) {
+          lastError = error;
+        }
+      }
+      throw lastError || new Error("sheet_sync_unavailable");
     }
     function saveSheetSyncConfig() {
       const config = {
@@ -2199,8 +2231,7 @@
       }
       if (!silent) renderSheetSyncConfig("正在从 Google Sheet 拉取专注记录...");
       try {
-        const payload = await jsonp(config.url, { action: "get_session_logs", token: config.token || "" });
-        if (!payload || !payload.ok) throw new Error(payload?.error || "unknown_error");
+        const { payload } = await resolveWorkingSheetToken(config);
         const before = data.logs.length;
         mergeRemoteSessionLogs(payload.rows || []);
         renderAll();
@@ -2216,8 +2247,15 @@
         renderSheetSyncConfig("未配置 Google Sheet 同步；本次只保存到当前浏览器。");
         return;
       }
+      let token = config.token || "";
+      try {
+        token = (await resolveWorkingSheetToken(config)).token;
+      } catch (error) {
+        renderSheetSyncConfig("同步失败：Apps Script URL 或 Token 不可用。");
+        return;
+      }
       const payload = {
-        token: config.token || "",
+        token,
         action: "append_session_log",
         module: "Session_Logs",
         row: logToSheetRow(log)
@@ -2243,7 +2281,14 @@
         renderSheetSyncConfig("先填写 Apps Script URL。");
         return;
       }
-      const payload = { token: config.token || "", action: "ping", module: "Settings", created_at: new Date().toISOString() };
+      let token = config.token || "";
+      try {
+        token = (await resolveWorkingSheetToken(config)).token;
+      } catch (error) {
+        renderSheetSyncConfig("测试失败：Apps Script URL 或 Token 不可用。");
+        return;
+      }
+      const payload = { token, action: "ping", module: "Settings", created_at: new Date().toISOString() };
       try {
         await fetch(config.url, { method: "POST", mode: "no-cors", headers: { "Content-Type": "text/plain;charset=utf-8" }, body: JSON.stringify(payload) });
         renderSheetSyncConfig("测试请求已发送。去 Google Sheet 的 Settings 查看 sync_ping。");
