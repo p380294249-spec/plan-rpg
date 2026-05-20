@@ -1,5 +1,20 @@
 # Plan RPG Version Notes
 
+## v0.3.30 - 2026-05-20
+
+### Goal
+
+Make meditation focus sessions easier to finish or cancel when opened by mistake.
+
+### Main Changes
+
+- Changed MEDITATION chapter and default meditation task GMN from `M` to `G`.
+- Kept meditation default duration at 10 minutes.
+- Fixed map/detail start flows so meditation no longer gets forced to 20 minutes.
+- Added an inline `取消本次` button inside the focus timer panel.
+- Updated meditation todo auto-classification to default to `G`.
+- Updated visible version labels to `v0.3.30`.
+
 ## v0.3.29 - 2026-05-17
 
 ### Goal
