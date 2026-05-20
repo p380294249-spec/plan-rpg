@@ -1,5 +1,17 @@
 # Plan RPG Version Notes
 
+## v0.3.35 - 2026-05-20
+
+### Goal
+
+Keep mental model tasks as 20-minute focus sessions.
+
+### Main Changes
+
+- Changed all six mental model chapter tasks from 10 minutes to 20 minutes.
+- Changed the nap/wake-up mental model case task to 20 minutes.
+- Updated visible version labels to `v0.3.35`.
+
 ## v0.3.34 - 2026-05-20
 
 ### Goal
