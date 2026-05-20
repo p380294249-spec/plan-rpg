@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Plan RPG v0.3.30 / 计划 RPG</title>
+  <title>Plan RPG v0.3.31 / 计划 RPG</title>
   <style>
     :root {
       --ink: #111827;
@@ -944,7 +944,7 @@
         <div>
           <h1>计划 RPG</h1>
           <p>把目标变成冒险</p>
-          <span class="version">v0.3.30 在线网页软件</span>
+          <span class="version">v0.3.31 在线网页软件</span>
         </div>
       </div>
 
@@ -1008,7 +1008,7 @@
         <div class="stats">
           <div class="stat"><b>⚡</b><div><strong id="totalMinutes">0 min</strong><span>同步专注时长</span></div></div>
           <div class="stat"><b>◆</b><div><strong id="gRatio">0%</strong><span>Growth 占比</span></div></div>
-          <div class="stat"><b>Lv</b><div><strong>探索者 28</strong><span>Plan RPG v0.3.30</span></div></div>
+          <div class="stat"><b>Lv</b><div><strong>探索者 28</strong><span>Plan RPG v0.3.31</span></div></div>
         </div>
       </header>
 
@@ -2435,12 +2435,9 @@
       const remoteLogs = rows
         .filter(row => row && row.log_id)
         .map((row, index) => sheetRowToLog(row, index));
-      if (!remoteLogs.length) return 0;
-      const byId = new Map(data.logs.map(log => [log.id, log]));
-      remoteLogs.forEach(log => byId.set(log.id, { ...(byId.get(log.id) || {}), ...log }));
-      data.logs = Array.from(byId.values()).sort((a, b) => String(b.date || "").localeCompare(String(a.date || "")));
+      data.logs = remoteLogs.sort((a, b) => String(b.date || "").localeCompare(String(a.date || "")));
       save();
-      return remoteLogs.filter(log => !data.logs.some(local => local.id === log.id)).length || remoteLogs.length;
+      return remoteLogs.length;
     }
     function metricLogToSheetRow(log) {
       return {
@@ -2519,11 +2516,9 @@
       if (!silent) renderSheetSyncConfig("正在从 Google Sheet 拉取专注记录...");
       try {
         const { payload } = await resolveWorkingSheetToken(config);
-        const before = data.logs.length;
-        mergeRemoteSessionLogs(payload.rows || []);
+        const cloudCount = mergeRemoteSessionLogs(payload.rows || []);
         renderAll();
-        const added = Math.max(0, data.logs.length - before);
-        renderSheetSyncConfig(added ? `已从 Google Sheet 拉取 ${added} 条新记录。` : "Google Sheet 已同步，没有新记录。");
+        renderSheetSyncConfig(`已按 Google Sheet 刷新，共 ${cloudCount} 条云端专注记录。`);
       } catch (error) {
         if (!silent) renderSheetSyncConfig("拉取失败，请确认 Apps Script 已更新并重新部署。");
       }

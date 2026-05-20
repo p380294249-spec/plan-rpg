@@ -1,5 +1,18 @@
 # Plan RPG Version Notes
 
+## v0.3.31 - 2026-05-20
+
+### Goal
+
+Make focus minutes consistent across different computers.
+
+### Main Changes
+
+- When Google Sheet sync is configured, `Session_Logs` now treats Google Sheet as the source of truth after pull.
+- Replaced the old browser-local merge behavior that could keep stale local logs and show different total focus minutes per device.
+- Updated sync status copy to show the cloud record count after refresh.
+- Updated visible version labels to `v0.3.31`.
+
 ## v0.3.30 - 2026-05-20
 
 ### Goal
