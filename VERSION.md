@@ -1,5 +1,19 @@
 # Plan RPG Version Notes
 
+## v0.3.34 - 2026-05-20
+
+### Goal
+
+Expand the mental model system into a six-step action loop.
+
+### Main Changes
+
+- Rebuilt `建立心智模型系统` around six chapters:
+  `真实场景还原`, `问题识别`, `能力归类`, `找对应高手`, `提炼动作模型`, `现实测试复盘`.
+- Added default tasks for each chapter.
+- Added the nap/wake-up example as a concrete test task.
+- Updated visible version labels to `v0.3.34`.
+
 ## v0.3.33 - 2026-05-20
 
 ### Goal
