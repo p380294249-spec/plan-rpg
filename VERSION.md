@@ -1,5 +1,19 @@
 # Plan RPG Version Notes
 
+## v0.3.38 - 2026-05-21
+
+### Goal
+
+Polish the UI so the app feels more like a focused daily command center.
+
+### Main Changes
+
+- Reduced the decorative map background and shifted the interface toward a cleaner workbench layout.
+- Improved visual hierarchy for weekly focus cards, panels, stats, and the right-side action detail.
+- Added clearer hover/focus states and softer shadows for clickable cards.
+- Made the sidebar sticky and tightened spacing so the main work area has more room.
+- Updated visible version labels to `v0.3.38`.
+
 ## v0.3.37 - 2026-05-20
 
 ### Goal
