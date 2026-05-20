@@ -1,5 +1,22 @@
 # Plan RPG Version Notes
 
+## v0.3.36 - 2026-05-20
+
+### Goal
+
+Make the dashboard default view focus on this week's two main G tasks.
+
+### Main Changes
+
+- Added a `本周作战` panel at the top of the map.
+- Default weekly focus is DFK `财务` and INSO `客户维护`.
+- Shows whether each focus has been completed today and gives a completion message when both are done.
+- Added one-click start buttons for each weekly focus.
+- Made 2030 life-grid, 2026 goals, and chapters collapsible and collapsed by default.
+- Keeps `20 分钟行动` expanded.
+- Stores collapse state in localStorage.
+- Updated visible version labels to `v0.3.36`.
+
 ## v0.3.35 - 2026-05-20
 
 ### Goal

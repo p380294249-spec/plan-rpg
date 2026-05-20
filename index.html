@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Plan RPG v0.3.35 / 计划 RPG</title>
+  <title>Plan RPG v0.3.36 / 计划 RPG</title>
   <style>
     :root {
       --ink: #111827;
@@ -342,6 +342,22 @@
       padding: 14px;
       backdrop-filter: blur(8px);
     }
+    .layer-toggle {
+      width: 100%;
+      min-height: 34px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      background: transparent;
+      color: inherit;
+      text-align: left;
+      padding: 0;
+    }
+    .layer-toggle h3 { margin: 0; }
+    .collapse-icon { font-weight: 1000; color: #475569; }
+    .map-layer.collapsed .collapsible-body { display: none; }
+    .map-layer.collapsed .collapse-icon { transform: rotate(-90deg); }
     .layer-head {
       display: flex;
       align-items: baseline;
@@ -361,6 +377,63 @@
       display: grid;
       grid-template-columns: repeat(4, minmax(130px, 1fr));
       gap: 10px;
+    }
+    .weekly-command {
+      display: grid;
+      gap: 12px;
+    }
+    .weekly-command-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(180px, 1fr));
+      gap: 12px;
+    }
+    .weekly-command-card {
+      position: relative;
+      display: grid;
+      gap: 9px;
+      min-height: 166px;
+      border-radius: 8px;
+      border: 1px solid rgba(37, 99, 235, .28);
+      background: rgba(255,255,255,.82);
+      padding: 14px;
+      overflow: hidden;
+    }
+    .weekly-command-card.done {
+      border-color: rgba(22, 163, 74, .55);
+      background: rgba(240, 253, 244, .9);
+    }
+    .weekly-command-card:before {
+      content: "";
+      position: absolute;
+      inset: 0 0 auto;
+      height: 4px;
+      background: linear-gradient(90deg, #2563eb, #8557e8);
+    }
+    .weekly-command-card.done:before { background: #16a34a; }
+    .weekly-command-card h4 {
+      position: relative;
+      margin: 0;
+      font-size: 18px;
+      line-height: 1.35;
+    }
+    .weekly-command-card p {
+      position: relative;
+      margin: 0;
+      line-height: 1.5;
+    }
+    .weekly-command-card .primary,
+    .weekly-command-card .secondary {
+      position: relative;
+      width: 100%;
+      align-self: end;
+    }
+    .command-complete {
+      border-radius: 8px;
+      border: 1px solid rgba(22, 163, 74, .35);
+      background: rgba(240, 253, 244, .9);
+      color: #166534;
+      padding: 12px 14px;
+      font-weight: 900;
     }
     .life-cell, .campaign-card, .quest-map-node, .task-map-card {
       text-align: left;
@@ -931,7 +1004,7 @@
       }
       .quest-lane:before { display: none; }
       .map-bottom { position: static; grid-template-columns: 1fr; margin-top: 16px; }
-      .form-grid, .review-cards, .skill-node-row, .reward-line, .option-row, .summary-strip { grid-template-columns: 1fr; }
+      .form-grid, .review-cards, .skill-node-row, .reward-line, .option-row, .summary-strip, .weekly-command-grid { grid-template-columns: 1fr; }
       .timer-value { font-size: 58px; }
     }
   </style>
@@ -944,7 +1017,7 @@
         <div>
           <h1>计划 RPG</h1>
           <p>把目标变成冒险</p>
-          <span class="version">v0.3.35 在线网页软件</span>
+          <span class="version">v0.3.36 在线网页软件</span>
         </div>
       </div>
 
@@ -1009,7 +1082,7 @@
         <div class="stats">
           <div class="stat"><b>⚡</b><div><strong id="totalMinutes">0 min</strong><span>同步专注时长</span></div></div>
           <div class="stat"><b>◆</b><div><strong id="gRatio">0%</strong><span>Growth 占比</span></div></div>
-          <div class="stat"><b>Lv</b><div><strong>探索者 28</strong><span>Plan RPG v0.3.35</span></div></div>
+          <div class="stat"><b>Lv</b><div><strong>探索者 28</strong><span>Plan RPG v0.3.36</span></div></div>
         </div>
       </header>
 
@@ -1017,33 +1090,40 @@
         <div class="map-layout">
           <div class="map-stage">
             <div class="world-map">
-              <section class="map-layer">
+              <section class="map-layer weekly-command">
                 <div class="layer-head">
-                  <h3>2030 人生九宫格</h3>
+                  <h3>本周作战</h3>
+                  <small>先完成两个主要 G，再选择其他任务。</small>
+                </div>
+                <div id="weeklyCommandPanel"></div>
+              </section>
+              <section class="map-layer collapsible-map-section" data-collapse-section="life">
+                <div class="layer-head">
+                  <button class="layer-toggle" data-collapse-toggle="life"><h3>2030 人生九宫格</h3><span class="collapse-icon">▼</span></button>
                   <small>五年后的方向提醒。</small>
                 </div>
-                <div class="life-grid" id="lifeGrid"></div>
+                <div class="collapsible-body"><div class="life-grid" id="lifeGrid"></div></div>
               </section>
-              <section class="map-layer">
+              <section class="map-layer collapsible-map-section" data-collapse-section="campaigns">
                 <div class="layer-head">
-                  <h3>2026 目标</h3>
+                  <button class="layer-toggle" data-collapse-toggle="campaigns"><h3>2026 目标</h3><span class="collapse-icon">▼</span></button>
                   <small>看进度，决定现在推进哪条线。</small>
                 </div>
-                <div class="campaign-grid" id="campaignGrid"></div>
+                <div class="collapsible-body"><div class="campaign-grid" id="campaignGrid"></div></div>
               </section>
-              <section class="map-layer">
+              <section class="map-layer collapsible-map-section" data-collapse-section="chapters">
                 <div class="layer-head">
-                  <h3>章节</h3>
+                  <button class="layer-toggle" data-collapse-toggle="chapters"><h3>章节</h3><span class="collapse-icon">▼</span></button>
                   <small>目标下面的阶段。灰色未完成，绿色已完成。</small>
                 </div>
-                <div class="weekly-map" id="weeklyMap"></div>
+                <div class="collapsible-body"><div class="weekly-map" id="weeklyMap"></div></div>
               </section>
-              <section class="map-layer">
+              <section class="map-layer collapsible-map-section" data-collapse-section="tasks">
                 <div class="layer-head">
-                  <h3>20 分钟行动</h3>
+                  <button class="layer-toggle" data-collapse-toggle="tasks"><h3>20 分钟行动</h3><span class="collapse-icon">▼</span></button>
                   <small>选一张卡，开始记录。</small>
                 </div>
-                <div class="task-rail" id="taskRail"></div>
+                <div class="collapsible-body"><div class="task-rail" id="taskRail"></div></div>
               </section>
             </div>
             <div class="map-bottom">
@@ -1477,6 +1557,10 @@
     let timerSessionActive = false;
     let pendingAfterSessionSave = null;
     let selectedPivotType = "renamed";
+    const weeklyCommandFocus = [
+      { id: "dfk-finance", label: "G1", title: "DFK 财务系统", questId: "Q-010", taskId: "T-002", note: "本周先把 DFK 财务流程和费用判断稳定下来。" },
+      { id: "inso-customer", label: "G2", title: "INSO 客户联系提醒管理系统", questId: "Q-013", taskId: "T-018", note: "本周先把客户联系、提醒和维护动作固定下来。" }
+    ];
 
     const $ = (id) => document.getElementById(id);
     const questById = (id) => data.quests.find(q => q.id === id);
@@ -1542,6 +1626,17 @@
     }
     function todayISO() {
       return new Date().toISOString().slice(0, 10);
+    }
+    function readMapCollapseState() {
+      const defaults = { life: true, campaigns: true, chapters: true, tasks: false };
+      try {
+        return { ...defaults, ...JSON.parse(localStorage.getItem(APP_CONFIG.MAP_COLLAPSE_STATE_KEY) || "{}") };
+      } catch (error) {
+        return defaults;
+      }
+    }
+    function saveMapCollapseState(state) {
+      localStorage.setItem(APP_CONFIG.MAP_COLLAPSE_STATE_KEY, JSON.stringify(state));
     }
 
     function loadData() {
@@ -1922,16 +2017,93 @@
     }
     function renderMap() {
       syncTimerWithClock();
+      renderWeeklyCommandPanel();
       renderLifeGrid();
       renderCampaignGrid();
       renderWeeklyMap();
       renderTaskRail();
+      renderMapCollapseState();
       renderActiveTimerPanel();
       const avg = overallAnnualProgress();
       $("annualProgress").textContent = pct(avg);
       $("annualFill").style.setProperty("--value", pct(avg));
       $("weekSessions").textContent = data.logs.length;
       $("weekLogs").textContent = data.logs.length;
+    }
+    function logBelongsToQuest(log, questId) {
+      const task = taskById(log.actual_task_id || log.taskId);
+      return log.questId === questId || task?.questId === questId;
+    }
+    function logDateKey(log) {
+      const parsed = parseLogDate(log.date);
+      return parsed ? `${parsed.getFullYear()}-${String(parsed.getMonth() + 1).padStart(2, "0")}-${String(parsed.getDate()).padStart(2, "0")}` : String(log.date || "").slice(0, 10);
+    }
+    function weeklyFocusDoneToday(focus) {
+      return data.logs.some(log => {
+        const logTaskId = log.actual_task_id || log.taskId;
+        return logDateKey(log) === todayISO() && (logTaskId === focus.taskId || logBelongsToQuest(log, focus.questId));
+      });
+    }
+    function weeklyFocusDoneThisWeek(focus) {
+      return logsForWeek(0).filter(log => {
+        const logTaskId = log.actual_task_id || log.taskId;
+        return logTaskId === focus.taskId || logBelongsToQuest(log, focus.questId);
+      }).length;
+    }
+    function renderWeeklyCommandPanel() {
+      const doneCount = weeklyCommandFocus.filter(weeklyFocusDoneToday).length;
+      $("weeklyCommandPanel").innerHTML = `
+        ${doneCount === weeklyCommandFocus.length ? `<div class="command-complete">今天主要任务完成了。可以去选择其他任务，或者收工复盘。</div>` : ""}
+        <div class="weekly-command-grid">
+          ${weeklyCommandFocus.map(focus => {
+            const quest = questById(focus.questId);
+            const task = taskById(focus.taskId) || tasksForQuest(focus.questId)[0];
+            const doneToday = weeklyFocusDoneToday(focus);
+            const weekDone = weeklyFocusDoneThisWeek(focus);
+            return `
+              <div class="weekly-command-card ${doneToday ? "done" : ""}">
+                <span class="pill">${focus.label} · ${doneToday ? "今日已完成" : "今日未完成"}</span>
+                <h4>${escapeHtml(focus.title)}</h4>
+                <p>${escapeHtml(focus.note)}</p>
+                <small>本周 ${weekDone} 次 · ${escapeHtml(quest?.name || focus.questId)} / ${escapeHtml(task?.current_title || task?.name || "选择任务")}</small>
+                <button class="${doneToday ? "secondary" : "primary"}" data-weekly-focus-start="${focus.id}">${doneToday ? "继续加一轮" : "开始 20 分钟"}</button>
+              </div>
+            `;
+          }).join("")}
+        </div>
+      `;
+      document.querySelectorAll("[data-weekly-focus-start]").forEach(btn => {
+        btn.onclick = () => startWeeklyFocus(btn.dataset.weeklyFocusStart);
+      });
+    }
+    function startWeeklyFocus(focusId) {
+      const focus = weeklyCommandFocus.find(item => item.id === focusId);
+      if (!focus) return;
+      const task = taskById(focus.taskId) || tasksForQuest(focus.questId)[0];
+      if (!task) return;
+      if (!confirmStartNewSession(task.id)) return;
+      selectedTaskId = task.id;
+      selectedQuestId = task.questId;
+      syncGoalForQuest(selectedQuestId);
+      setTimerForTask({ ...task, minutes: 20 }, true);
+      showScreen("focus");
+      if ($("durationInput")) $("durationInput").value = "20";
+      seconds = 20 * 60;
+      renderTimer();
+      if (!running) toggleTimer();
+    }
+    function renderMapCollapseState() {
+      const state = readMapCollapseState();
+      document.querySelectorAll("[data-collapse-section]").forEach(section => {
+        const key = section.dataset.collapseSection;
+        section.classList.toggle("collapsed", Boolean(state[key]));
+      });
+    }
+    function toggleMapSection(key) {
+      const state = readMapCollapseState();
+      state[key] = !state[key];
+      saveMapCollapseState(state);
+      renderMapCollapseState();
     }
     function renderActiveTimerPanel() {
       const panel = $("activeTimerPanel");
@@ -3632,6 +3804,9 @@
     $("testSheetSyncBtn").addEventListener("click", testSheetSync);
     $("pullSheetLogsBtn").addEventListener("click", () => pullSessionLogsFromSheet());
     $("uploadLocalLogsBtn").addEventListener("click", uploadLocalSessionLogsToSheet);
+    document.querySelectorAll("[data-collapse-toggle]").forEach(btn => {
+      btn.addEventListener("click", () => toggleMapSection(btn.dataset.collapseToggle));
+    });
     $("recordTypeSelect").addEventListener("change", (event) => setRecordType(event.target.value));
     $("saveMetricLogBtn").addEventListener("click", saveMetricLog);
     $("createRandomStartBtn").addEventListener("click", () => createRandomEvent(true));
