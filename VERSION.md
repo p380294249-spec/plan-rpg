@@ -1,5 +1,19 @@
 # Plan RPG Version Notes
 
+## v0.3.32 - 2026-05-20
+
+### Goal
+
+Let an old computer upload its local-only focus history into the shared Google Sheet.
+
+### Main Changes
+
+- Added a local pre-pull safety snapshot for browser-only session logs.
+- Added `上传本机记录` in the Google Sheet sync panel.
+- Upload compares local/preserved log IDs against Google Sheet and sends only missing session logs.
+- After upload, the app refreshes from Google Sheet so the screen uses the cloud source of truth.
+- Updated visible version labels to `v0.3.32`.
+
 ## v0.3.31 - 2026-05-20
 
 ### Goal

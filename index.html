@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Plan RPG v0.3.31 / 计划 RPG</title>
+  <title>Plan RPG v0.3.32 / 计划 RPG</title>
   <style>
     :root {
       --ink: #111827;
@@ -944,7 +944,7 @@
         <div>
           <h1>计划 RPG</h1>
           <p>把目标变成冒险</p>
-          <span class="version">v0.3.31 在线网页软件</span>
+          <span class="version">v0.3.32 在线网页软件</span>
         </div>
       </div>
 
@@ -989,6 +989,7 @@
           <button id="saveSheetSyncBtn">保存同步设置</button>
           <button id="testSheetSyncBtn">测试</button>
           <button id="pullSheetLogsBtn">拉取记录</button>
+          <button id="uploadLocalLogsBtn">上传本机记录</button>
         </div>
         <small id="sheetSyncStatus">打开网页会自动读取，完成专注会自动写入 Session_Logs。</small>
       </div>
@@ -1008,7 +1009,7 @@
         <div class="stats">
           <div class="stat"><b>⚡</b><div><strong id="totalMinutes">0 min</strong><span>同步专注时长</span></div></div>
           <div class="stat"><b>◆</b><div><strong id="gRatio">0%</strong><span>Growth 占比</span></div></div>
-          <div class="stat"><b>Lv</b><div><strong>探索者 28</strong><span>Plan RPG v0.3.31</span></div></div>
+          <div class="stat"><b>Lv</b><div><strong>探索者 28</strong><span>Plan RPG v0.3.32</span></div></div>
         </div>
       </header>
 
@@ -2431,6 +2432,41 @@
         skillXp
       }, index, data.tasks);
     }
+    function readPreservedLocalSessionLogs() {
+      try {
+        return JSON.parse(localStorage.getItem(APP_CONFIG.LOCAL_UNSYNCED_LOGS_KEY) || "[]");
+      } catch (error) {
+        return [];
+      }
+    }
+    function savePreservedLocalSessionLogs(logs = []) {
+      const byId = new Map();
+      logs
+        .filter(log => log && log.id)
+        .map((log, index) => normalizeLog(log, index, data.tasks))
+        .forEach(log => byId.set(log.id, log));
+      localStorage.setItem(APP_CONFIG.LOCAL_UNSYNCED_LOGS_KEY, JSON.stringify(Array.from(byId.values())));
+    }
+    function preserveLocalSessionLogsBeforeCloudPull(remoteRows = []) {
+      const cloudIds = new Set(remoteRows.map(row => row.log_id).filter(Boolean));
+      const localOnly = data.logs.filter(log => log?.id && !cloudIds.has(log.id));
+      if (!localOnly.length) return 0;
+      const existing = readPreservedLocalSessionLogs();
+      savePreservedLocalSessionLogs([...existing, ...localOnly]);
+      return localOnly.length;
+    }
+    function clearPreservedUploadedLogs(uploadedIds = new Set()) {
+      if (!uploadedIds.size) return;
+      const remaining = readPreservedLocalSessionLogs().filter(log => !uploadedIds.has(log.id));
+      savePreservedLocalSessionLogs(remaining);
+    }
+    function candidateLocalSessionLogs() {
+      const byId = new Map();
+      [...readPreservedLocalSessionLogs(), ...data.logs].forEach((log, index) => {
+        if (log?.id) byId.set(log.id, normalizeLog(log, index, data.tasks));
+      });
+      return Array.from(byId.values());
+    }
     function mergeRemoteSessionLogs(rows = []) {
       const remoteLogs = rows
         .filter(row => row && row.log_id)
@@ -2516,12 +2552,65 @@
       if (!silent) renderSheetSyncConfig("正在从 Google Sheet 拉取专注记录...");
       try {
         const { payload } = await resolveWorkingSheetToken(config);
+        const preserved = preserveLocalSessionLogsBeforeCloudPull(payload.rows || []);
         const cloudCount = mergeRemoteSessionLogs(payload.rows || []);
         renderAll();
-        renderSheetSyncConfig(`已按 Google Sheet 刷新，共 ${cloudCount} 条云端专注记录。`);
+        const note = preserved ? ` 已保护 ${preserved} 条本机旧记录，可点“上传本机记录”。` : "";
+        renderSheetSyncConfig(`已按 Google Sheet 刷新，共 ${cloudCount} 条云端专注记录。${note}`);
       } catch (error) {
         if (!silent) renderSheetSyncConfig("拉取失败，请确认 Apps Script 已更新并重新部署。");
       }
+    }
+    async function uploadLocalSessionLogsToSheet() {
+      const config = sheetSyncConfig();
+      if (!config.url) {
+        renderSheetSyncConfig("先填写 Apps Script URL。");
+        return;
+      }
+      renderSheetSyncConfig("正在检查本机有哪些记录还没进 Google Sheet...");
+      let token = config.token || "";
+      let cloudRows = [];
+      try {
+        const resolved = await resolveWorkingSheetToken(config);
+        token = resolved.token;
+        cloudRows = resolved.payload.rows || [];
+      } catch (error) {
+        renderSheetSyncConfig("上传失败：Apps Script URL 或 Token 不可用。");
+        return;
+      }
+      preserveLocalSessionLogsBeforeCloudPull(cloudRows);
+      const cloudIds = new Set(cloudRows.map(row => row.log_id).filter(Boolean));
+      const missing = candidateLocalSessionLogs().filter(log => log.id && !cloudIds.has(log.id));
+      if (!missing.length) {
+        renderSheetSyncConfig("本机没有需要上传的旧专注记录。");
+        return;
+      }
+      renderSheetSyncConfig(`正在上传 ${missing.length} 条本机旧专注记录...`);
+      const uploadedIds = new Set();
+      for (const log of missing) {
+        const payload = {
+          token,
+          action: "append_session_log",
+          module: "Session_Logs",
+          row: logToSheetRow(log)
+        };
+        try {
+          await fetch(config.url, {
+            method: "POST",
+            mode: "no-cors",
+            headers: { "Content-Type": "text/plain;charset=utf-8" },
+            body: JSON.stringify(payload)
+          });
+          uploadedIds.add(log.id);
+        } catch (error) {
+          const pending = JSON.parse(localStorage.getItem(APP_CONFIG.PENDING_SYNC_KEY) || "[]");
+          pending.push(payload);
+          localStorage.setItem(APP_CONFIG.PENDING_SYNC_KEY, JSON.stringify(pending));
+        }
+      }
+      clearPreservedUploadedLogs(uploadedIds);
+      renderSheetSyncConfig(`已发送 ${uploadedIds.size} 条本机旧记录到 Google Sheet。稍等几秒后会自动拉取。`);
+      setTimeout(() => pullSessionLogsFromSheet(), 1800);
     }
     async function syncSessionLogToSheet(log) {
       const config = sheetSyncConfig();
@@ -3520,6 +3609,7 @@
     $("saveSheetSyncBtn").addEventListener("click", saveSheetSyncConfig);
     $("testSheetSyncBtn").addEventListener("click", testSheetSync);
     $("pullSheetLogsBtn").addEventListener("click", () => pullSessionLogsFromSheet());
+    $("uploadLocalLogsBtn").addEventListener("click", uploadLocalSessionLogsToSheet);
     $("recordTypeSelect").addEventListener("change", (event) => setRecordType(event.target.value));
     $("saveMetricLogBtn").addEventListener("click", saveMetricLog);
     $("createRandomStartBtn").addEventListener("click", () => createRandomEvent(true));
