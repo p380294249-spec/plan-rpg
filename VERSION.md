@@ -1,5 +1,21 @@
 # Plan RPG Version Notes
 
+## v0.3.37 - 2026-05-20
+
+### Goal
+
+Split the single-file frontend into a maintainable static module structure.
+
+### Main Changes
+
+- Moved CSS from `index.html` to `src/ui/styles.css`.
+- Moved default seed data to `src/models/seed-data.js`.
+- Filled the existing `src/storage`, `src/services`, `src/state`, and `src/ui` folders with extracted app logic.
+- Kept the safe GitHub Pages script model: plain `<script src>` loading, no bundler, no ES module migration.
+- Reduced `index.html` to the page shell plus stylesheet/script links.
+- Preserved existing localStorage keys, Google Sheet fields, Apps Script actions, timer behavior, GMN editing, and weekly focus behavior.
+- Updated visible version labels to `v0.3.37`.
+
 ## v0.3.36 - 2026-05-20
 
 ### Goal

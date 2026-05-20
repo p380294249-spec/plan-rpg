@@ -2,7 +2,7 @@
 
 Plan RPG is a lightweight web MVP for turning yearly plans, weekly quests, 20-minute focus sessions, execution logs, rewards, skills, and reviews into a game-like personal planning system.
 
-Current version: `v0.3.36`
+Current version: `v0.3.37`
 
 Live app:
 
@@ -41,7 +41,14 @@ GitHub Pages frontend
 ## Repository Structure
 
 ```txt
-index.html                  Main GitHub Pages frontend
+index.html                  GitHub Pages shell: DOM skeleton + script/style links
+src/config/                 App constants and sync keys
+src/models/                 Seed data and schema documentation
+src/storage/                localStorage cache and Google Sheet API client
+src/services/               Session, task, XP, timer, review, and classification logic
+src/state/                  Current selected screen/task/quest and timer state
+src/ui/                     CSS and page render functions
+src/main.js                 App bootstrap and event binding
 google-apps-script/Code.gs  Google Apps Script API
 docs/data-modules.md        Google Sheet module/schema notes
 VERSION.md                  Version history and handoff notes
@@ -123,7 +130,7 @@ The frontend has a default Apps Script URL and token, but browser-saved sync set
 For frontend/documentation changes:
 
 ```bash
-git add index.html README.md VERSION.md docs google-apps-script tests
+git add index.html src README.md VERSION.md docs google-apps-script tests
 git commit -m "describe the change"
 git push origin main
 ```
