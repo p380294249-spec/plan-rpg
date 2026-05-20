@@ -1,5 +1,20 @@
 # Plan RPG Version Notes
 
+## v0.3.33 - 2026-05-20
+
+### Goal
+
+Move reading under Mindset and add a mental model system branch.
+
+### Main Changes
+
+- Removed `READ` from the 2030 life-grid categories.
+- Moved the `READ` quest under `MINDSET`.
+- Added `建立心智模型系统` as a Mindset chapter.
+- Added a default task for building one reusable mental model card.
+- Added normalization to drop old local `READ` life-grid entries.
+- Updated visible version labels to `v0.3.33`.
+
 ## v0.3.32 - 2026-05-20
 
 ### Goal

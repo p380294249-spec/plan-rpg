@@ -3,7 +3,7 @@
 // Change values here only. Do not put business logic here.
 
 const APP_CONFIG = {
-  VERSION: "0.3.32",
+  VERSION: "0.3.33",
   STORAGE_KEY: "plan-rpg-local-mvp-v2",
   LEGACY_KEY: "plan-rpg-local-mvp-v1",
   SHEET_SYNC_CONFIG_KEY: "plan-rpg-sheet-sync-config-v1",

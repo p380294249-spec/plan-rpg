@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Plan RPG v0.3.32 / 计划 RPG</title>
+  <title>Plan RPG v0.3.33 / 计划 RPG</title>
   <style>
     :root {
       --ink: #111827;
@@ -944,7 +944,7 @@
         <div>
           <h1>计划 RPG</h1>
           <p>把目标变成冒险</p>
-          <span class="version">v0.3.32 在线网页软件</span>
+          <span class="version">v0.3.33 在线网页软件</span>
         </div>
       </div>
 
@@ -1009,7 +1009,7 @@
         <div class="stats">
           <div class="stat"><b>⚡</b><div><strong id="totalMinutes">0 min</strong><span>同步专注时长</span></div></div>
           <div class="stat"><b>◆</b><div><strong id="gRatio">0%</strong><span>Growth 占比</span></div></div>
-          <div class="stat"><b>Lv</b><div><strong>探索者 28</strong><span>Plan RPG v0.3.32</span></div></div>
+          <div class="stat"><b>Lv</b><div><strong>探索者 28</strong><span>Plan RPG v0.3.33</span></div></div>
         </div>
       </header>
 
@@ -1338,12 +1338,11 @@
         { id: "BUSINESS", title: "Business: DFK + INSO as 2026 main goals", currentValue: 0, targetValue: 2, unit: "个主目标", role: "Mainline" },
         { id: "PASSIVE", title: "Passive: remittance system and clients", currentValue: 0, targetValue: 3, unit: "个模块", role: "Mainline", displayTitle: "PASSIVE INCOME" },
         { id: "HEALTH", title: "Keep weight within 5KG", currentValue: 4, targetValue: 10, unit: "次", role: "Habit" },
-        { id: "MINDSET", title: "Mindset: meditation, review and emotional records", currentValue: 0, targetValue: 3, unit: "模块", role: "Habit" },
+        { id: "MINDSET", title: "Mindset: meditation, reading, review and mental models", currentValue: 0, targetValue: 4, unit: "模块", role: "Habit" },
         { id: "FAMILY", title: "Girl friend and family life", currentValue: 3, targetValue: 12, unit: "次", role: "Life" },
         { id: "SOCIAL", title: "Meet people and find mentor", currentValue: 1, targetValue: 12, unit: "次", role: "Sideline", displayTitle: "SOCIAL NETWORK" },
         { id: "INTERESTS", title: "Interest trial count", currentValue: 1, targetValue: 3, unit: "次", role: "Sideline" },
-        { id: "NEW", title: "AI automation for daily work", currentValue: 0, targetValue: 2, unit: "个自动化", role: "Sideline", displayTitle: "NEW THINGS" },
-        { id: "READ", title: "Read and finish books", currentValue: 1, targetValue: 30, unit: "本", role: "Habit" }
+        { id: "NEW", title: "AI automation for daily work", currentValue: 0, targetValue: 2, unit: "个自动化", role: "Sideline", displayTitle: "NEW THINGS" }
       ],
       quests: [
         { id: "Q-001", name: "DFK 赚钱", type: "Main", goal: "BUSINESS", target: "DFK platform gets profit; Shawn gets salary + move toward 50 containers/month", currentValue: 0, targetValue: 50, unit: "柜/月", description: "Business main branch 1: DFK platform profit, container profit and salary are tracked by Project Chapters + Quick Metric.", nextMove: "negotiate and move toward 50 containers/month", status: "In Progress", gmn: "G", priority: "High", icon: "🚚" },
@@ -1368,8 +1367,9 @@
         { id: "Q-007", name: "INTERESTS", type: "Side", goal: "INTERESTS", target: "Interest trial count", currentValue: 1, targetValue: 3, unit: "次", description: "Need define metric type: trial / lesson / hobby session.", nextMove: "记录一次兴趣试验或练习", status: "In Progress", gmn: "M", priority: "Low", icon: "☕" },
         { id: "Q-008", name: "NEW THINGS", type: "Side", goal: "NEW", target: "find things that are fun for life", currentValue: 0, targetValue: 2, unit: "个", description: "Could be Habit if repeated; new experiences/research can be Quick Metric or Session depending on effort.", nextMove: "find things that are fun for life", status: "In Progress", gmn: "G", priority: "High", icon: "✨" },
         { id: "Q-028", name: "Record the smile", type: "Habit", goal: "MINDSET", target: "Every day share 3 good things", currentValue: 6, targetValue: 300, unit: "次", description: "Count of good-things records. Not a 20min task. Quick log only.", nextMove: "record good things", status: "In Progress", gmn: "M", priority: "Medium", icon: "😊" },
-        { id: "Q-029", name: "READ", type: "Habit", goal: "READ", target: "read a book I love; know what kind", currentValue: 1, targetValue: 30, unit: "本", description: "Reading time can be Session; finished book/review is Quick Metric.", nextMove: "read a book I love; know what kind", status: "In Progress", gmn: "G", priority: "Medium", icon: "📖" },
+        { id: "Q-029", name: "READ", type: "Habit", goal: "MINDSET", target: "read a book I love; know what kind", currentValue: 1, targetValue: 30, unit: "本", description: "Reading belongs under Mindset. Reading time can be Session; finished book/review is Quick Metric.", nextMove: "read a book I love; know what kind", status: "In Progress", gmn: "G", priority: "Medium", icon: "📖" },
         { id: "Q-030", name: "Record the Bad things", type: "Habit", goal: "MINDSET", target: "Record all bad things", currentValue: 2, targetValue: 50, unit: "次", description: "Bad-things record count. Quick log only.", nextMove: "record one bad thing and lesson", status: "In Progress", gmn: "M", priority: "Medium", icon: "📝" },
+        { id: "Q-031", name: "建立心智模型系统", type: "Main", goal: "MINDSET", target: "沉淀一套能帮助判断、复盘和行动的心智模型系统", currentValue: 0, targetValue: 12, unit: "张模型卡", description: "把读书、经历、复盘里反复出现的判断方式整理成可复用的心智模型卡。每张模型卡包含适用场景、判断问题、行动原则和例子。", nextMove: "先建立 1 张心智模型卡：模型名称、使用场景、例子、下一步", status: "Not Started", gmn: "G", priority: "High", icon: "🧠" },
         { id: "Q-023", parentQuestId: "Q-008", name: "研究 AI 日常工作自动化", type: "Side", goal: "NEW", target: "用 10 个自动化流程支撑 DFK + INSO 每天 4 小时以内", currentValue: 0, targetValue: 10, unit: "个流程", description: "研究 AI 如何嵌入自己的真实工作流，不只学习工具，而是把手动动作变成可复用系统。最终效果是 DFK 每天 ≤2 小时、INSO 每天 ≤2 小时。", nextMove: "列出 DFK 和 INSO 每天最耗时的 5 个动作", status: "In Progress", gmn: "G", priority: "High", icon: "🤖" },
         { id: "Q-024", parentQuestId: "Q-023", name: "快速将工作模式自动化", type: "Main", goal: "NEW", target: "每月至少自动化 1 个重复工作流", description: "把报价、记录、跟进、打印、财务、客户维护等重复动作变成模板、脚本或 AI 工作流。", nextMove: "选一个手动流程，写出输入、处理、输出", status: "In Progress", gmn: "G", priority: "High", icon: "⚙️" },
         { id: "Q-025", parentQuestId: "Q-023", name: "搭建 MVP", type: "Main", goal: "NEW", target: "做出可真实使用的 AI 自动化原型", description: "先做最小可用版本，能节省一次真实手动操作即可，不追求完美。", nextMove: "搭建一个 AI 自动化 MVP 并跑一次真实任务", status: "Not Started", gmn: "G", priority: "High", icon: "🧩" },
@@ -1405,6 +1405,7 @@
         { id: "T-030", questId: "Q-025", name: "搭建 AI 自动化 MVP", instruction: "用最简单方式做一个能跑通真实任务的 AI 自动化原型。", minutes: 20, standard: "MVP 跑通一次真实任务", gmn: "G", skillIds: ["operations", "market"], status: "Not Started" },
         { id: "T-031", questId: "Q-026", name: "优化自动化流程", instruction: "复盘一个 AI 自动化 MVP 的错误、卡点、耗时和下一步优化。", minutes: 20, standard: "完成一次优化记录或修正", gmn: "G", skillIds: ["operations", "personal-system"], status: "Not Started" },
         { id: "T-032", questId: "Q-027", name: "整理可推销案例", instruction: "把一个内部 AI 自动化方案写成客户能懂的案例：问题、方案、效果、报价方向。", minutes: 20, standard: "完成一版案例草稿", gmn: "G", skillIds: ["communication", "market"], status: "Not Started" },
+        { id: "T-033", questId: "Q-031", name: "建立一张心智模型卡", instruction: "从一次读书、复盘或真实经历中提炼一个判断模型，写清适用场景、关键问题、行动原则和例子。", minutes: 20, standard: "完成 1 张心智模型卡", gmn: "G", skillIds: ["strategy", "personal-system"], status: "Not Started", quest_type: "main" },
         { id: "T-007", questId: "Q-004", name: "每日冥想记录", instruction: "冥想/呼吸后描述场景和感受。", minutes: 10, standard: "写下冥想场景和身体/情绪感受", gmn: "G", skillIds: ["personal-system"], status: "Not Started" },
         { id: "T-008", questId: "Q-005", name: "每周体重测量", instruction: "记录本周体重、变化原因、饮食/运动状态。", minutes: 10, standard: "完成一次体重趋势记录", gmn: "G", skillIds: ["personal-system"], status: "Not Started" },
         { id: "T-009", questId: "Q-006", name: "复盘一个联系人", instruction: "写下一个人能帮什么、你能提供什么、下一步联系。", minutes: 20, standard: "完成联系人卡片", gmn: "G", skillIds: ["communication", "leadership"], status: "Not Started" },
@@ -1560,9 +1561,17 @@
       return rows;
     }
     function normalizeGoals(goals) {
-      return goals.map(goal => {
+      return goals.filter(goal => goal.id !== "READ").map(goal => {
         const fixed = seed.goals2030.find(item => item.id === goal.id);
-        return fixed ? { ...fixed, ...goal } : goal;
+        if (!fixed) return goal;
+        return {
+          ...goal,
+          title: fixed.title,
+          targetValue: fixed.targetValue,
+          unit: fixed.unit,
+          role: fixed.role,
+          displayTitle: fixed.displayTitle
+        };
       });
     }
     function normalizeTodos(todos) {
