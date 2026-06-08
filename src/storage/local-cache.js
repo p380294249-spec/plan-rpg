@@ -36,6 +36,22 @@ function normalizeData(raw) {
   return merged;
 }
 
+function isMergedMindsetQuestId(questId) {
+  return MINDSET_MERGED_QUEST_IDS.includes(questId);
+}
+
+function isMergedMindsetTaskId(taskId) {
+  return MINDSET_MERGED_TASK_IDS.includes(taskId);
+}
+
+function mergedMindsetQuestId(questId) {
+  return isMergedMindsetQuestId(questId) ? MINDSET_CANONICAL_QUEST_ID : questId;
+}
+
+function mergedMindsetTaskId(taskId) {
+  return isMergedMindsetTaskId(taskId) ? MINDSET_CANONICAL_TASK_ID : taskId;
+}
+
 function mergeById(defaultRows, savedRows) {
   const rows = [...defaultRows];
   savedRows.forEach(row => {
@@ -64,6 +80,7 @@ function normalizeGoals(goals) {
 function normalizeTodos(todos) {
   return todos.map((todo, index) => {
     const suggestion = classifyTodo(`${todo.title || ""} ${todo.note || ""}`);
+    const questId = mergedMindsetQuestId(todo.questId || suggestion.questId);
     return {
       id: todo.id || `TODO-${index + 1}`,
       title: todo.title || "",
@@ -71,7 +88,7 @@ function normalizeTodos(todos) {
       dueDate: todo.dueDate || todayISO(),
       priority: todo.priority || "medium",
       status: todo.status || "open",
-      questId: todo.questId || suggestion.questId,
+      questId,
       gmn: todo.gmn || suggestion.gmn,
       createdAt: todo.createdAt || new Date().toISOString(),
       convertedTaskId: todo.convertedTaskId || ""
@@ -80,7 +97,7 @@ function normalizeTodos(todos) {
 }
 
 function normalizeQuests(quests) {
-  return quests.map(quest => {
+  return quests.filter(quest => !isMergedMindsetQuestId(quest.id)).map(quest => {
     const fixed = seed.quests.find(item => item.id === quest.id);
     if (!fixed) return quest;
     return {
@@ -103,7 +120,7 @@ function normalizeQuests(quests) {
 }
 
 function normalizeTasks(tasks) {
-  return tasks.map(task => {
+  return tasks.filter(task => !isMergedMindsetTaskId(task.id)).map(task => {
     const fixed = seed.tasks.find(item => item.id === task.id);
     const base = {
       is_random_event: false,
@@ -136,14 +153,16 @@ function normalizeTasks(tasks) {
 }
 
 function normalizeLog(log, index, tasks = seed.tasks) {
-  const task = taskByIdFromRows(log.taskId, tasks);
+  const normalizedTaskId = mergedMindsetTaskId(log.actual_task_id || log.taskId);
+  const normalizedQuestId = mergedMindsetQuestId(log.questId);
+  const task = taskByIdFromRows(normalizedTaskId || log.taskId, tasks);
   return {
     id: log.id || `L-${String(index + 1).padStart(3, "0")}`,
     date: log.date || new Date().toISOString().slice(0, 10),
     minutes: Number(log.minutes || 20),
     gmn: log.gmn || task?.gmn || "G",
-    questId: log.questId || task?.questId || "Q-009",
-    taskId: log.taskId || "T-003",
+    questId: normalizedQuestId || task?.questId || "Q-009",
+    taskId: normalizedTaskId || log.taskId || "T-003",
     whatDone: log.whatDone || "",
     problem: log.problem || "",
     solution: log.solution || "",
@@ -154,8 +173,8 @@ function normalizeLog(log, index, tasks = seed.tasks) {
     skillXp: log.skillXp || buildSkillXp(task || seed.tasks[2]),
     is_random_event: Boolean(log.is_random_event || task?.is_random_event),
     is_pivoted: Boolean(log.is_pivoted),
-    original_task_id: log.original_task_id || log.taskId || "T-003",
-    actual_task_id: log.actual_task_id || log.taskId || "T-003",
+    original_task_id: mergedMindsetTaskId(log.original_task_id || log.taskId || "T-003"),
+    actual_task_id: normalizedTaskId || log.taskId || "T-003",
     pivot_note: log.pivot_note || ""
   };
 }
@@ -164,7 +183,7 @@ function normalizeMetricLogs(metricLogs) {
   return metricLogs.map((log, index) => ({
     id: log.id || `ML-${String(index + 1).padStart(3, "0")}`,
     date: log.date || todayISO(),
-    goalId: log.goalId || log.goal_id || "BUSINESS",
+    goalId: log.goalId === "READ" || log.goal_id === "READ" ? "MINDSET" : (log.goalId || log.goal_id || "BUSINESS"),
     metricType: log.metricType || log.metric_type || "Metric",
     value: Number(log.value || 0),
     unit: log.unit || "",

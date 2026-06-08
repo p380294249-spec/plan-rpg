@@ -116,6 +116,9 @@ function quickMetricConfigForQuest(questId) {
   if (questId === "Q-003") {
     return { label: "记录 INSO 收入", goalId: "BUSINESS", metricType: "INSO 收入", unit: "RMB" };
   }
+  if (questId === "Q-004") {
+    return { label: "记录一次冥想", goalId: "MINDSET", metricType: "Meditation", unit: "次" };
+  }
   return null;
 }
 
@@ -138,7 +141,7 @@ function classifyTodo(text) {
   if (has("财务", "利润", "对账", "成本", "费用")) return { questId: "Q-010", gmn: "G", reason: "DFK 财务系统" };
   if (has("物流", "发货", "货柜", "船", "资料", "报关", "仓库", "广州", "义乌")) return { questId: "Q-009", gmn: "G", reason: "DFK 稳定系统" };
   if (has("推广", "培训", "sop", "系统", "流程", "记录")) return { questId: "Q-016", gmn: "G", reason: "DFK 培训/系统" };
-  if (has("冥想", "焦虑", "呼吸", "冷静")) return { questId: "Q-004", gmn: "G", reason: "心态成长" };
+  if (has("冥想", "焦虑", "呼吸", "冷静", "好事", "坏事", "心智", "mindset", "read", "book", "读书", "阅读")) return { questId: "Q-004", gmn: "G", reason: "MINDSET 已统一到冥想入口" };
   if (has("健康", "体重", "训练", "饮食", "健身")) return { questId: "Q-005", gmn: "G", reason: "健康系统" };
   if (has("女朋友", "girlfriend", "约会", "旅行", "旅游")) return { questId: "Q-021", gmn: "M", reason: "Family / girl friend" };
   if (has("优化ai", "优化自动化", "流程优化")) return { questId: "Q-026", gmn: "G", reason: "AI 自动化优化" };

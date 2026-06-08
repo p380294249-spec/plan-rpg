@@ -1,5 +1,20 @@
 # Plan RPG Version Notes
 
+## v0.3.39 - 2026-06-08
+
+### Goal
+
+Merge all Mindset branches/actions into one Meditation entry so completion data is not split.
+
+### Main Changes
+
+- Kept `Q-004 / T-007` as the only active MINDSET meditation quest/action.
+- Removed old default MINDSET branches for smile, read, bad things, and mental model steps from the seed map.
+- Normalizes old local/cloud logs from the deprecated MINDSET quest/task IDs into `Q-004 / T-007`.
+- Normalizes old todos and metric logs so MINDSET progress routes to meditation.
+- Changed the meditation action default to 20 minutes.
+- Updated visible version labels to `v0.3.39`.
+
 ## v0.3.38 - 2026-05-21
 
 ### Goal

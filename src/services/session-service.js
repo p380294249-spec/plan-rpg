@@ -19,11 +19,8 @@ function metricQuestIdFor(goalId, metricType = "", targetData = data) {
   const value = String(metricType).toLowerCase();
   const has = (...words) => words.some(word => value.includes(word.toLowerCase()));
   if (goalId === "HEALTH" || has("weight", "体重", "kg")) return "Q-005";
-  if (has("good things", "smile", "好事", "开心")) return "Q-028";
-  if (has("bad things", "bad", "坏事", "教训")) return "Q-030";
-  if (has("meditation", "冥想", "thought", "想法")) return "Q-004";
-  if (goalId === "MINDSET") return "Q-004";
-  if (goalId === "READ" || has("book", "read", "reading", "读书", "读完")) return "Q-029";
+  if (goalId === "MINDSET" || goalId === "READ") return "Q-004";
+  if (has("good things", "smile", "好事", "开心", "bad things", "bad", "坏事", "教训", "meditation", "冥想", "thought", "想法", "book", "read", "reading", "读书", "读完")) return "Q-004";
   if (goalId === "PASSIVE" || has("汇款", "remittance", "transfer")) return "Q-002";
   if (goalId === "NEW" || has("ai", "mvp", "automation", "自动化")) return "Q-008";
   if (has("rfq", "order", "income", "收入", "客户", "customer", "contact")) return "Q-003";
@@ -56,6 +53,26 @@ function applyMetricLogsToDashboard(metricLogs = data.metricLogs || [], targetDa
       if (total.value > 0 && quest.status === "Not Started") quest.status = "In Progress";
     }
   });
+  applyMindsetMeditationProgress(targetData);
+}
+
+function applyMindsetMeditationProgress(targetData = data) {
+  const quest = targetData.quests?.find(item => item.id === MINDSET_CANONICAL_QUEST_ID);
+  const goal = targetData.goals2030?.find(item => item.id === "MINDSET");
+  if (!quest && !goal) return;
+  const sessionCount = (targetData.logs || []).filter(log => log.questId === MINDSET_CANONICAL_QUEST_ID || log.taskId === MINDSET_CANONICAL_TASK_ID || log.actual_task_id === MINDSET_CANONICAL_TASK_ID).length;
+  const metricCount = (targetData.metricLogs || [])
+    .filter(log => log.goalId === "MINDSET" || log.goalId === "READ" || metricQuestIdFor(log.goalId, log.metricType, targetData) === MINDSET_CANONICAL_QUEST_ID)
+    .reduce((sum, log) => sum + Math.max(1, Number(log.value || 1)), 0);
+  const current = Math.max(Number(quest?.currentValue || 0), Number(goal?.currentValue || 0), sessionCount + metricCount);
+  if (quest) {
+    quest.currentValue = current;
+    quest.unit = "次";
+  }
+  if (goal) {
+    goal.currentValue = current;
+    goal.unit = "次";
+  }
 }
 
 function displayProgress(row) {
@@ -99,7 +116,7 @@ function buildSkillXp(task) {
 }
 
 function isMeditationTask(task) {
-  return task?.questId === "Q-004" || task?.id === "T-007";
+  return task?.questId === MINDSET_CANONICAL_QUEST_ID || task?.id === MINDSET_CANONICAL_TASK_ID || isMergedMindsetTaskId(task?.id);
 }
 
 function taskDefaultMinutes(task) {
