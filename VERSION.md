@@ -1,5 +1,17 @@
 # Plan RPG Version Notes
 
+## v0.3.40 - 2026-06-09
+
+### Goal
+
+Make meditation use a 10-minute default while keeping merged Mindset history.
+
+### Main Changes
+
+- Changed the unified meditation action `T-007` default duration from 20 minutes to 10 minutes.
+- Kept the v0.3.39 migration that maps old Mindset quest/task IDs into `Q-004 / T-007`.
+- Updated visible version labels to `v0.3.40`.
+
 ## v0.3.39 - 2026-06-08
 
 ### Goal
@@ -12,7 +24,7 @@ Merge all Mindset branches/actions into one Meditation entry so completion data 
 - Removed old default MINDSET branches for smile, read, bad things, and mental model steps from the seed map.
 - Normalizes old local/cloud logs from the deprecated MINDSET quest/task IDs into `Q-004 / T-007`.
 - Normalizes old todos and metric logs so MINDSET progress routes to meditation.
-- Changed the meditation action default to 20 minutes.
+- Merged old meditation-related records into the unified meditation progress.
 - Updated visible version labels to `v0.3.39`.
 
 ## v0.3.38 - 2026-05-21

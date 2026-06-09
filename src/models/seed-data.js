@@ -67,7 +67,7 @@ const seed = {
     { id: "T-030", questId: "Q-025", name: "搭建 AI 自动化 MVP", instruction: "用最简单方式做一个能跑通真实任务的 AI 自动化原型。", minutes: 20, standard: "MVP 跑通一次真实任务", gmn: "G", skillIds: ["operations", "market"], status: "Not Started" },
     { id: "T-031", questId: "Q-026", name: "优化自动化流程", instruction: "复盘一个 AI 自动化 MVP 的错误、卡点、耗时和下一步优化。", minutes: 20, standard: "完成一次优化记录或修正", gmn: "G", skillIds: ["operations", "personal-system"], status: "Not Started" },
     { id: "T-032", questId: "Q-027", name: "整理可推销案例", instruction: "把一个内部 AI 自动化方案写成客户能懂的案例：问题、方案、效果、报价方向。", minutes: 20, standard: "完成一版案例草稿", gmn: "G", skillIds: ["communication", "market"], status: "Not Started" },
-    { id: "T-007", questId: "Q-004", name: "每日冥想记录", instruction: "冥想/呼吸后描述场景、身体、情绪和念头。原来的 MINDSET 行动都合并到这张卡。", minutes: 20, standard: "完成一次冥想记录", gmn: "G", skillIds: ["personal-system"], status: "Not Started", quest_type: "main" },
+    { id: "T-007", questId: "Q-004", name: "每日冥想记录", instruction: "冥想/呼吸后描述场景、身体、情绪和念头。原来的 MINDSET 行动都合并到这张卡。", minutes: 10, standard: "完成一次冥想记录", gmn: "G", skillIds: ["personal-system"], status: "Not Started", quest_type: "main" },
     { id: "T-008", questId: "Q-005", name: "每周体重测量", instruction: "记录本周体重、变化原因、饮食/运动状态。", minutes: 10, standard: "完成一次体重趋势记录", gmn: "G", skillIds: ["personal-system"], status: "Not Started" },
     { id: "T-009", questId: "Q-006", name: "复盘一个联系人", instruction: "写下一个人能帮什么、你能提供什么、下一步联系。", minutes: 20, standard: "完成联系人卡片", gmn: "G", skillIds: ["communication", "leadership"], status: "Not Started" },
     { id: "T-010", questId: "Q-007", name: "V60/兴趣记录", instruction: "记录一次咖啡/运动体验和改进点。", minutes: 20, standard: "完成一条兴趣日志", gmn: "M", skillIds: ["personal-system"], status: "Not Started" },
