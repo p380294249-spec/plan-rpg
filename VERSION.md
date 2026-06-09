@@ -1,5 +1,17 @@
 # Plan RPG Version Notes
 
+## v0.3.43 - 2026-06-09
+
+### Goal
+
+Make the lower action card use the same real meditation progress count as the chapter card.
+
+### Main Changes
+
+- The 20-minute action card no longer shows the estimated task count for value-based quests.
+- Meditation action cards now show `已完成 current / target 次` using the merged MINDSET count.
+- Updated visible version labels to `v0.3.43`.
+
 ## v0.3.42 - 2026-06-09
 
 ### Goal

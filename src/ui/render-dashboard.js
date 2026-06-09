@@ -236,13 +236,20 @@ function renderTaskRail() {
 
 function taskMapHtml(t) {
   const type = questTypeForTask(t);
-  const progress = data.logs.some(l => (l.actual_task_id || l.taskId) === t.id) ? 100 : 0;
+  const quest = questById(t.questId);
+  const questValueProgress = quest ? valueProgress(quest) : null;
+  const progress = questValueProgress !== null
+    ? computedQuestProgress(quest)
+    : (data.logs.some(l => (l.actual_task_id || l.taskId) === t.id) ? 100 : 0);
+  const progressText = questValueProgress !== null
+    ? `已完成 ${Number(quest.currentValue || 0)} / ${Number(quest.targetValue || 0)} ${escapeHtml(quest.unit || "")}`
+    : `${progress >= 100 ? "已完成" : "未完成"} · ${t.estimated_sessions || 1} 次`;
   const generated = t.generated_task_id ? taskById(t.generated_task_id) : null;
   return `
     <button class="task-map-card ${typeClass(type)} ${gmnClass(t.gmn)} ${t.id === selectedTaskId ? "active" : ""} ${progress >= 100 ? "state-done" : "state-todo"}" data-task-node="${t.id}">
       <span class="node-title">${escapeHtml(t.current_title || t.name)}</span>
       <span class="node-compact"><span class="type-badge">${t.status === "Discovery" ? "Discovery" : typeBadge(type)}</span><span class="gmn-tag ${gmnClass(t.gmn)}">${t.gmn}</span></span>
-      <small>${progress >= 100 ? "已完成" : "未完成"} · ${t.estimated_sessions || 1} 次</small>
+      <small>${progressText}</small>
       ${generated ? `<div class="pivot-link">⇢ ${escapeHtml(generated.current_title || generated.name)}</div>` : ""}
     </button>
   `;
