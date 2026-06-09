@@ -1,5 +1,18 @@
 # Plan RPG Version Notes
 
+## v0.3.41 - 2026-06-09
+
+### Goal
+
+Make the merged single-level Mindset meditation entry start the correct 10-minute task from the dashboard.
+
+### Main Changes
+
+- Fixed dashboard selection for goals that do not have child chapters.
+- When selecting MINDSET, the right-side `开始记录` action now selects `Q-004 / T-007` instead of keeping the previous task.
+- The chapters section now shows the single selected quest when there are no child chapters.
+- Updated visible version labels to `v0.3.41`.
+
 ## v0.3.40 - 2026-06-09
 
 ### Goal

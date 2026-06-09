@@ -151,14 +151,19 @@ function renderLifeGrid() {
     selectedGoalId = btn.dataset.goal;
     const campaign = campaignQuestsForGoal(selectedGoalId)[0];
     if (campaign) {
-      selectedCampaignId = campaign.id;
-      const chapter = chapterQuestsForCampaign(campaign.id)[0];
-      selectedQuestId = chapter.id;
-      const task = tasksForQuest(chapter.id)[0];
-      if (task) selectedTaskId = task.id;
+      selectCampaignEntry(campaign.id);
     }
     renderAll();
   });
+}
+
+function selectCampaignEntry(campaignId) {
+  selectedCampaignId = campaignId;
+  syncGoalForQuest(selectedCampaignId);
+  const chapter = chapterQuestsForCampaign(campaignId)[0];
+  selectedQuestId = chapter?.id || campaignId;
+  const task = tasksForQuest(selectedQuestId)[0];
+  if (task) selectedTaskId = task.id;
 }
 
 function renderCampaignGrid() {
@@ -177,19 +182,16 @@ function renderCampaignGrid() {
     `;
   }).join("") || `<p>这个 2030 分类下还没有 2026 战役。</p>`;
   document.querySelectorAll("[data-campaign]").forEach(btn => btn.onclick = () => {
-    selectedCampaignId = btn.dataset.campaign;
-    syncGoalForQuest(selectedCampaignId);
-    const chapter = chapterQuestsForCampaign(selectedCampaignId)[0];
-    selectedQuestId = chapter.id;
-    const task = tasksForQuest(selectedQuestId)[0];
-    if (task) selectedTaskId = task.id;
+    selectCampaignEntry(btn.dataset.campaign);
     renderAll();
   });
 }
 
 function renderWeeklyMap() {
   const visibleQuests = chapterQuestsForCampaign(selectedCampaignId);
-  $("weeklyMap").innerHTML = visibleQuests.map(q => questNodeHtml(q)).join("") || `<p>选择其他 2030 分类查看本周关卡。</p>`;
+  const fallbackQuest = questById(selectedCampaignId);
+  const nodes = visibleQuests.length ? visibleQuests : (fallbackQuest ? [fallbackQuest] : []);
+  $("weeklyMap").innerHTML = nodes.map(q => questNodeHtml(q)).join("") || `<p>选择其他 2030 分类查看本周关卡。</p>`;
   document.querySelectorAll("[data-quest-node]").forEach(btn => btn.onclick = () => {
     selectedQuestId = btn.dataset.questNode;
     syncGoalForQuest(selectedQuestId);
