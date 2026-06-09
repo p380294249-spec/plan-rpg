@@ -1,5 +1,18 @@
 # Plan RPG Version Notes
 
+## v0.3.42 - 2026-06-09
+
+### Goal
+
+Make meditation progress display the real merged count instead of a misleading task count.
+
+### Main Changes
+
+- Removed the old seed progress baseline for MINDSET meditation.
+- Recalculates meditation progress from merged logs and metric records each load/render.
+- Shows value-based quest detail as `current / target unit` instead of estimated task count.
+- Updated visible version labels to `v0.3.42`.
+
 ## v0.3.41 - 2026-06-09
 
 ### Goal

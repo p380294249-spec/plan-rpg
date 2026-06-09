@@ -64,7 +64,7 @@ function applyMindsetMeditationProgress(targetData = data) {
   const metricCount = (targetData.metricLogs || [])
     .filter(log => log.goalId === "MINDSET" || log.goalId === "READ" || metricQuestIdFor(log.goalId, log.metricType, targetData) === MINDSET_CANONICAL_QUEST_ID)
     .reduce((sum, log) => sum + Math.max(1, Number(log.value || 1)), 0);
-  const current = Math.max(Number(quest?.currentValue || 0), Number(goal?.currentValue || 0), sessionCount + metricCount);
+  const current = sessionCount + metricCount;
   if (quest) {
     quest.currentValue = current;
     quest.unit = "次";

@@ -205,6 +205,9 @@ function questNodeHtml(q) {
   const progress = computedQuestProgress(q);
   const type = questTypeForQuest(q);
   const estimated = tasksForQuest(q.id).reduce((s, t) => s + Number(t.estimated_sessions || 1), 0);
+  const progressDetail = valueProgress(q) !== null
+    ? `${Number(q.currentValue || 0)} / ${Number(q.targetValue || 0)} ${escapeHtml(q.unit || "")}`
+    : `${estimated || 1} 次`;
   const discovery = tasksForQuest(q.id).some(t => t.status === "Discovery" || t.pivot_status === "completed_as_discovery");
   const pivotLinks = tasksForQuest(q.id).filter(t => t.generated_task_id).map(t => {
     const generated = taskById(t.generated_task_id);
@@ -214,7 +217,7 @@ function questNodeHtml(q) {
     <button class="quest-map-node ${typeClass(type)} ${gmnClass(q.gmn)} ${q.id === selectedQuestId ? "active" : ""} ${discovery ? "discovery" : ""} ${progress >= 100 ? "state-done" : "state-todo"}" data-quest-node="${q.id}">
       <span class="node-title">${escapeHtml(`${q.mapDepth ? "- " : ""}${q.name}`)}</span>
       <span class="node-compact"><span class="type-badge">${typeBadge(discovery ? "pivot" : type)}</span><span class="gmn-tag ${gmnClass(q.gmn)}">${q.gmn}</span></span>
-      <small>${progress}% · ${estimated || 1} 次</small>
+      <small>${progress}% · ${progressDetail}</small>
       ${pivotLinks}
     </button>
   `;
