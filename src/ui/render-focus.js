@@ -13,11 +13,18 @@ function renderFocus() {
       syncGoalForQuest(selectedQuestId);
     }
   }
-  $("taskSelect").innerHTML = data.tasks.map(t => {
+  const sessionTasks = data.tasks.filter(t => !isMetricOnlyTask(t));
+  $("taskSelect").innerHTML = sessionTasks.map(t => {
     const q = questById(t.questId);
     return `<option value="${t.id}" ${t.id === selectedTaskId ? "selected" : ""}>${escapeHtml(q.name)} · ${escapeHtml(t.current_title || t.name)} · ${gmnText(t.gmn)}</option>`;
   }).join("");
-  const t = taskById(selectedTaskId);
+  const selected = taskById(selectedTaskId);
+  const t = selected && !isMetricOnlyTask(selected) ? selected : sessionTasks[0];
+  if (!t) {
+    setRecordType("metric");
+    return;
+  }
+  selectedTaskId = t.id;
   const q = questById(t.questId);
   selectedQuestId = q.id;
   setTimerForTask(t);

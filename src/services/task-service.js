@@ -119,7 +119,19 @@ function quickMetricConfigForQuest(questId) {
   if (questId === "Q-004") {
     return { label: "记录一次冥想", goalId: "MINDSET", metricType: "Meditation", unit: "次" };
   }
+  if (questId === "Q-005") {
+    return { label: "记录体重", goalId: "HEALTH", metricType: "Weight", unit: "KG" };
+  }
   return null;
+}
+
+function isMetricOnlyQuest(questOrId) {
+  const quest = typeof questOrId === "string" ? questById(questOrId) : questOrId;
+  return quest?.recordMode === "metric";
+}
+
+function isMetricOnlyTask(task) {
+  return Boolean(task && isMetricOnlyQuest(task.questId));
 }
 
 function openRandomEventModal() {

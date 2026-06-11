@@ -188,6 +188,18 @@ function renderCampaignGrid() {
 }
 
 function renderWeeklyMap() {
+  if (isMetricOnlyQuest(selectedCampaignId)) {
+    const q = questById(selectedCampaignId);
+    $("weeklyMap").innerHTML = q ? `
+      <div class="metric-only-card">
+        <span class="pill">数据记录目标</span>
+        <h4>${escapeHtml(q.name)}</h4>
+        <p>${escapeHtml(q.description || q.target)}</p>
+        <b>${Number(q.currentValue || 0)} / ${Number(q.targetValue || 0)} ${escapeHtml(q.unit || "")}</b>
+      </div>
+    ` : "";
+    return;
+  }
   const visibleQuests = chapterQuestsForCampaign(selectedCampaignId);
   const fallbackQuest = questById(selectedCampaignId);
   const nodes = visibleQuests.length ? visibleQuests : (fallbackQuest ? [fallbackQuest] : []);
@@ -224,6 +236,16 @@ function questNodeHtml(q) {
 }
 
 function renderTaskRail() {
+  if (isMetricOnlyQuest(selectedQuestId) || isMetricOnlyQuest(selectedCampaignId)) {
+    $("taskRail").innerHTML = `
+      <div class="metric-only-card compact">
+        <span class="pill">无需 20 分钟</span>
+        <h4>只记录结果数据</h4>
+        <p>点击右侧「记录体重」，输入本周体重即可。</p>
+      </div>
+    `;
+    return;
+  }
   const tasks = tasksForQuest(selectedQuestId);
   $("taskRail").innerHTML = tasks.map(t => taskMapHtml(t)).join("") || `<p>这个关卡还没有 20min task。</p>`;
   document.querySelectorAll("[data-task-node]").forEach(btn => btn.onclick = () => {

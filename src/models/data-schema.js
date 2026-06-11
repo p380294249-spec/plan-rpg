@@ -13,6 +13,7 @@
  *   currentValue  - number, current progress value
  *   targetValue   - number, target value for progress calculation
  *   baselineValue - number (optional), historical count added before synced records
+ *   baselineThrough - string (optional), date covered by baselineValue
  *   unit          - string, unit of measurement (e.g. "个主目标", "周")
  *   role          - string, category: "Mainline" | "Habit" | "Life" | "Sideline"
  *   displayTitle  - string (optional), override display text (e.g. "PASSIVE INCOME")
@@ -32,7 +33,9 @@
  *   currentValue    - number (optional), current progress value
  *   targetValue     - number (optional), target value
  *   baselineValue   - number (optional), historical count added before synced records
+ *   baselineThrough - string (optional), date covered by baselineValue
  *   unit            - string (optional), unit of measurement
+ *   recordMode      - string (optional), "metric" means result-only tracking, no 20min task needed
  *   description     - string, detailed description
  *   nextMove        - string, recommended next action
  *   status          - string: "In Progress" | "Not Started" | "Done" | "Paused" | "Discovery" | "Promoted" | "Filed as Noise" | "Filed as Maintenance"

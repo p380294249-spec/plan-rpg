@@ -533,6 +533,40 @@ label { display: grid; gap: 6px; font-size: 13px; color: #344054; font-weight: 8
   outline: 2px solid rgba(124, 58, 237, .45);
   background: #fff;
 }
+.metric-only-card {
+  border: 1px solid rgba(5, 150, 105, .32);
+  background: rgba(240, 253, 244, .86);
+  border-radius: 8px;
+  padding: 14px;
+  display: grid;
+  gap: 8px;
+  color: #14532d;
+}
+.metric-only-card.compact {
+  min-width: 240px;
+}
+.metric-only-card h4,
+.metric-only-card p {
+  margin: 0;
+}
+.metric-only-card b {
+  font-size: 20px;
+}
+.metric-only-summary {
+  border: 1px solid rgba(5, 150, 105, .25);
+  background: rgba(240, 253, 244, .75);
+  border-radius: 8px;
+  padding: 12px;
+  display: grid;
+  gap: 4px;
+}
+.metric-only-summary b {
+  font-size: 22px;
+  color: #14532d;
+}
+.metric-only-summary small {
+  color: #475569;
+}
 .type-main { --type-color: #2563eb; border-color: rgba(37, 99, 235, .52); }
 .type-side { --type-color: #94a3b8; border-color: rgba(148, 163, 184, .34); }
 .quest-map-node.type-side,

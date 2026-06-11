@@ -1,5 +1,20 @@
 # Plan RPG Version Notes
 
+## v0.3.45 - 2026-06-11
+
+### Goal
+
+Turn HEALTH into a result-only weight tracking goal instead of a 20-minute action.
+
+### Main Changes
+
+- HEALTH now tracks 52 weekly weight checks against 72KG +/- 5KG.
+- Added 24 completed weeks through 2026-06-11 as the current-year baseline.
+- Future HEALTH progress counts one in-range weight record per week after the baseline date.
+- HEALTH opens Quick Metric weight entry directly and hides 20-minute action/task cards.
+- Documented metric-only goals in the data schema.
+- Updated visible version labels to `v0.3.45`.
+
 ## v0.3.44 - 2026-06-11
 
 ### Goal

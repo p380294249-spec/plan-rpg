@@ -15,6 +15,22 @@ function monthKey(date = todayISO()) {
   return String(date || todayISO()).slice(0, 7);
 }
 
+function yearKey(date = todayISO()) {
+  return String(date || todayISO()).slice(0, 4);
+}
+
+function dateAfter(left, right) {
+  return String(left || "") > String(right || "");
+}
+
+function weekIndexInYear(date = todayISO()) {
+  const value = String(date || todayISO()).slice(0, 10);
+  const start = new Date(`${value.slice(0, 4)}-01-01T00:00:00`);
+  const current = new Date(`${value}T12:00:00`);
+  const day = Math.floor((current - start) / 86400000) + 1;
+  return Math.max(1, Math.ceil(day / 7));
+}
+
 function metricQuestIdFor(goalId, metricType = "", targetData = data) {
   const value = String(metricType).toLowerCase();
   const has = (...words) => words.some(word => value.includes(word.toLowerCase()));
@@ -53,7 +69,43 @@ function applyMetricLogsToDashboard(metricLogs = data.metricLogs || [], targetDa
       if (total.value > 0 && quest.status === "Not Started") quest.status = "In Progress";
     }
   });
+  applyHealthWeightProgress(targetData);
   applyMindsetMeditationProgress(targetData);
+}
+
+function isHealthWeightMetric(log, targetData = data) {
+  return log.goalId === "HEALTH" || metricQuestIdFor(log.goalId, log.metricType, targetData) === "Q-005";
+}
+
+function isWeightInHealthRange(value, targetData = data) {
+  const goal = targetData.goals2030?.find(item => item.id === "HEALTH");
+  const quest = targetData.quests?.find(item => item.id === "Q-005");
+  const base = Number(quest?.baseWeightKg || goal?.baseWeightKg || 72);
+  const tolerance = Number(quest?.toleranceKg || goal?.toleranceKg || 5);
+  const weight = Number(value);
+  return Number.isFinite(weight) && weight >= base - tolerance && weight <= base + tolerance;
+}
+
+function applyHealthWeightProgress(targetData = data) {
+  const quest = targetData.quests?.find(item => item.id === "Q-005");
+  const goal = targetData.goals2030?.find(item => item.id === "HEALTH");
+  if (!quest && !goal) return;
+  const baseline = Math.max(Number(quest?.baselineValue || 0), Number(goal?.baselineValue || 0));
+  const baselineThrough = quest?.baselineThrough || goal?.baselineThrough || "2026-06-11";
+  const targetYear = yearKey(baselineThrough);
+  const completedWeeks = new Set();
+  (targetData.metricLogs || [])
+    .filter(log => isHealthWeightMetric(log, targetData))
+    .filter(log => yearKey(log.date) === targetYear)
+    .filter(log => dateAfter(log.date, baselineThrough))
+    .filter(log => isWeightInHealthRange(log.value, targetData))
+    .forEach(log => completedWeeks.add(`${targetYear}-W${weekIndexInYear(log.date)}`));
+  const current = baseline + completedWeeks.size;
+  [quest, goal].filter(Boolean).forEach(row => {
+    row.currentValue = current;
+    row.targetValue = 52;
+    row.unit = "周";
+  });
 }
 
 function applyMindsetMeditationProgress(targetData = data) {
@@ -158,6 +210,10 @@ function startQuickMetricFromQuest(questId) {
 }
 
 function startDefaultRecordFromDetail() {
+  if (isMetricOnlyQuest(selectedQuestId)) {
+    startQuickMetricFromQuest(selectedQuestId);
+    return;
+  }
   const tasks = tasksForQuest(selectedQuestId);
   const current = taskById(selectedTaskId);
   const task = current && current.questId === selectedQuestId ? current : tasks[0];
@@ -335,6 +391,10 @@ function saveMetricLog() {
     alert("Value 必须是数字。");
     return;
   }
+  const statusNote = goalId === "HEALTH" && metricQuestIdFor(goalId, metricType) === "Q-005"
+    ? (isWeightInHealthRange(value) ? "达标：在 67-77KG 范围内。" : "未达标：超出 67-77KG 范围。")
+    : "";
+  const note = $("metricLogNote").value.trim();
   const log = {
     id: newId("ML"),
     date: $("metricLogDate").value || todayISO(),
@@ -342,7 +402,7 @@ function saveMetricLog() {
     metricType,
     value,
     unit: $("metricLogUnit").value.trim(),
-    note: $("metricLogNote").value.trim(),
+    note: [statusNote, note].filter(Boolean).join(" "),
     month: monthKey($("metricLogDate").value || todayISO()),
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString()
