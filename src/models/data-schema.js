@@ -12,6 +12,7 @@
  *   title         - string, human-readable title
  *   currentValue  - number, current progress value
  *   targetValue   - number, target value for progress calculation
+ *   baselineValue - number (optional), historical count added before synced records
  *   unit          - string, unit of measurement (e.g. "个主目标", "周")
  *   role          - string, category: "Mainline" | "Habit" | "Life" | "Sideline"
  *   displayTitle  - string (optional), override display text (e.g. "PASSIVE INCOME")
@@ -30,6 +31,7 @@
  *   target          - string, human-readable target description
  *   currentValue    - number (optional), current progress value
  *   targetValue     - number (optional), target value
+ *   baselineValue   - number (optional), historical count added before synced records
  *   unit            - string (optional), unit of measurement
  *   description     - string, detailed description
  *   nextMove        - string, recommended next action

@@ -1,5 +1,18 @@
 # Plan RPG Version Notes
 
+## v0.3.44 - 2026-06-11
+
+### Goal
+
+Add the user's historical meditation completions that were not synced before.
+
+### Main Changes
+
+- Added a MINDSET meditation baseline of 80 historical completions.
+- Meditation progress is now `baseline 80 + synced sessions + synced metric logs`.
+- Documented `baselineValue` in the data schema.
+- Updated visible version labels to `v0.3.44`.
+
 ## v0.3.43 - 2026-06-09
 
 ### Goal
