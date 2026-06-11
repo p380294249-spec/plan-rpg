@@ -1,5 +1,19 @@
 # Plan RPG Version Notes
 
+## v0.3.46 - 2026-06-11
+
+### Goal
+
+Make the dashboard data-first and remove the redundant 20-minute action rail.
+
+### Main Changes
+
+- Removed the Dashboard `20 分钟行动` section and its render logic.
+- Clicking a 2026 goal now opens that goal's own data/detail panel instead of jumping into its first chapter.
+- BUSINESS 2026 goals show their current/target data directly on the goal cards.
+- DFK and INSO goal details prioritize quick metric recording for containers/income.
+- Updated visible version labels to `v0.3.46`.
+
 ## v0.3.45 - 2026-06-11
 
 ### Goal

@@ -25,7 +25,6 @@ function renderMap() {
   renderLifeGrid();
   renderCampaignGrid();
   renderWeeklyMap();
-  renderTaskRail();
   renderMapCollapseState();
   renderActiveTimerPanel();
   const avg = overallAnnualProgress();
@@ -160,8 +159,7 @@ function renderLifeGrid() {
 function selectCampaignEntry(campaignId) {
   selectedCampaignId = campaignId;
   syncGoalForQuest(selectedCampaignId);
-  const chapter = chapterQuestsForCampaign(campaignId)[0];
-  selectedQuestId = chapter?.id || campaignId;
+  selectedQuestId = campaignId;
   const task = tasksForQuest(selectedQuestId)[0];
   if (task) selectedTaskId = task.id;
 }
@@ -169,7 +167,6 @@ function selectCampaignEntry(campaignId) {
 function renderCampaignGrid() {
   const campaigns = campaignQuestsForGoal(selectedGoalId);
   $("campaignGrid").innerHTML = campaigns.map(q => {
-    const children = chapterQuestsForCampaign(q.id);
     const progress = computedQuestProgress(q);
     const type = questTypeForQuest(q);
     return `
@@ -177,6 +174,7 @@ function renderCampaignGrid() {
         <span class="node-title">${escapeHtml(q.name)}</span>
         <span class="node-compact"><span class="type-badge">年度目标</span><span>${Math.round(progress)}%</span></span>
         <div class="bar"><div class="fill" style="--value:${progress}%"></div></div>
+        ${valueProgress(q) !== null ? `<small class="data-progress">${Number(q.currentValue || 0)} / ${Number(q.targetValue || 0)} ${escapeHtml(q.unit || "")}</small>` : ""}
         <small>${escapeHtml(q.target)}</small>
       </button>
     `;
@@ -231,48 +229,6 @@ function questNodeHtml(q) {
       <span class="node-compact"><span class="type-badge">${typeBadge(discovery ? "pivot" : type)}</span><span class="gmn-tag ${gmnClass(q.gmn)}">${q.gmn}</span></span>
       <small>${progress}% · ${progressDetail}</small>
       ${pivotLinks}
-    </button>
-  `;
-}
-
-function renderTaskRail() {
-  if (isMetricOnlyQuest(selectedQuestId) || isMetricOnlyQuest(selectedCampaignId)) {
-    $("taskRail").innerHTML = `
-      <div class="metric-only-card compact">
-        <span class="pill">无需 20 分钟</span>
-        <h4>只记录结果数据</h4>
-        <p>点击右侧「记录体重」，输入本周体重即可。</p>
-      </div>
-    `;
-    return;
-  }
-  const tasks = tasksForQuest(selectedQuestId);
-  $("taskRail").innerHTML = tasks.map(t => taskMapHtml(t)).join("") || `<p>这个关卡还没有 20min task。</p>`;
-  document.querySelectorAll("[data-task-node]").forEach(btn => btn.onclick = () => {
-    selectedTaskId = btn.dataset.taskNode;
-    selectedQuestId = taskById(selectedTaskId).questId;
-    syncGoalForQuest(selectedQuestId);
-    renderAll();
-  });
-}
-
-function taskMapHtml(t) {
-  const type = questTypeForTask(t);
-  const quest = questById(t.questId);
-  const questValueProgress = quest ? valueProgress(quest) : null;
-  const progress = questValueProgress !== null
-    ? computedQuestProgress(quest)
-    : (data.logs.some(l => (l.actual_task_id || l.taskId) === t.id) ? 100 : 0);
-  const progressText = questValueProgress !== null
-    ? `已完成 ${Number(quest.currentValue || 0)} / ${Number(quest.targetValue || 0)} ${escapeHtml(quest.unit || "")}`
-    : `${progress >= 100 ? "已完成" : "未完成"} · ${t.estimated_sessions || 1} 次`;
-  const generated = t.generated_task_id ? taskById(t.generated_task_id) : null;
-  return `
-    <button class="task-map-card ${typeClass(type)} ${gmnClass(t.gmn)} ${t.id === selectedTaskId ? "active" : ""} ${progress >= 100 ? "state-done" : "state-todo"}" data-task-node="${t.id}">
-      <span class="node-title">${escapeHtml(t.current_title || t.name)}</span>
-      <span class="node-compact"><span class="type-badge">${t.status === "Discovery" ? "Discovery" : typeBadge(type)}</span><span class="gmn-tag ${gmnClass(t.gmn)}">${t.gmn}</span></span>
-      <small>${progressText}</small>
-      ${generated ? `<div class="pivot-link">⇢ ${escapeHtml(generated.current_title || generated.name)}</div>` : ""}
     </button>
   `;
 }

@@ -10,18 +10,21 @@ function renderDetail() {
   const taskType = questTypeForTask(selectedTask);
   const quickMetric = quickMetricConfigForQuest(q.id);
   const metricOnly = isMetricOnlyQuest(q);
-  const metricLogs = metricOnly ? data.metricLogs.filter(log => metricQuestIdFor(log.goalId, log.metricType) === q.id).slice(0, 5) : [];
+  const metricCapable = Boolean(quickMetric);
+  const metricLogs = metricCapable ? data.metricLogs.filter(log => metricQuestIdFor(log.goalId, log.metricType) === q.id).slice(0, 5) : [];
+  const detailTypeLabel = selectedTask ? typeBadge(taskType) : typeBadge(questTypeForQuest(q));
   $("questDetail").innerHTML = `
     <div class="simple-detail">
-      <span class="pill">${typeBadge(taskType)} · ${gmnText(selectedTask?.gmn || q.gmn)}</span>
+      <span class="pill">${detailTypeLabel} · ${gmnText(selectedTask?.gmn || q.gmn)}</span>
       <h3>${escapeHtml(q.name)}</h3>
-      ${quickMetric ? `<button class="secondary full" id="detailQuickMetric">${escapeHtml(quickMetric.label)}</button>` : ""}
-      ${metricOnly ? `
+      ${quickMetric ? `<button class="primary full" id="detailQuickMetric">${escapeHtml(quickMetric.label)}</button>` : ""}
+      ${metricCapable || metricOnly ? `
         <div class="metric-only-summary">
           <b>${Number(q.currentValue || 0)} / ${Number(q.targetValue || 0)} ${escapeHtml(q.unit || "")}</b>
           <small>${escapeHtml(q.target || "")}</small>
         </div>
-      ` : `<button class="primary full" id="detailStart">开始记录</button>`}
+      ` : ""}
+      ${selectedTask && !metricOnly ? `<button class="secondary full" id="detailStart">开始20分钟记录</button>` : ""}
       <details class="custom-task-box">
         <summary class="secondary full">修改 GMN</summary>
         <div class="form-grid">
@@ -72,8 +75,8 @@ function renderDetail() {
         </div>`}
         <h4>最近记录</h4>
         <div class="route">
-          ${metricOnly
-            ? (metricLogs.length ? metricLogs.map(log => `<div class="route-item"><b>${escapeHtml(log.date)} · ${Number(log.value || 0)} ${escapeHtml(log.unit || "")}</b><br><small>${escapeHtml(log.note || "已记录")}</small></div>`).join("") : `<div class="route-item"><small>还没有体重记录。2026-06-11 前已按 24 周达标计入。</small></div>`)
+          ${metricCapable
+            ? (metricLogs.length ? metricLogs.map(log => `<div class="route-item"><b>${escapeHtml(log.date)} · ${Number(log.value || 0)} ${escapeHtml(log.unit || "")}</b><br><small>${escapeHtml(log.note || "已记录")}</small></div>`).join("") : `<div class="route-item"><small>${metricOnly ? "还没有体重记录。2026-06-11 前已按 24 周达标计入。" : "还没有数据记录。"}</small></div>`)
             : (taskLogs.length ? taskLogs.slice(0, 3).map(log => `<div class="route-item"><b>${escapeHtml(log.date)} · ${log.minutes} 分钟 · ${gmnText(log.gmn)}</b><br><small>${escapeHtml(log.whatDone || "已记录")}</small></div>`).join("") : `<div class="route-item"><small>还没有记录。</small></div>`)}
         </div>
         ${selectedTask?.is_random_event ? `<div class="route-item"><b>突发任务归类</b><div class="actions"><button class="secondary" data-classify-random="main">主线</button><button class="secondary" data-classify-random="side">支线</button><button class="secondary" data-classify-random="maintenance">维护</button><button class="secondary" data-classify-random="noise">噪音</button></div></div>` : ""}

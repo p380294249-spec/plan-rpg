@@ -2,7 +2,7 @@
 // Extracted from index.html during the safe modular refactor.
 
 function readMapCollapseState() {
-  const defaults = { life: true, campaigns: true, chapters: true, tasks: false };
+  const defaults = { life: true, campaigns: true, chapters: true };
   try {
     return { ...defaults, ...JSON.parse(localStorage.getItem(APP_CONFIG.MAP_COLLAPSE_STATE_KEY) || "{}") };
   } catch (error) {
