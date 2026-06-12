@@ -315,12 +315,21 @@ function syncTimerWithClock() {
   seconds = Math.ceil(remainingMs / 1000);
   renderTimer();
   if (remainingMs <= 0) {
+    const completedTask = taskById(timerTaskId || selectedTaskId);
+    const shouldAutoSaveMeditation = isMeditationTask(completedTask);
     running = false;
     timerSessionActive = false;
     clearInterval(timer);
     timer = null;
     timerEndsAt = 0;
     seconds = 0;
+    if (shouldAutoSaveMeditation) {
+      selectedTaskId = completedTask.id;
+      selectedQuestId = completedTask.questId;
+      syncGoalForQuest(selectedQuestId);
+      saveSession();
+      return;
+    }
     renderTimer();
   }
 }

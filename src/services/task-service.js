@@ -116,9 +116,6 @@ function quickMetricConfigForQuest(questId) {
   if (questId === "Q-003") {
     return { label: "记录 INSO 收入", goalId: "BUSINESS", metricType: "INSO 收入", unit: "RMB" };
   }
-  if (questId === "Q-004") {
-    return { label: "记录一次冥想", goalId: "MINDSET", metricType: "Meditation", unit: "次" };
-  }
   if (questId === "Q-005") {
     return { label: "记录体重", goalId: "HEALTH", metricType: "Weight", unit: "KG" };
   }

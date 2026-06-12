@@ -1,5 +1,19 @@
 # Plan RPG Version Notes
 
+## v0.3.47 - 2026-06-12
+
+### Goal
+
+Restore meditation as a 10-minute mood/state session instead of a quick metric.
+
+### Main Changes
+
+- Removed the MINDSET quick metric shortcut.
+- MINDSET detail now starts the 10-minute meditation session card.
+- Meditation sessions still show progress count, but the record flow captures mood/state like before.
+- When a meditation timer reaches zero, the session is saved automatically and progress updates from the new log.
+- Updated visible version labels to `v0.3.47`.
+
 ## v0.3.46 - 2026-06-11
 
 ### Goal

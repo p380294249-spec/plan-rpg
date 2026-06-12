@@ -11,20 +11,22 @@ function renderDetail() {
   const quickMetric = quickMetricConfigForQuest(q.id);
   const metricOnly = isMetricOnlyQuest(q);
   const metricCapable = Boolean(quickMetric);
+  const valueBased = valueProgress(q) !== null;
   const metricLogs = metricCapable ? data.metricLogs.filter(log => metricQuestIdFor(log.goalId, log.metricType) === q.id).slice(0, 5) : [];
   const detailTypeLabel = selectedTask ? typeBadge(taskType) : typeBadge(questTypeForQuest(q));
+  const startLabel = selectedTask && isMeditationTask(selectedTask) ? "开始10分钟冥想记录" : "开始20分钟记录";
   $("questDetail").innerHTML = `
     <div class="simple-detail">
       <span class="pill">${detailTypeLabel} · ${gmnText(selectedTask?.gmn || q.gmn)}</span>
       <h3>${escapeHtml(q.name)}</h3>
       ${quickMetric ? `<button class="primary full" id="detailQuickMetric">${escapeHtml(quickMetric.label)}</button>` : ""}
-      ${metricCapable || metricOnly ? `
+      ${metricCapable || metricOnly || valueBased ? `
         <div class="metric-only-summary">
           <b>${Number(q.currentValue || 0)} / ${Number(q.targetValue || 0)} ${escapeHtml(q.unit || "")}</b>
           <small>${escapeHtml(q.target || "")}</small>
         </div>
       ` : ""}
-      ${selectedTask && !metricOnly ? `<button class="secondary full" id="detailStart">开始20分钟记录</button>` : ""}
+      ${selectedTask && !metricOnly ? `<button class="secondary full" id="detailStart">${startLabel}</button>` : ""}
       <details class="custom-task-box">
         <summary class="secondary full">修改 GMN</summary>
         <div class="form-grid">
