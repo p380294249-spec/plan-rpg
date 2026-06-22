@@ -1,5 +1,20 @@
 # Plan RPG Version Notes
 
+## v0.3.48 - 2026-06-22
+
+### Goal
+
+Make the map dashboard concise and easy to operate on a phone.
+
+### Main Changes
+
+- Top bar now keeps only total focus time and weekly G ratio.
+- Removed the dashboard path text and explanatory helper text.
+- Weekly focus now shows only the two configured priorities and a start button.
+- Goal cards keep title, type, progress, and measurable value without long descriptions.
+- Added a compact mobile layout that hides sidebar utilities and keeps navigation accessible.
+- Updated visible version labels to `v0.3.48`.
+
 ## v0.3.47 - 2026-06-12
 
 ### Goal

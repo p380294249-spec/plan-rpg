@@ -27,11 +27,6 @@ function renderMap() {
   renderWeeklyMap();
   renderMapCollapseState();
   renderActiveTimerPanel();
-  const avg = overallAnnualProgress();
-  $("annualProgress").textContent = pct(avg);
-  $("annualFill").style.setProperty("--value", pct(avg));
-  $("weekSessions").textContent = data.logs.length;
-  $("weekLogs").textContent = data.logs.length;
 }
 
 function logBelongsToQuest(log, questId) {
@@ -51,30 +46,15 @@ function weeklyFocusDoneToday(focus) {
   });
 }
 
-function weeklyFocusDoneThisWeek(focus) {
-  return logsForWeek(0).filter(log => {
-    const logTaskId = log.actual_task_id || log.taskId;
-    return logTaskId === focus.taskId || logBelongsToQuest(log, focus.questId);
-  }).length;
-}
-
 function renderWeeklyCommandPanel() {
-  const doneCount = weeklyCommandFocus.filter(weeklyFocusDoneToday).length;
   $("weeklyCommandPanel").innerHTML = `
-    ${doneCount === weeklyCommandFocus.length ? `<div class="command-complete">今天主要任务完成了。可以去选择其他任务，或者收工复盘。</div>` : ""}
     <div class="weekly-command-grid">
       ${weeklyCommandFocus.map(focus => {
-        const quest = questById(focus.questId);
-        const task = taskById(focus.taskId) || tasksForQuest(focus.questId)[0];
         const doneToday = weeklyFocusDoneToday(focus);
-        const weekDone = weeklyFocusDoneThisWeek(focus);
         return `
           <div class="weekly-command-card ${doneToday ? "done" : ""}">
-            <span class="pill">${focus.label} · ${doneToday ? "今日已完成" : "今日未完成"}</span>
             <h4>${escapeHtml(focus.title)}</h4>
-            <p>${escapeHtml(focus.note)}</p>
-            <small>本周 ${weekDone} 次 · ${escapeHtml(quest?.name || focus.questId)} / ${escapeHtml(task?.current_title || task?.name || "选择任务")}</small>
-            <button class="${doneToday ? "secondary" : "primary"}" data-weekly-focus-start="${focus.id}">${doneToday ? "继续加一轮" : "开始 20 分钟"}</button>
+            <button class="${doneToday ? "secondary" : "primary"}" data-weekly-focus-start="${focus.id}">开始</button>
           </div>
         `;
       }).join("")}
@@ -171,11 +151,9 @@ function renderCampaignGrid() {
     const type = questTypeForQuest(q);
     return `
       <button class="campaign-card ${typeClass(type)} ${q.id === selectedCampaignId ? "active" : ""} ${progress >= 100 ? "state-done" : "state-todo"}" data-campaign="${q.id}">
-        <span class="node-title">${escapeHtml(q.name)}</span>
-        <span class="node-compact"><span class="type-badge">年度目标</span><span>${Math.round(progress)}%</span></span>
+        <span class="campaign-head"><span class="node-title">${escapeHtml(q.name)}</span><span class="type-badge">${typeBadge(type)}</span><span class="campaign-progress">${Math.round(progress)}%</span></span>
         <div class="bar"><div class="fill" style="--value:${progress}%"></div></div>
         ${valueProgress(q) !== null ? `<small class="data-progress">${Number(q.currentValue || 0)} / ${Number(q.targetValue || 0)} ${escapeHtml(q.unit || "")}</small>` : ""}
-        <small>${escapeHtml(q.target)}</small>
       </button>
     `;
   }).join("") || `<p>这个 2030 分类下还没有 2026 战役。</p>`;

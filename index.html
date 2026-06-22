@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Plan RPG v0.3.47 / 计划 RPG</title>
+  <title>Plan RPG v0.3.48 / 计划 RPG</title>
   <link rel="stylesheet" href="src/ui/styles.css" />
 </head>
 <body>
@@ -14,7 +14,7 @@
         <div>
           <h1>计划 RPG</h1>
           <p>把目标变成冒险</p>
-          <span class="version">v0.3.47 在线网页软件</span>
+          <span class="version">v0.3.48 在线网页软件</span>
         </div>
       </div>
 
@@ -74,12 +74,10 @@
       <header class="topbar">
         <div class="title">
           <h2>2026 计划地图</h2>
-          <p>2030 方向 → 2026 数据目标 → 章节推进 → Log → Review</p>
         </div>
         <div class="stats">
           <div class="stat"><b>⚡</b><div><strong id="totalMinutes">0 min</strong><span>同步专注时长</span></div></div>
           <div class="stat"><b>◆</b><div><strong id="gRatio">0%</strong><span>Growth 占比</span></div></div>
-          <div class="stat"><b>Lv</b><div><strong>探索者 28</strong><span>Plan RPG v0.3.47</span></div></div>
         </div>
       </header>
 
@@ -90,52 +88,35 @@
               <section class="map-layer weekly-command">
                 <div class="layer-head">
                   <h3>本周作战</h3>
-                  <small>先完成两个主要 G，再选择其他任务。</small>
                 </div>
                 <div id="weeklyCommandPanel"></div>
               </section>
               <section class="map-layer collapsible-map-section" data-collapse-section="life">
                 <div class="layer-head">
                   <button class="layer-toggle" data-collapse-toggle="life"><h3>2030 人生九宫格</h3><span class="collapse-icon">▼</span></button>
-                  <small>五年后的方向提醒。</small>
                 </div>
                 <div class="collapsible-body"><div class="life-grid" id="lifeGrid"></div></div>
               </section>
               <section class="map-layer collapsible-map-section" data-collapse-section="campaigns">
                 <div class="layer-head">
                   <button class="layer-toggle" data-collapse-toggle="campaigns"><h3>2026 目标</h3><span class="collapse-icon">▼</span></button>
-                  <small>看进度，决定现在推进哪条线。</small>
                 </div>
                 <div class="collapsible-body"><div class="campaign-grid" id="campaignGrid"></div></div>
               </section>
               <section class="map-layer collapsible-map-section" data-collapse-section="chapters">
                 <div class="layer-head">
                   <button class="layer-toggle" data-collapse-toggle="chapters"><h3>章节</h3><span class="collapse-icon">▼</span></button>
-                  <small>目标下面的阶段。灰色未完成，绿色已完成。</small>
                 </div>
                 <div class="collapsible-body"><div class="weekly-map" id="weeklyMap"></div></div>
               </section>
             </div>
-            <div class="map-bottom">
-              <div class="progress-panel">
-                <div>年度探索进度</div>
-                <strong id="annualProgress">0%</strong>
-                <div class="bar"><div class="fill" id="annualFill" style="--value:0%"></div></div>
-                <div class="milestones"><span>Q1 25%</span><span>Q2 50%</span><span>Q3 75%</span><span>Q4 100%</span></div>
-              </div>
-              <div class="week-panel">
-                <b>本周成就</b>
-                <p><span id="weekSessions">0</span> 次 Session</p>
-                <p><span id="weekLogs">0</span> 条执行日志</p>
-              </div>
-              <div class="week-panel hide" id="activeTimerPanel">
-                <b>正在专注</b>
-                <p><span id="activeTimerLeft">00:00</span> · <span id="activeTimerState">进行中</span></p>
-                <p id="activeTimerTask">当前任务</p>
-                <div class="timer-panel-actions">
-                  <button class="secondary" id="cancelFocusBtn">取消专注</button>
-                  <button class="primary" id="returnFocusBtn">返回计时</button>
-                </div>
+            <div class="week-panel hide" id="activeTimerPanel">
+              <b>正在专注</b>
+              <p><span id="activeTimerLeft">00:00</span> · <span id="activeTimerState">进行中</span></p>
+              <p id="activeTimerTask">当前任务</p>
+              <div class="timer-panel-actions">
+                <button class="secondary" id="cancelFocusBtn">取消专注</button>
+                <button class="primary" id="returnFocusBtn">返回计时</button>
               </div>
             </div>
           </div>
