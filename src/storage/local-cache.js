@@ -71,6 +71,14 @@ function mergedMindsetTaskId(taskId) {
   return isMergedMindsetTaskId(taskId) ? MINDSET_CANONICAL_TASK_ID : taskId;
 }
 
+function mergedDfkQuestId(questId) {
+  return DFK_LEGACY_QUEST_MAP[questId] || questId;
+}
+
+function isMergedDfkQuestId(questId) {
+  return Boolean(DFK_LEGACY_QUEST_MAP[questId]);
+}
+
 function mergeById(defaultRows, savedRows) {
   const rows = [...defaultRows];
   savedRows.forEach(row => {
@@ -126,9 +134,10 @@ function normalizeTodoCategory(todo) {
 }
 
 function normalizeQuests(quests) {
-  return quests.filter(quest => !isMergedMindsetQuestId(quest.id)).map(quest => {
+  return quests.filter(quest => !isMergedMindsetQuestId(quest.id) && !isMergedDfkQuestId(quest.id)).map(quest => {
     const fixed = seed.quests.find(item => item.id === quest.id);
     if (!fixed) return quest;
+    const renamedDfkModule = ["Q-009", "Q-010", "Q-016"].includes(quest.id) && quest.name !== fixed.name;
     return {
       ...quest,
       parentQuestId: fixed.parentQuestId,
@@ -142,8 +151,9 @@ function normalizeQuests(quests) {
       targetValue: fixed.targetValue,
       icon: fixed.icon,
       priority: fixed.priority,
+      monthlyMetric: Boolean(fixed.monthlyMetric),
       status: quest.status || fixed.status,
-      gmn: quest.gmn || fixed.gmn
+      gmn: renamedDfkModule ? fixed.gmn : (quest.gmn || fixed.gmn)
     };
   });
 }
@@ -151,9 +161,10 @@ function normalizeQuests(quests) {
 function normalizeTasks(tasks) {
   return tasks.filter(task => !isMergedMindsetTaskId(task.id)).map(task => {
     const fixed = seed.tasks.find(item => item.id === task.id);
+    const normalizedQuestId = mergedDfkQuestId(task.questId);
     const base = {
       is_random_event: false,
-      quest_type: questTypeFromQuestId(fixed?.questId || task.questId),
+      quest_type: questTypeFromQuestId(fixed?.questId || normalizedQuestId),
       estimated_sessions: 1,
       reason: "",
       source: "manual",
@@ -177,13 +188,13 @@ function normalizeTasks(tasks) {
         quest_type: fixed.quest_type || questTypeFromQuestId(fixed.questId)
       };
     }
-    return { ...base, ...task, minutes: Number(task.minutes || 20) };
+    return { ...base, ...task, questId: normalizedQuestId, minutes: Number(task.minutes || 20) };
   });
 }
 
 function normalizeLog(log, index, tasks = seed.tasks) {
   const normalizedTaskId = mergedMindsetTaskId(log.actual_task_id || log.taskId);
-  const normalizedQuestId = mergedMindsetQuestId(log.questId);
+  const normalizedQuestId = mergedDfkQuestId(mergedMindsetQuestId(log.questId));
   const task = taskByIdFromRows(normalizedTaskId || log.taskId, tasks);
   return {
     id: log.id || `L-${String(index + 1).padStart(3, "0")}`,

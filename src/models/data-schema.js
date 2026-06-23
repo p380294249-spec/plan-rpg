@@ -36,6 +36,7 @@
  *   baselineThrough - string (optional), date covered by baselineValue
  *   unit            - string (optional), unit of measurement
  *   recordMode      - string (optional), "metric" means result-only tracking, no 20min task needed
+ *   monthlyMetric   - boolean (optional), aggregate Metric Logs for the current calendar month and reset display at the next month
  *   description     - string, detailed description
  *   nextMove        - string, recommended next action
  *   status          - string: "In Progress" | "Not Started" | "Done" | "Paused" | "Discovery" | "Promoted" | "Filed as Noise" | "Filed as Maintenance"
@@ -99,6 +100,26 @@
  *   original_task_id  - string, original task ID before pivot
  *   actual_task_id    - string, actual task ID after pivot (may equal original_task_id)
  *   pivot_note        - string, human-readable pivot description
+ */
+
+/*
+ * METRIC_LOG
+ * Stored in: localStorage (STORAGE_KEY) under data.metricLogs + Google Sheets (Metric_Logs tab)
+ * Created by: saveMetricLog()
+ * Fields:
+ *   id          - string, unique metric log ID
+ *   date        - string, YYYY-MM-DD format; determines the month and year totals
+ *   month       - string, YYYY-MM format
+ *   goalId      - string, linked Goal2030 ID
+ *   metricType  - string, e.g. "DFK 装柜" or "INSO 收入"
+ *   value       - number, incremental amount to add
+ *   unit        - string, e.g. "柜" or "RMB"
+ *   note        - string, optional context
+ *   createdAt   - string, ISO datetime
+ *   updatedAt   - string, ISO datetime
+ *
+ * Monthly business metrics display only the current month total on the map.
+ * The dated rows remain available for annual totals and Google Sheet history.
  */
 
 /*

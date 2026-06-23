@@ -11,8 +11,15 @@ function renderDetail() {
   const quickMetric = quickMetricConfigForQuest(q.id);
   const metricOnly = isMetricOnlyQuest(q);
   const metricCapable = Boolean(quickMetric);
+  const monthlyMetric = isMonthlyMetricQuest(q);
+  const monthlySummary = monthlyMetric ? monthlyMetricSummary(q) : null;
   const valueBased = valueProgress(q) !== null;
-  const metricLogs = metricCapable ? data.metricLogs.filter(log => metricQuestIdFor(log.goalId, log.metricType) === q.id).slice(0, 5) : [];
+  const metricLogs = metricCapable
+    ? (monthlyMetric
+      ? metricLogsForQuest(q.id, { month: monthKey() })
+      : data.metricLogs.filter(log => metricQuestIdFor(log.goalId, log.metricType) === q.id))
+        .slice(0, 5)
+    : [];
   const detailTypeLabel = selectedTask ? typeBadge(taskType) : typeBadge(questTypeForQuest(q));
   const startLabel = selectedTask && isMeditationTask(selectedTask) ? "开始10分钟冥想记录" : "开始20分钟记录";
   $("questDetail").innerHTML = `
@@ -22,7 +29,9 @@ function renderDetail() {
       ${quickMetric ? `<button class="primary full" id="detailQuickMetric">${escapeHtml(quickMetric.label)}</button>` : ""}
       ${metricCapable || metricOnly || valueBased ? `
         <div class="metric-only-summary">
-          <b>${Number(q.currentValue || 0)} / ${Number(q.targetValue || 0)} ${escapeHtml(q.unit || "")}</b>
+          <b>${monthlyMetric
+            ? `本月 ${Number(monthlySummary.value || 0)} / ${Number(monthlySummary.target || 0)} ${escapeHtml(monthlySummary.unit || "")} · ${monthlySummary.progress}%`
+            : `${Number(q.currentValue || 0)} / ${Number(q.targetValue || 0)} ${escapeHtml(q.unit || "")}`}</b>
           <small>${escapeHtml(q.target || "")}</small>
         </div>
       ` : ""}
@@ -54,7 +63,7 @@ function renderDetail() {
       </details>
       <details class="custom-task-box" ${metricOnly ? "open" : ""}>
         <summary class="secondary full">更多记录设置</summary>
-        ${valueProgress(q) !== null ? `
+        ${valueProgress(q) !== null && !monthlyMetric ? `
         <div class="custom-task-box">
           <h4>更新目标进度</h4>
           <div class="form-grid">
@@ -75,7 +84,7 @@ function renderDetail() {
           </div>
           <button class="secondary full" id="quickTaskStart">加入并开始记录</button>
         </div>`}
-        <h4>最近记录</h4>
+        <h4>${monthlyMetric ? "本月记录" : "最近记录"}</h4>
         <div class="route">
           ${metricCapable
             ? (metricLogs.length ? metricLogs.map(log => `<div class="route-item"><b>${escapeHtml(log.date)} · ${Number(log.value || 0)} ${escapeHtml(log.unit || "")}</b><br><small>${escapeHtml(log.note || "已记录")}</small></div>`).join("") : `<div class="route-item"><small>${metricOnly ? "还没有体重记录。2026-06-11 前已按 24 周达标计入。" : "还没有数据记录。"}</small></div>`)

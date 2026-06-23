@@ -111,10 +111,10 @@ function questIdForType(type, goalId = "") {
 
 function quickMetricConfigForQuest(questId) {
   if (questId === "Q-001") {
-    return { label: "记录装柜数量", goalId: "BUSINESS", metricType: "装柜数量", unit: "柜" };
+    return { label: "记录本月装柜", goalId: "BUSINESS", metricType: "DFK 装柜", unit: "柜" };
   }
   if (questId === "Q-003") {
-    return { label: "记录 INSO 收入", goalId: "BUSINESS", metricType: "INSO 收入", unit: "RMB" };
+    return { label: "记录本月 INSO 收入", goalId: "BUSINESS", metricType: "INSO 收入", unit: "RMB" };
   }
   if (questId === "Q-005") {
     return { label: "记录体重", goalId: "HEALTH", metricType: "Weight", unit: "KG" };

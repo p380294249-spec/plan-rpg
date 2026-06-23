@@ -1,5 +1,19 @@
 # Plan RPG Version Notes
 
+## v0.3.53 - 2026-06-23
+
+### Goal
+
+Make DFK and INSO monthly business data additive, clear, and independent from 20-minute work modules.
+
+### Main Changes
+
+- DFK now records incremental container counts against a monthly target of 30 containers; for example, entries of 3 and 2 display as `本月 5 / 30 柜 · 17%`.
+- INSO income now uses the same monthly incremental record model against `10000 RMB`.
+- The map automatically resets monthly display totals when the calendar month changes, while dated Metric Logs remain in Google Sheet and local data for annual totals.
+- Simplified DFK chapters to: `公司系统维护` (G), `公司内部管理` (M), and `客户与物流事务` (N).
+- Merged old printing records into company system maintenance and old personnel-management records into company internal management.
+
 ## v0.3.52 - 2026-06-23
 
 ### Fix

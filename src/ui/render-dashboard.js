@@ -147,13 +147,17 @@ function selectCampaignEntry(campaignId) {
 function renderCampaignGrid() {
   const campaigns = campaignQuestsForGoal(selectedGoalId);
   $("campaignGrid").innerHTML = campaigns.map(q => {
-    const progress = computedQuestProgress(q);
+    const monthlyMetric = isMonthlyMetricQuest(q);
+    const summary = monthlyMetric ? monthlyMetricSummary(q) : null;
+    const progress = monthlyMetric ? summary.progress : computedQuestProgress(q);
     const type = questTypeForQuest(q);
     return `
       <button class="campaign-card ${typeClass(type)} ${q.id === selectedCampaignId ? "active" : ""} ${progress >= 100 ? "state-done" : "state-todo"}" data-campaign="${q.id}">
         <span class="campaign-head"><span class="node-title">${escapeHtml(q.name)}</span><span class="type-badge">${typeBadge(type)}</span><span class="campaign-progress">${Math.round(progress)}%</span></span>
         <div class="bar"><div class="fill" style="--value:${progress}%"></div></div>
-        ${valueProgress(q) !== null ? `<small class="data-progress">${Number(q.currentValue || 0)} / ${Number(q.targetValue || 0)} ${escapeHtml(q.unit || "")}</small>` : ""}
+        ${monthlyMetric
+          ? `<small class="data-progress">本月 ${Number(summary.value || 0)} / ${Number(summary.target || 0)} ${escapeHtml(summary.unit || "")}</small>`
+          : (valueProgress(q) !== null ? `<small class="data-progress">${Number(q.currentValue || 0)} / ${Number(q.targetValue || 0)} ${escapeHtml(q.unit || "")}</small>` : "")}
       </button>
     `;
   }).join("") || `<p>这个 2030 分类下还没有 2026 战役。</p>`;

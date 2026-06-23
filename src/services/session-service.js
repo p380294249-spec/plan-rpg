@@ -44,29 +44,75 @@ function metricQuestIdFor(goalId, metricType = "", targetData = data) {
   return targetData?.quests?.find(q => !q.parentQuestId && q.goal === goalId)?.id || "";
 }
 
+function isMonthlyMetricQuest(questOrId, targetData = data) {
+  const quest = typeof questOrId === "string"
+    ? targetData?.quests?.find(item => item.id === questOrId)
+    : questOrId;
+  return Boolean(quest?.monthlyMetric);
+}
+
+function metricLogsForQuest(questId, { month = "", year = "" } = {}, targetData = data) {
+  return (targetData?.metricLogs || []).filter(log => {
+    if (metricQuestIdFor(log.goalId, log.metricType, targetData) !== questId) return false;
+    if (month && monthKey(log.date) !== month) return false;
+    if (year && yearKey(log.date) !== year) return false;
+    return true;
+  });
+}
+
+function metricTotalForQuest(questId, filters = {}, targetData = data) {
+  return metricLogsForQuest(questId, filters, targetData)
+    .reduce((sum, log) => sum + Number(log.value || 0), 0);
+}
+
+function monthlyMetricSummary(questOrId, targetData = data) {
+  const quest = typeof questOrId === "string"
+    ? targetData?.quests?.find(item => item.id === questOrId)
+    : questOrId;
+  if (!quest) return { value: 0, target: 0, unit: "", progress: 0 };
+  const value = metricTotalForQuest(quest.id, { month: monthKey() }, targetData);
+  const target = Number(quest.targetValue || 0);
+  return {
+    value,
+    target,
+    unit: String(quest.unit || "").replace(/\/月$/, ""),
+    progress: target ? Math.max(0, Math.min(100, Math.round((value / target) * 100))) : 0
+  };
+}
+
+function annualMetricTotal(questOrId, targetData = data) {
+  const questId = typeof questOrId === "string" ? questOrId : questOrId?.id;
+  return metricTotalForQuest(questId, { year: yearKey() }, targetData);
+}
+
 function applyMetricLogsToDashboard(metricLogs = data.metricLogs || [], targetData = data) {
   const currentMonth = monthKey();
   const monthly = metricLogs.filter(log => monthKey(log.date) === currentMonth);
+  targetData.quests
+    .filter(quest => isMonthlyMetricQuest(quest, targetData))
+    .forEach(quest => { quest.currentValue = 0; });
   const totals = new Map();
   monthly.forEach(log => {
-    const key = `${log.goalId}|${log.metricType}`;
-    const current = totals.get(key) || { goalId: log.goalId, metricType: log.metricType, value: 0, unit: log.unit };
+    const questId = metricQuestIdFor(log.goalId, log.metricType, targetData);
+    if (!questId) return;
+    const current = totals.get(questId) || { questId, value: 0, unit: log.unit };
     current.value += Number(log.value || 0);
     if (log.unit) current.unit = log.unit;
-    totals.set(key, current);
+    totals.set(questId, current);
   });
   totals.forEach(total => {
-    const goal = targetData.goals2030?.find(item => item.id === total.goalId);
-    if (goal) {
-      goal.currentValue = total.value;
-      goal.unit = total.unit || goal.unit;
-    }
-    const questId = metricQuestIdFor(total.goalId, total.metricType, targetData);
-    const quest = targetData.quests?.find(item => item.id === questId);
+    const quest = targetData.quests?.find(item => item.id === total.questId);
     if (quest) {
       quest.currentValue = total.value;
       quest.unit = total.unit || quest.unit;
       if (total.value > 0 && quest.status === "Not Started") quest.status = "In Progress";
+      if (quest.goal !== "BUSINESS") {
+        const goal = targetData.goals2030?.find(item => item.id === quest.goal);
+        if (goal) {
+          goal.currentValue = total.value;
+          goal.unit = total.unit || goal.unit;
+        }
+      }
     }
   });
   applyHealthWeightProgress(targetData);
