@@ -249,7 +249,8 @@ function candidateLocalSessionLogs() {
 
 function saveDraft() {
   localStorage.setItem(APP_CONFIG.FOCUS_DRAFT_KEY, JSON.stringify({ taskId: selectedTaskId, ...readForm() }));
-  $("sessionResult").innerHTML = `<span class="pill">草稿已保存</span><h3>可以先离开</h3><p>当前记录已暂存在本机浏览器，完成后再结算。</p>`;
+  $("sessionResult").classList.remove("hide");
+  $("sessionResult").innerHTML = `<span class="pill">草稿已保存</span>`;
 }
 
 function exportData() {

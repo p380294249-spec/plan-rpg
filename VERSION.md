@@ -1,5 +1,19 @@
 # Plan RPG Version Notes
 
+## v0.3.49 - 2026-06-23
+
+### Goal
+
+Simplify meditation recording and remove unnecessary interface introductions.
+
+### Main Changes
+
+- Meditation now uses one `感受 / Mood` field instead of separate feeling and Mood inputs.
+- The merged meditation feeling is preserved in both log fields used by existing Google Sheet sync.
+- Removed task instructions, record-board help text, unfinished-session intro, and several static page descriptions.
+- Reduced the saved-draft panel to a short status only.
+- Updated visible version labels to `v0.3.49`.
+
 ## v0.3.48 - 2026-06-22
 
 ### Goal

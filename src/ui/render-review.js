@@ -17,9 +17,6 @@ function renderReview() {
   const noiseLogs = thisWeek.filter(l => taskById(l.actual_task_id || l.taskId)?.quest_type === "noise" || l.gmn === "N");
   const range = weekRange(0);
   $("reviewWeekTitle").textContent = `本周复盘 · ${formatShortDate(range.start)} - ${formatShortDate(range.end)}`;
-  $("reviewWeekSubtitle").textContent = total
-    ? "看本周时间有没有偏离年度方向，再决定下周要跟进哪里。"
-    : "本周还没有记录，开始一次 20 分钟后这里会自动汇总。";
   $("metricTotal").textContent = total;
   $("metricG").textContent = g;
   $("metricM").textContent = m;

@@ -31,7 +31,6 @@ function renderFocus() {
   $("sessionGmn").value = t.gmn || "G";
   $("sessionGmn").onchange = (e) => updateTaskGmn(t.id, e.target.value);
   $("focusTaskName").textContent = t.current_title || t.name;
-  $("focusTaskInfo").textContent = `${q.name} / ${t.instruction} 完成标准：${t.standard}`;
   $("sessionTypePill").textContent = `${selectedDurationMinutes()}min Session`;
   $("durationInput").onchange = () => {
     const minutes = selectedDurationMinutes();
@@ -71,7 +70,7 @@ function setRecordType(type) {
   if ($("recordTypeSelect")) $("recordTypeSelect").value = isMetric ? "metric" : "session";
   $("sessionRecordFields")?.classList.toggle("hide", isMetric);
   $("sessionLogPanel")?.classList.toggle("hide", isMetric);
-  $("sessionResult")?.classList.toggle("hide", isMetric);
+  if (isMetric) $("sessionResult")?.classList.add("hide");
   $("metricRecordFields")?.classList.toggle("hide", !isMetric);
   if ($("sessionTypePill")) $("sessionTypePill").textContent = isMetric ? "Quick Metric Log" : `${selectedDurationMinutes()}min Session`;
 }
@@ -86,12 +85,12 @@ function populateMetricGoalSelect() {
 function renderRecordBoardMode(task) {
   const meditation = isMeditationTask(task);
   $("recordBoardTitle").textContent = meditation ? "冥想记录板" : "战斗记录板";
-  $("recordBoardHelp").textContent = meditation ? "简单记录场景和感受即可，不需要写成完整复盘。" : "先写关键内容，结束时再补全。保存后可以编辑。";
   $("whatDoneLabel").firstChild.textContent = meditation ? "场景" : "做了什么";
-  $("problemLabel").firstChild.textContent = meditation ? "感受" : "遇到什么问题";
+  $("problemLabel").firstChild.textContent = meditation ? "感受 / Mood" : "遇到什么问题";
   $("whatDone").placeholder = meditation ? "在哪里、什么姿势、周围环境、冥想前的状态..." : `这 ${selectedDurationMinutes()} 分钟具体推进了什么？`;
   $("problem").placeholder = meditation ? "身体、呼吸、情绪、念头有没有变化？" : "卡点、阻力、情绪、信息缺口...";
   ["solutionLabel", "goodLabel", "badLabel", "nextStepLabel"].forEach(id => $(id).classList.toggle("hide", meditation));
+  $("moodStressLabel").classList.toggle("hide", meditation);
 }
 
 function renderTimer() {
@@ -108,6 +107,7 @@ function renderSessionResult(log) {
   const q = questById(log.questId);
   const t = taskById(log.taskId);
   const meditation = isMeditationTask(t);
+  $("sessionResult").classList.remove("hide");
   $("sessionResult").innerHTML = `
     <span class="pill">Session 结算完成</span>
     <h3>${escapeHtml(t.current_title || t.name)}</h3>

@@ -365,6 +365,8 @@ function resetTimer() {
 function readForm() {
   const t = taskById(selectedTaskId);
   const q = questById(t.questId);
+  const meditation = isMeditationTask(t);
+  const feeling = $("problem").value.trim();
   return {
     id: newId("L"),
     date: new Date().toISOString().slice(0, 10),
@@ -373,12 +375,12 @@ function readForm() {
     questId: q.id,
     taskId: t.id,
     whatDone: $("whatDone").value.trim() || (isMeditationTask(t) ? "完成一次冥想" : (t.current_title || t.name)),
-    problem: $("problem").value.trim(),
-    solution: isMeditationTask(t) ? "" : $("solution").value.trim(),
-    good: isMeditationTask(t) ? "" : $("good").value.trim(),
-    bad: isMeditationTask(t) ? "" : $("bad").value.trim(),
-    nextStep: isMeditationTask(t) ? ($("nextStep").value.trim() || "下次继续短冥想") : ($("nextStep").value.trim() || q.nextMove),
-    moodStress: $("moodStress").value.trim(),
+    problem: feeling,
+    solution: meditation ? "" : $("solution").value.trim(),
+    good: meditation ? "" : $("good").value.trim(),
+    bad: meditation ? "" : $("bad").value.trim(),
+    nextStep: meditation ? ($("nextStep").value.trim() || "下次继续短冥想") : ($("nextStep").value.trim() || q.nextMove),
+    moodStress: meditation ? feeling : $("moodStress").value.trim(),
     skillXp: buildSkillXp(t),
     is_random_event: Boolean(t.is_random_event),
     is_pivoted: false,

@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Plan RPG v0.3.48 / 计划 RPG</title>
+  <title>Plan RPG v0.3.49 / 计划 RPG</title>
   <link rel="stylesheet" href="src/ui/styles.css" />
 </head>
 <body>
@@ -14,7 +14,7 @@
         <div>
           <h1>计划 RPG</h1>
           <p>把目标变成冒险</p>
-          <span class="version">v0.3.48 在线网页软件</span>
+          <span class="version">v0.3.49 在线网页软件</span>
         </div>
       </div>
 
@@ -134,7 +134,6 @@
             <label>Record Type<select id="recordTypeSelect"><option value="session">20min Session</option><option value="metric">Quick Metric Log</option></select></label>
             <div id="sessionRecordFields">
             <h3 id="focusTaskName">选择一个任务开始</h3>
-            <p id="focusTaskInfo"></p>
             <label>当前任务<select id="taskSelect"></select></label>
             <label class="duration-control">本次时间（分钟）<input id="durationInput" type="number" min="1" max="180" step="1" value="20" /></label>
             <label>本次 GMN<select id="sessionGmn"><option value="G">G 成长</option><option value="M">M 维护</option><option value="N">N 噪音</option></select></label>
@@ -156,7 +155,6 @@
             </div>
             <div id="metricRecordFields" class="hide">
               <h3>Quick Metric Log</h3>
-              <p>记录结果数据，不启动 20 分钟计时。</p>
               <label>Date<input id="metricLogDate" type="date" /></label>
               <label>Goal<select id="metricLogGoal"></select></label>
               <label>Metric Type<input id="metricLogType" list="metricTypeOptions" placeholder="例如：体重 / RFQ / 收入 / 冥想" /></label>
@@ -182,7 +180,6 @@
 
           <div class="panel" id="sessionLogPanel">
             <h3 id="recordBoardTitle">战斗记录板</h3>
-            <p id="recordBoardHelp">先写关键内容，结束时再补全。保存后可以编辑。</p>
             <div class="form-grid">
               <label id="whatDoneLabel">做了什么<textarea id="whatDone" placeholder="这 20 分钟具体推进了什么？"></textarea></label>
               <label id="problemLabel">遇到什么问题<textarea id="problem" placeholder="卡点、阻力、情绪、信息缺口..."></textarea></label>
@@ -190,15 +187,11 @@
               <label id="goodLabel">好的地方<textarea id="good" placeholder="值得保留的动作、判断、节奏..."></textarea></label>
               <label id="badLabel">不好的地方<textarea id="bad" placeholder="浪费、拖延、误判、流程问题..."></textarea></label>
               <label id="nextStepLabel">下一步<textarea id="nextStep" placeholder="下一次 20 分钟应该从哪里开始？"></textarea></label>
-              <label id="moodStressLabel">Mood / Stress<textarea id="moodStress" placeholder="情绪、压力、能量状态。"></textarea></label>
+              <label id="moodStressLabel">状态<textarea id="moodStress" placeholder="情绪、压力、能量状态。"></textarea></label>
             </div>
           </div>
 
-          <div class="panel session-result" id="sessionResult">
-            <span class="pill">Session 结算</span>
-            <h3>还没有完成本次专注</h3>
-            <p>完成后这里会显示你写了什么、获得了什么、下一步去哪里。</p>
-          </div>
+          <div class="panel session-result hide" id="sessionResult"></div>
         </div>
       </section>
 
@@ -207,7 +200,6 @@
           <div class="panel">
             <span class="pill">Todo Inbox</span>
             <h3>待办收件箱</h3>
-            <p>先把事情丢进来。系统会按关键词给一个归类建议，你也可以手动改。到期日是今天的会进入今日提醒。</p>
             <div class="form-grid">
               <label>待办事项<input id="todoTitle" placeholder="例如：明天联系银行确认收款限制" /></label>
               <label>到期日<input id="todoDueDate" type="date" /></label>
@@ -219,7 +211,6 @@
             </div>
             <div class="route-item" id="todoSuggestion">
               <b>自动归类建议</b>
-              <p>输入待办后会显示建议。</p>
             </div>
             <div class="actions">
               <button class="secondary" id="autoClassifyTodoBtn">采用建议</button>
@@ -241,7 +232,6 @@
           <div class="panel">
             <span class="pill">Weekly Review</span>
             <h3 id="reviewWeekTitle">本周自动汇总</h3>
-            <p id="reviewWeekSubtitle">这里会汇总本周专注记录，帮你核对方向、时间和下周重点。</p>
             <div class="review-cards">
               <div class="metric"><span>Total</span><b id="metricTotal">0</b></div>
               <div class="metric"><span>Growth</span><b id="metricG">0</b></div>
@@ -300,7 +290,6 @@
           <div class="panel">
             <span class="pill">CEO Skill Tree</span>
             <h3>技能专项</h3>
-            <p>从 CEO / Founder / GM 招聘要求反推学习路线。每次 20 分钟会给相关技能加 XP。</p>
             <div class="skill-grid" id="skillList"></div>
           </div>
           <div class="panel" id="skillDetail"></div>
@@ -327,7 +316,6 @@
         <div>
           <span class="pill">Random Event</span>
           <h3>突发任务</h3>
-          <p>把临时事件收编进地图，判断它是机会、风险、维护，还是噪音。</p>
         </div>
         <button class="ghost" data-close-modal="randomEventModal">关闭</button>
       </div>
