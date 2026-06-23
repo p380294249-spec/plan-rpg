@@ -32,6 +32,7 @@ function renderAll() {
 
 function bootstrapPlanRpg() {
   data = loadData();
+  todoUiState = readTodoUiState();
   document.querySelectorAll(".nav button").forEach(btn => btn.addEventListener("click", () => showScreen(btn.dataset.screen)));
   $("backToMapBtn").addEventListener("click", () => showScreen("map"));
   $("startPauseBtn").addEventListener("click", toggleTimer);
@@ -39,11 +40,6 @@ function bootstrapPlanRpg() {
   $("cancelFocusInlineBtn").addEventListener("click", cancelActiveSessionWithConfirm);
   document.addEventListener("visibilitychange", syncTimerWithClock);
   $("randomEventBtn").addEventListener("click", openRandomEventModal);
-  $("todoTitle").addEventListener("input", () => updateTodoSuggestion(false));
-  $("todoNote").addEventListener("input", () => updateTodoSuggestion(false));
-  $("todoGoal").addEventListener("change", () => populateTodoQuestSelect($("todoGoal").value));
-  $("autoClassifyTodoBtn").addEventListener("click", applyTodoSuggestion);
-  $("addTodoBtn").addEventListener("click", createTodo);
   $("pivotTaskBtn").addEventListener("click", openPivotModal);
   $("saveDraftBtn").addEventListener("click", saveDraft);
   $("saveSessionBtn").addEventListener("click", saveSession);

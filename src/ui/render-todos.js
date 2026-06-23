@@ -1,35 +1,79 @@
 // src/ui/render-todos.js
-// Extracted from index.html during the safe modular refactor.
+// Render-only layer for the minimal DFK / INSO / OTHER todo experience.
 
 function renderTodos() {
-  populateTodoGoalSelect($("todoGoal").value || "BUSINESS");
-  populateTodoQuestSelect($("todoGoal").value || "BUSINESS", $("todoQuest").value || "Q-001");
-  if (!$("todoDueDate").value) $("todoDueDate").value = todayISO();
-  const openTodos = data.todos.filter(todo => todo.status !== "done" && todo.status !== "deleted");
-  const today = openTodos.filter(todo => todo.dueDate <= todayISO());
-  const later = openTodos.filter(todo => todo.dueDate > todayISO());
-  $("todayTodoList").innerHTML = today.map(todoCard).join("") || `<p>今天没有提醒。可以先把事情丢进待办收件箱。</p>`;
-  $("laterTodoList").innerHTML = later.map(todoCard).join("") || `<p>晚点做列表为空。</p>`;
-  document.querySelectorAll("[data-todo-start]").forEach(btn => btn.onclick = () => startTodo(btn.dataset.todoStart));
-  document.querySelectorAll("[data-todo-done]").forEach(btn => btn.onclick = () => finishTodo(btn.dataset.todoDone));
-  document.querySelectorAll("[data-todo-later]").forEach(btn => btn.onclick = () => moveTodoLater(btn.dataset.todoLater));
-  document.querySelectorAll("[data-todo-delete]").forEach(btn => btn.onclick = () => deleteTodo(btn.dataset.todoDelete));
+  renderTodoInputControls();
+  renderTodoGroups();
+  renderCompletedTodoHistory();
 }
 
-function todoCard(todo) {
-  const quest = questById(todo.questId);
-  const goal = data.goals2030.find(item => item.id === goalIdForQuestId(todo.questId));
+function renderTodoInputControls() {
+  document.querySelectorAll("[data-todo-input-category]").forEach(button => {
+    const active = button.dataset.todoInputCategory === todoUiState.category;
+    button.classList.toggle("active", active);
+    button.setAttribute("aria-pressed", String(active));
+    button.onclick = () => setTodoInputCategory(button.dataset.todoInputCategory);
+  });
+  bindTodoToggle("todoStarButton", todoUiState.isStarred, () => toggleTodoInputFlag("isStarred"), true);
+  bindTodoToggle("todoUrgentButton", todoUiState.isUrgent, () => toggleTodoInputFlag("isUrgent"));
+  $("addTodoBtn").onclick = addSimpleTodo;
+  $("todoContent").onkeydown = event => {
+    if (event.key !== "Enter" || event.isComposing) return;
+    event.preventDefault();
+    addSimpleTodo();
+  };
+  document.querySelectorAll("[data-todo-filter]").forEach(button => {
+    const active = button.dataset.todoFilter === todoUiState.filter;
+    button.classList.toggle("active", active);
+    button.setAttribute("aria-pressed", String(active));
+    button.onclick = () => setTodoFilter(button.dataset.todoFilter);
+  });
+}
+
+function bindTodoToggle(id, active, onClick, hasStarIcon = false) {
+  const button = $(id);
+  button.classList.toggle("active", active);
+  button.setAttribute("aria-pressed", String(active));
+  if (hasStarIcon) button.querySelector("[data-toggle-icon]").textContent = active ? "★" : "☆";
+  button.onclick = onClick;
+}
+
+function renderTodoGroups() {
+  const groups = todoPendingGroups();
+  $("todoGroups").innerHTML = groups
+    .filter(group => group.todos.length)
+    .map(group => `
+      <section class="todo-group todo-group-${group.id}">
+        <h4>${group.title}</h4>
+        <div class="todo-items">${group.todos.map(todoItemHtml).join("")}</div>
+      </section>
+    `).join("") || `<div class="todo-empty">没有待办</div>`;
+  document.querySelectorAll("[data-todo-complete]").forEach(input => {
+    input.onchange = () => completeSimpleTodo(input.dataset.todoComplete);
+  });
+}
+
+function todoItemHtml(todo) {
   return `
-    <div class="log-card">
-      <div class="row"><span class="pill">${escapeHtml(todo.dueDate)} · ${escapeHtml(todo.priority)} · ${todo.gmn}</span><small>${escapeHtml(goalLabel(goal))} / ${escapeHtml(questPathLabel(todo.questId) || quest?.name || todo.questId)}</small></div>
-      <p><b>${escapeHtml(todo.title)}</b></p>
-      ${todo.note ? `<p>${escapeHtml(todo.note)}</p>` : ""}
-      <div class="log-actions">
-        <button class="primary" data-todo-start="${todo.id}">开始20分钟</button>
-        <button class="secondary" data-todo-later="${todo.id}">明天提醒</button>
-        <button class="secondary" data-todo-done="${todo.id}">完成</button>
-        <button class="danger" data-todo-delete="${todo.id}">删除</button>
-      </div>
-    </div>
+    <label class="todo-item">
+      <input class="todo-check" type="checkbox" data-todo-complete="${escapeHtml(todo.id)}" aria-label="完成：${escapeHtml(todo.content)}" />
+      <span class="todo-content">${escapeHtml(todo.content)}</span>
+      <span class="todo-category category-${todo.category.toLowerCase()}">${todoCategoryLabel(todo.category)}</span>
+      ${todo.is_starred ? `<span class="todo-star" title="重要">★</span>` : ""}
+      ${todo.is_urgent ? `<span class="todo-urgent">紧急</span>` : ""}
+    </label>
   `;
+}
+
+function renderCompletedTodoHistory() {
+  const todos = completedTodos();
+  $("completedTodoList").innerHTML = todos.length
+    ? todos.map(todo => `
+      <div class="completed-todo">
+        <span>${escapeHtml(todo.content)}</span>
+        <span class="todo-category category-${todo.category.toLowerCase()}">${todoCategoryLabel(todo.category)}</span>
+        <small>${todoShortDate(todo.completed_at)}</small>
+      </div>
+    `).join("")
+    : `<div class="todo-empty">暂无完成记录</div>`;
 }

@@ -797,6 +797,144 @@ small { color: var(--muted); line-height: 1.5; }
   gap: 18px;
   align-items: start;
 }
+.todo-simple-layout {
+  display: grid;
+  grid-template-columns: minmax(260px, 330px) minmax(0, 1fr);
+  gap: 18px;
+  align-items: start;
+}
+.todo-input-panel {
+  display: grid;
+  gap: 12px;
+}
+.todo-input-panel h3,
+.todo-list-head h3 {
+  margin: 0;
+}
+.todo-category-buttons,
+.todo-toggle-row,
+.todo-filter-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.todo-choice,
+.todo-toggle,
+.todo-filter {
+  min-height: 38px;
+  border-radius: 8px;
+  padding: 8px 12px;
+  color: #475569;
+  background: rgba(255, 255, 255, .82);
+  border: 1px solid var(--line);
+  font-weight: 900;
+}
+.todo-choice.active,
+.todo-filter.active {
+  color: #fff;
+  background: #2563eb;
+  border-color: #2563eb;
+}
+.todo-toggle.active {
+  color: #9a6700;
+  background: #fffbeb;
+  border-color: rgba(245, 158, 11, .6);
+}
+.todo-toggle.urgent-toggle.active {
+  color: #b42318;
+  background: #fff1f2;
+  border-color: rgba(220, 38, 38, .55);
+}
+.todo-list-panel {
+  display: grid;
+  gap: 14px;
+}
+.todo-list-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+.todo-filter-buttons { justify-content: flex-end; }
+.todo-filter { min-height: 32px; padding: 6px 9px; font-size: 12px; }
+.todo-group + .todo-group { margin-top: 18px; }
+.todo-group h4 {
+  margin: 0 0 8px;
+  font-size: 14px;
+  color: #475569;
+}
+.todo-group-urgent-starred h4 { color: #b42318; }
+.todo-group-urgent h4 { color: #c2410c; }
+.todo-group-starred h4 { color: #9a6700; }
+.todo-items {
+  display: grid;
+  gap: 8px;
+}
+.todo-item {
+  display: grid;
+  grid-template-columns: 20px minmax(0, 1fr) auto auto auto;
+  align-items: center;
+  gap: 9px;
+  min-height: 52px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, .84);
+  padding: 9px 11px;
+  font-weight: 700;
+  color: #172033;
+}
+.todo-check {
+  width: 18px;
+  height: 18px;
+  accent-color: #059669;
+  cursor: pointer;
+}
+.todo-content {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.todo-category,
+.todo-urgent {
+  display: inline-flex;
+  align-items: center;
+  min-height: 24px;
+  border-radius: 999px;
+  padding: 3px 7px;
+  font-size: 11px;
+  font-weight: 900;
+  white-space: nowrap;
+}
+.category-dfk { color: #9a6700; background: #fffbeb; border: 1px solid rgba(245, 158, 11, .35); }
+.category-inso { color: #1d4ed8; background: #eff6ff; border: 1px solid rgba(37, 99, 235, .28); }
+.category-other { color: #475569; background: #f1f5f9; border: 1px solid rgba(100, 116, 139, .25); }
+.todo-star { color: #d97706; font-size: 17px; line-height: 1; }
+.todo-urgent { color: #b42318; background: #fff1f2; border: 1px solid rgba(220, 38, 38, .32); }
+.todo-empty {
+  padding: 20px 0;
+  color: var(--muted);
+  text-align: center;
+}
+.todo-history {
+  border-top: 1px solid var(--line);
+  padding-top: 12px;
+}
+.todo-history summary {
+  cursor: pointer;
+  color: #475569;
+  font-weight: 900;
+}
+.todo-history[open] summary { margin-bottom: 10px; }
+.completed-todo {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto auto;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 0;
+  border-bottom: 1px solid rgba(148, 163, 184, .2);
+  color: #64748b;
+  font-size: 13px;
+}
+.completed-todo > span:first-child { min-width: 0; overflow-wrap: anywhere; }
 .timer {
   text-align: center;
   padding: 18px 0 14px;
@@ -1009,7 +1147,7 @@ td { color: #475569; }
 @media (max-width: 1180px) {
   .app { grid-template-columns: 1fr; }
   .sidebar { position: static; height: auto; display: grid; }
-  .map-layout, .focus-grid, .review-grid, .skill-tree {
+  .map-layout, .focus-grid, .review-grid, .todo-simple-layout, .skill-tree {
     grid-template-columns: 1fr;
     height: auto;
     min-height: 0;
@@ -1035,6 +1173,12 @@ td { color: #475569; }
   .layer-head h3 { font-size: 16px; }
   .life-grid, .campaign-grid { grid-template-columns: 1fr; }
   .life-cell { min-height: 52px; }
+  .todo-list-head { align-items: flex-start; flex-direction: column; }
+  .todo-filter-buttons { justify-content: flex-start; }
+  .todo-item { grid-template-columns: 20px minmax(0, 1fr) auto auto; }
+  .todo-item .todo-urgent { grid-column: 2 / -1; justify-self: start; }
+  .completed-todo { grid-template-columns: minmax(0, 1fr) auto; }
+  .completed-todo small { grid-column: 2; }
   .quest-lane, .quest-lane.side {
     grid-template-columns: repeat(2, minmax(120px, 1fr));
     height: auto;

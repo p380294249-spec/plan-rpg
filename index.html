@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Plan RPG v0.3.49 / 计划 RPG</title>
+  <title>Plan RPG v0.3.50 / 计划 RPG</title>
   <link rel="stylesheet" href="src/ui/styles.css" />
 </head>
 <body>
@@ -14,7 +14,7 @@
         <div>
           <h1>计划 RPG</h1>
           <p>把目标变成冒险</p>
-          <span class="version">v0.3.49 在线网页软件</span>
+          <span class="version">v0.3.50 在线网页软件</span>
         </div>
       </div>
 
@@ -196,34 +196,37 @@
       </section>
 
       <section id="todos" class="screen">
-        <div class="review-grid">
-          <div class="panel">
-            <span class="pill">Todo Inbox</span>
-            <h3>待办收件箱</h3>
-            <div class="form-grid">
-              <label>待办事项<input id="todoTitle" placeholder="例如：明天联系银行确认收款限制" /></label>
-              <label>到期日<input id="todoDueDate" type="date" /></label>
-              <label>优先级<select id="todoPriority"><option value="medium">medium</option><option value="high">high</option><option value="urgent">urgent</option><option value="low">low</option></select></label>
-              <label>人生分类<select id="todoGoal"></select></label>
-              <label>具体目标/章节<select id="todoQuest"></select></label>
-              <label>GMN<select id="todoGmn"><option>G</option><option>M</option><option>N</option></select></label>
-              <label>备注<textarea id="todoNote" placeholder="背景、链接、等待什么、下一步是什么..."></textarea></label>
+        <div class="todo-simple-layout">
+          <section class="panel todo-input-panel">
+            <h3>添加待办</h3>
+            <div class="todo-category-buttons" aria-label="待办分类">
+              <button class="todo-choice" data-todo-input-category="DFK">DFK</button>
+              <button class="todo-choice" data-todo-input-category="INSO">INSO</button>
+              <button class="todo-choice" data-todo-input-category="OTHER">OTHER</button>
             </div>
-            <div class="route-item" id="todoSuggestion">
-              <b>自动归类建议</b>
+            <input id="todoContent" placeholder="写下要做什么……" autocomplete="off" />
+            <div class="todo-toggle-row">
+              <button class="todo-toggle" id="todoStarButton" aria-pressed="false"><span data-toggle-icon>☆</span> 重要</button>
+              <button class="todo-toggle urgent-toggle" id="todoUrgentButton" aria-pressed="false">紧急</button>
             </div>
-            <div class="actions">
-              <button class="secondary" id="autoClassifyTodoBtn">采用建议</button>
-              <button class="primary" id="addTodoBtn">加入待办</button>
+            <button class="primary full" id="addTodoBtn">添加</button>
+          </section>
+          <section class="panel todo-list-panel">
+            <div class="todo-list-head">
+              <h3>待办清单</h3>
+              <div class="todo-filter-buttons" aria-label="待办筛选">
+                <button class="todo-filter" data-todo-filter="ALL">全部</button>
+                <button class="todo-filter" data-todo-filter="DFK">DFK</button>
+                <button class="todo-filter" data-todo-filter="INSO">INSO</button>
+                <button class="todo-filter" data-todo-filter="OTHER">OTHER</button>
+              </div>
             </div>
-          </div>
-          <div class="panel">
-            <span class="pill">Today</span>
-            <h3>今日提醒</h3>
-            <div class="log-list" id="todayTodoList"></div>
-            <h3>晚点做</h3>
-            <div class="log-list" id="laterTodoList"></div>
-          </div>
+            <div id="todoGroups"></div>
+            <details class="todo-history">
+              <summary>完成记录</summary>
+              <div id="completedTodoList"></div>
+            </details>
+          </section>
         </div>
       </section>
 
@@ -375,6 +378,7 @@
   <script src="src/storage/local-cache.js"></script>
   <script src="src/storage/sheet-api.js"></script>
   <script src="src/services/task-service.js"></script>
+  <script src="src/services/todo-service.js"></script>
   <script src="src/services/session-service.js"></script>
   <script src="src/ui/render-dashboard.js"></script>
   <script src="src/ui/render-detail.js"></script>

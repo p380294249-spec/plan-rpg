@@ -99,7 +99,7 @@ const seed = {
     ["Log", "Session Log", "真实执行过程记录", "GMN, content, problem, solution, good/bad, next action", "为周复盘和 AI 分析提供数据"],
     ["Skill", "CEO Skill", "专项能力成长", "skillId, level, xp, requirements, unlock", "把执行任务转化成长期职业技能"],
     ["Review", "Weekly Review", "复盘并生成下周路线", "G/M/N占比、输出、问题、下一步", "形成计划-执行-复盘闭环"],
-    ["Inbox", "Todo Reminder", "待办收件箱和今日提醒", "title, dueDate, questId, gmn, priority, convertedTaskId", "先收集事情，自动/手动归类，晚点再转成 20min Task"],
+    ["Inbox", "Todo", "极简待办", "category, content, is_starred, is_urgent, status, completed_at", "快速记录、优先处理、保留完成历史"],
     ["Dynamic", "Random Event", "突发任务收编", "quest_type, gmn_type, source, reason, priority", "把临时事件判断为机会、风险、维护或噪音"],
     ["Dynamic", "Task Pivot", "任务转向轨迹", "pivot_status, original_task_id, actual_task_id, pivot_note", "保留探索过程，不覆盖历史"]
   ]

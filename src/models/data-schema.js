@@ -104,19 +104,18 @@
 /*
  * TODO
  * Stored in: localStorage (STORAGE_KEY) under data.todos
- * Created by: createTodo()
+ * Created by: addSimpleTodo()
  * Normalized by: normalizeTodos()
  * Fields:
- *   id              - string, unique todo ID (e.g. "TODO-1")
- *   title           - string, todo title
- *   note            - string, additional notes
- *   dueDate         - string, YYYY-MM-DD format
- *   priority        - string: "high" | "medium" | "low" | "urgent"
- *   status          - string: "open" | "done"
- *   questId         - string, linked Quest ID
- *   gmn             - string: "G" | "M" | "N"
- *   createdAt       - string, ISO datetime
- *   convertedTaskId - string, ID of Task converted from this todo (empty if not converted)
+ *   id              - string, unique todo ID
+ *   category        - string: "DFK" | "INSO" | "OTHER"
+ *   content         - string, short todo content
+ *   is_starred      - boolean, important marker
+ *   is_urgent       - boolean, time-pressure marker
+ *   status          - string: "pending" | "done" | "cancelled"
+ *   created_at      - string, ISO datetime
+ *   completed_at    - string, ISO datetime (empty until done)
+ *   updated_at      - string, ISO datetime
  */
 
 /*

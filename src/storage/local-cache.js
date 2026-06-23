@@ -14,6 +14,25 @@ function saveMapCollapseState(state) {
   localStorage.setItem(APP_CONFIG.MAP_COLLAPSE_STATE_KEY, JSON.stringify(state));
 }
 
+function readTodoUiState() {
+  const defaults = { category: "DFK", filter: "ALL", isStarred: false, isUrgent: false };
+  try {
+    const saved = JSON.parse(localStorage.getItem(APP_CONFIG.TODO_UI_STATE_KEY) || "{}");
+    return {
+      category: ["DFK", "INSO", "OTHER"].includes(saved.category) ? saved.category : defaults.category,
+      filter: ["ALL", "DFK", "INSO", "OTHER"].includes(saved.filter) ? saved.filter : defaults.filter,
+      isStarred: Boolean(saved.isStarred),
+      isUrgent: Boolean(saved.isUrgent)
+    };
+  } catch (error) {
+    return defaults;
+  }
+}
+
+function saveTodoUiState(state) {
+  localStorage.setItem(APP_CONFIG.TODO_UI_STATE_KEY, JSON.stringify(state));
+}
+
 function loadData() {
   const current = JSON.parse(localStorage.getItem(APP_CONFIG.STORAGE_KEY) || "null");
   if (current) return normalizeData(current);
@@ -79,21 +98,31 @@ function normalizeGoals(goals) {
 
 function normalizeTodos(todos) {
   return todos.map((todo, index) => {
-    const suggestion = classifyTodo(`${todo.title || ""} ${todo.note || ""}`);
-    const questId = mergedMindsetQuestId(todo.questId || suggestion.questId);
+    const createdAt = todo.created_at || todo.createdAt || new Date().toISOString();
+    const legacyStatus = String(todo.status || "pending").toLowerCase();
+    const status = legacyStatus === "done" ? "done" : (legacyStatus === "cancelled" || legacyStatus === "deleted" ? "cancelled" : "pending");
     return {
       id: todo.id || `TODO-${index + 1}`,
-      title: todo.title || "",
-      note: todo.note || "",
-      dueDate: todo.dueDate || todayISO(),
-      priority: todo.priority || "medium",
-      status: todo.status || "open",
-      questId,
-      gmn: todo.gmn || suggestion.gmn,
-      createdAt: todo.createdAt || new Date().toISOString(),
-      convertedTaskId: todo.convertedTaskId || ""
+      category: normalizeTodoCategory(todo),
+      content: todo.content || todo.title || "",
+      is_starred: Boolean(todo.is_starred ?? todo.isStarred ?? ["high", "urgent"].includes(String(todo.priority || "").toLowerCase())),
+      is_urgent: Boolean(todo.is_urgent ?? todo.isUrgent ?? String(todo.priority || "").toLowerCase() === "urgent"),
+      status,
+      created_at: createdAt,
+      completed_at: status === "done" ? (todo.completed_at || todo.completedAt || todo.updated_at || todo.updatedAt || createdAt) : "",
+      updated_at: todo.updated_at || todo.updatedAt || createdAt
     };
   });
+}
+
+function normalizeTodoCategory(todo) {
+  if (["DFK", "INSO", "OTHER"].includes(todo.category)) return todo.category;
+  if (["Q-003", "Q-011", "Q-012", "Q-013"].includes(todo.questId)) return "INSO";
+  if (["Q-001", "Q-009", "Q-010", "Q-016", "Q-018", "Q-019"].includes(todo.questId)) return "DFK";
+  const text = `${todo.content || ""} ${todo.title || ""}`.toUpperCase();
+  if (text.includes("INSO") || text.includes("RFQ") || text.includes("报价") || text.includes("客户")) return "INSO";
+  if (text.includes("DFK") || text.includes("财务") || text.includes("打印") || text.includes("货柜")) return "DFK";
+  return "OTHER";
 }
 
 function normalizeQuests(quests) {

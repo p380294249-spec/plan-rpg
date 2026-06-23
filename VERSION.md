@@ -1,5 +1,20 @@
 # Plan RPG Version Notes
 
+## v0.3.50 - 2026-06-23
+
+### Goal
+
+Replace the old project-style Todo inbox with a quick daily DFK / INSO / OTHER checklist.
+
+### Main Changes
+
+- Added one-click DFK, INSO, and OTHER categories, plus independent important and urgent toggles.
+- Rebuilt the pending list into four priority groups: urgent + important, urgent, important, and normal.
+- Completing a todo now records `completed_at` and keeps the item in the expandable completion history.
+- Migrated legacy Todo records into the new fields without deleting them.
+- Removed old Todo-to-20-minute-task conversion, Goal, Quest, GMN, date, and note controls.
+- Added a dedicated `src/services/todo-service.js` business module and mobile layouts for the new Todo screen.
+
 ## v0.3.49 - 2026-06-23
 
 ### Goal
