@@ -1,5 +1,12 @@
 # Plan RPG Version Notes
 
+## v0.3.52 - 2026-06-23
+
+### Fix
+
+- Only the completion checkbox can now mark a Todo as done; clicking its text or empty card space no longer completes it.
+- After adding a Todo, important and urgent reset to unselected while the selected category remains ready for the next entry.
+
 ## v0.3.51 - 2026-06-23
 
 ### Fix

@@ -67,6 +67,9 @@ function addSimpleTodo() {
     updated_at: now
   });
   $("todoContent").value = "";
+  todoUiState.isStarred = false;
+  todoUiState.isUrgent = false;
+  saveTodoUiState(todoUiState);
   save();
   renderTodos();
   $("todoContent").focus();

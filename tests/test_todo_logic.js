@@ -66,4 +66,24 @@ assert.equal(payload.groups[0].todos[0].id, "old-urgent");
 assert.equal(payload.groups[2].todos[0].id, "old-important");
 assert.equal(payload.completed[0].id, "old-done");
 
+const addResult = vm.runInContext(`
+  const todoInput = { value: "发送 INSO 报价", focus: () => {} };
+  globalThis.document = { getElementById: id => id === "todoContent" ? todoInput : null };
+  function renderTodos() {}
+  todoUiState = { category: "INSO", filter: "ALL", isStarred: true, isUrgent: true };
+  addSimpleTodo();
+  JSON.stringify({ todo: data.todos[0], state: todoUiState });
+`, context);
+const added = JSON.parse(addResult);
+assert.equal(added.todo.category, "INSO");
+assert.equal(added.todo.is_starred, true);
+assert.equal(added.todo.is_urgent, true);
+assert.equal(added.state.category, "INSO");
+assert.equal(added.state.isStarred, false);
+assert.equal(added.state.isUrgent, false);
+
+const todoRenderer = fs.readFileSync(path.join(root, "src/ui/render-todos.js"), "utf8");
+assert.ok(todoRenderer.includes('<div class="todo-item">'));
+assert.ok(!todoRenderer.includes('<label class="todo-item">'));
+
 console.log("Plan RPG todo migration and priority tests passed.");

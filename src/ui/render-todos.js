@@ -55,13 +55,13 @@ function renderTodoGroups() {
 
 function todoItemHtml(todo) {
   return `
-    <label class="todo-item">
+    <div class="todo-item">
       <input class="todo-check" type="checkbox" data-todo-complete="${escapeHtml(todo.id)}" aria-label="完成：${escapeHtml(todo.content)}" />
       <span class="todo-content">${escapeHtml(todo.content)}</span>
       <span class="todo-category category-${todo.category.toLowerCase()}">${todoCategoryLabel(todo.category)}</span>
       ${todo.is_starred ? `<span class="todo-star" title="重要">★</span>` : ""}
       ${todo.is_urgent ? `<span class="todo-urgent">紧急</span>` : ""}
-    </label>
+    </div>
   `;
 }
 
