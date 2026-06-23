@@ -1,5 +1,11 @@
 # Plan RPG Version Notes
 
+## v0.3.51 - 2026-06-23
+
+### Fix
+
+- Added a version marker to every static CSS and JavaScript file reference so GitHub Pages visitors do not receive a new page with stale cached scripts.
+
 ## v0.3.50 - 2026-06-23
 
 ### Goal
