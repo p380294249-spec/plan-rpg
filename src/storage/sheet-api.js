@@ -12,13 +12,12 @@ function readStoredSheetSyncConfig() {
 function sheetSyncConfig() {
   const saved = readStoredSheetSyncConfig();
   const isMissing = !saved || !saved.url || !saved.token;
-  const legacyTokens = APP_CONFIG.LEGACY_SYNC_TOKENS || [];
-  const isLegacyDefault = saved?.url === APP_CONFIG.DEFAULT_GAS_URL && legacyTokens.includes(saved?.token);
+  const isLegacyUrl = (APP_CONFIG.LEGACY_GAS_URLS || []).includes(saved?.url);
   const config = {
-    url: saved?.url || APP_CONFIG.DEFAULT_GAS_URL,
-    token: isMissing || isLegacyDefault ? APP_CONFIG.DEFAULT_SYNC_TOKEN : saved.token
+    url: isLegacyUrl ? APP_CONFIG.DEFAULT_GAS_URL : (saved?.url || APP_CONFIG.DEFAULT_GAS_URL),
+    token: isMissing || isLegacyUrl ? APP_CONFIG.DEFAULT_SYNC_TOKEN : saved.token
   };
-  if (isMissing || isLegacyDefault) {
+  if (isMissing || isLegacyUrl) {
     localStorage.setItem(APP_CONFIG.SHEET_SYNC_CONFIG_KEY, JSON.stringify(config));
   }
   return config;
@@ -157,6 +156,67 @@ function mergeRemoteMetricLogs(rows = []) {
   applyMetricLogsToDashboard();
   save();
   return remoteLogs.filter(log => !beforeIds.has(log.id)).length;
+}
+
+function todoToSheetRow(todo) {
+  return {
+    todo_id: todo.id,
+    category: todo.category,
+    content: todo.content,
+    is_starred: Boolean(todo.is_starred),
+    is_urgent: Boolean(todo.is_urgent),
+    status: todo.status,
+    created_at: todo.created_at,
+    completed_at: todo.completed_at || "",
+    updated_at: todo.updated_at || new Date().toISOString()
+  };
+}
+
+function sheetRowToTodo(row, index = 0) {
+  return normalizeTodos([{
+    id: row.todo_id || `TODO-REMOTE-${index + 1}`,
+    category: row.category,
+    content: row.content,
+    is_starred: row.is_starred,
+    is_urgent: row.is_urgent,
+    status: row.status,
+    created_at: row.created_at,
+    completed_at: row.completed_at,
+    updated_at: row.updated_at
+  }])[0];
+}
+
+function todoIsNewer(left, right) {
+  return String(left?.updated_at || "") > String(right?.updated_at || "");
+}
+
+function mergeRemoteTodos(rows = []) {
+  const remoteById = new Map();
+  rows
+    .filter(row => row && row.todo_id)
+    .map((row, index) => sheetRowToTodo(row, index))
+    .forEach(todo => {
+      const current = remoteById.get(todo.id);
+      if (!current || todoIsNewer(todo, current)) remoteById.set(todo.id, todo);
+    });
+
+  const localById = new Map(data.todos.map(todo => [todo.id, todo]));
+  const merged = new Map(localById);
+  const uploads = [];
+  remoteById.forEach(remoteTodo => {
+    const localTodo = localById.get(remoteTodo.id);
+    if (!localTodo || todoIsNewer(remoteTodo, localTodo) || remoteTodo.updated_at === localTodo.updated_at) {
+      merged.set(remoteTodo.id, remoteTodo);
+    } else {
+      uploads.push(localTodo);
+    }
+  });
+  localById.forEach((localTodo, id) => {
+    if (!remoteById.has(id)) uploads.push(localTodo);
+  });
+  data.todos = Array.from(merged.values()).sort((left, right) => String(right.updated_at || "").localeCompare(String(left.updated_at || "")));
+  save();
+  return { remoteCount: remoteById.size, uploads };
 }
 
 function jsonp(url, params = {}) {
@@ -308,6 +368,25 @@ async function pullMetricLogsFromSheet({ silent = false } = {}) {
   }
 }
 
+async function pullTodosFromSheet({ silent = false } = {}) {
+  const config = sheetSyncConfig();
+  if (!config.url) return;
+  try {
+    const { token } = await resolveWorkingSheetToken(config);
+    const payload = await jsonp(config.url, { action: "get_todos", token });
+    if (!payload || !payload.ok) throw new Error(payload?.error || "unknown_error");
+    const { remoteCount, uploads } = mergeRemoteTodos(payload.rows || []);
+    renderAll();
+    for (const todo of uploads) await syncTodoToSheet(todo, { token, silent: true });
+    if (!silent) {
+      const uploadNote = uploads.length ? `，已补传 ${uploads.length} 条本机待办` : "";
+      renderSheetSyncConfig(`Todo 已同步，共 ${remoteCount} 条云端待办${uploadNote}。`);
+    }
+  } catch (error) {
+    if (!silent) renderSheetSyncConfig("Todo 同步失败，请确认 Apps Script 已更新并重新部署。");
+  }
+}
+
 async function syncMetricLogToSheet(log) {
   const config = sheetSyncConfig();
   if (!config.url) return;
@@ -337,6 +416,38 @@ async function syncMetricLogToSheet(log) {
     pending.push(payload);
     localStorage.setItem(APP_CONFIG.PENDING_SYNC_KEY, JSON.stringify(pending));
     renderSheetSyncConfig("Metric Log 同步失败，已暂存到本机待重试队列。");
+  }
+}
+
+async function syncTodoToSheet(todo, { token = "", silent = false } = {}) {
+  const config = sheetSyncConfig();
+  if (!config.url) return;
+  let workingToken = token;
+  try {
+    if (!workingToken) workingToken = (await resolveWorkingSheetToken(config)).token;
+  } catch (error) {
+    if (!silent) renderSheetSyncConfig("Todo 同步失败：Apps Script URL 或 Token 不可用。");
+    return;
+  }
+  const payload = {
+    token: workingToken,
+    action: "upsert_todo",
+    module: "Todos",
+    row: todoToSheetRow(todo)
+  };
+  try {
+    await fetch(config.url, {
+      method: "POST",
+      mode: "no-cors",
+      headers: { "Content-Type": "text/plain;charset=utf-8" },
+      body: JSON.stringify(payload)
+    });
+    if (!silent) renderSheetSyncConfig("Todo 已同步到 Google Sheet。");
+  } catch (error) {
+    const pending = JSON.parse(localStorage.getItem(APP_CONFIG.PENDING_SYNC_KEY) || "[]");
+    pending.push(payload);
+    localStorage.setItem(APP_CONFIG.PENDING_SYNC_KEY, JSON.stringify(pending));
+    if (!silent) renderSheetSyncConfig("Todo 同步失败，已暂存到本机待重试队列。");
   }
 }
 

@@ -38,7 +38,10 @@ function bootstrapPlanRpg() {
   $("startPauseBtn").addEventListener("click", toggleTimer);
   $("resetBtn").addEventListener("click", resetTimer);
   $("cancelFocusInlineBtn").addEventListener("click", cancelActiveSessionWithConfirm);
-  document.addEventListener("visibilitychange", syncTimerWithClock);
+  document.addEventListener("visibilitychange", () => {
+    syncTimerWithClock();
+    if (!document.hidden) pullTodosFromSheet({ silent: true });
+  });
   $("randomEventBtn").addEventListener("click", openRandomEventModal);
   $("pivotTaskBtn").addEventListener("click", openPivotModal);
   $("saveDraftBtn").addEventListener("click", saveDraft);
@@ -68,6 +71,7 @@ function bootstrapPlanRpg() {
   renderAll();
   pullSessionLogsFromSheet({ silent: true });
   pullMetricLogsFromSheet({ silent: true });
+  pullTodosFromSheet({ silent: true });
 }
 
 bootstrapPlanRpg();

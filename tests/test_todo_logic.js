@@ -70,6 +70,7 @@ const addResult = vm.runInContext(`
   const todoInput = { value: "发送 INSO 报价", focus: () => {} };
   globalThis.document = { getElementById: id => id === "todoContent" ? todoInput : null };
   function renderTodos() {}
+  syncTodoToSheet = () => Promise.resolve();
   todoUiState = { category: "INSO", filter: "ALL", isStarred: true, isUrgent: true };
   addSimpleTodo();
   JSON.stringify({ todo: data.todos[0], state: todoUiState });

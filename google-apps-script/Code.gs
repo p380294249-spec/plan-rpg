@@ -13,6 +13,10 @@ function doGet(e) {
     return jsonp_(params.callback, { ok: true, action: params.action, rows: readRows_('Metric_Logs') });
   }
 
+  if (params.action === 'get_todos') {
+    return jsonp_(params.callback, { ok: true, action: params.action, rows: readRows_('Todos') });
+  }
+
   return jsonp_(params.callback, { ok: false, error: 'unknown_action' });
 }
 
@@ -28,6 +32,11 @@ function doPost(e) {
 
   if (payload.action === 'append_metric_log') {
     appendMetricLog_(payload.row || {});
+    return json_({ ok: true, action: payload.action });
+  }
+
+  if (payload.action === 'upsert_todo') {
+    upsertTodo_(payload.row || {});
     return json_({ ok: true, action: payload.action });
   }
 
@@ -59,6 +68,55 @@ function appendMetricLog_(row) {
   const sheet = ensureSheet_('Metric_Logs', headers);
   const values = headers.map(header => row[header] == null ? '' : row[header]);
   sheet.appendRow(values);
+}
+
+function upsertTodo_(row) {
+  const headers = ['todo_id', 'category', 'content', 'is_starred', 'is_urgent', 'status', 'created_at', 'completed_at', 'updated_at'];
+  const sheet = ensureTodoSheet_(headers);
+  const todoId = String(row.todo_id || '');
+  if (!todoId) throw new Error('todo_id is required');
+  const values = headers.map(header => row[header] == null ? '' : row[header]);
+  const lastRow = sheet.getLastRow();
+  if (lastRow < 2) {
+    sheet.appendRow(values);
+    return;
+  }
+  const ids = sheet.getRange(2, 1, lastRow - 1, 1).getValues().flat().map(String);
+  const rowIndex = ids.indexOf(todoId);
+  if (rowIndex === -1) {
+    sheet.appendRow(values);
+    return;
+  }
+  sheet.getRange(rowIndex + 2, 1, 1, headers.length).setValues([values]);
+}
+
+function ensureTodoSheet_(headers) {
+  const spreadsheet = SpreadsheetApp.openById(SPREADSHEET_ID);
+  let sheet = spreadsheet.getSheetByName('Todos');
+  if (!sheet) {
+    sheet = spreadsheet.insertSheet('Todos');
+    sheet.appendRow(headers);
+    return sheet;
+  }
+
+  if (sheet.getLastRow() === 0) {
+    sheet.appendRow(headers);
+    return sheet;
+  }
+
+  const existingHeaders = sheet.getRange(1, 1, 1, Math.max(sheet.getLastColumn(), headers.length)).getValues()[0];
+  const isCurrentSchema = headers.every((header, index) => existingHeaders[index] === header);
+  if (isCurrentSchema) return sheet;
+
+  // The original Todos tab only had empty legacy headers. Migrate it once,
+  // but never overwrite a sheet that already contains legacy user rows.
+  if (sheet.getLastRow() < 2) {
+    sheet.clear();
+    sheet.getRange(1, 1, 1, headers.length).setValues([headers]);
+    return sheet;
+  }
+
+  throw new Error('Todos sheet contains legacy rows and needs a manual migration before sync.');
 }
 
 function ensureSheet_(sheetName, headers) {

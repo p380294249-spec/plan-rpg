@@ -1,5 +1,13 @@
 # Plan RPG Version Notes
 
+## v0.3.55 - 2026-06-24
+
+### Sync
+
+- Todos now write to and read from the shared Google Sheet `Todos` tab.
+- New and completed todos update the same row by ID; opening the page and returning to it refreshes cloud data.
+- Browsers using the retired Apps Script address automatically move to the new shared sync service.
+
 ## v0.3.54 - 2026-06-24
 
 ### Weekly Focus

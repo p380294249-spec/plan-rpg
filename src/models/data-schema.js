@@ -124,7 +124,7 @@
 
 /*
  * TODO
- * Stored in: localStorage (STORAGE_KEY) under data.todos
+ * Stored in: localStorage (STORAGE_KEY) under data.todos + Google Sheets (Todos tab)
  * Created by: addSimpleTodo()
  * Normalized by: normalizeTodos()
  * Fields:
@@ -137,6 +137,9 @@
  *   created_at      - string, ISO datetime
  *   completed_at    - string, ISO datetime (empty until done)
  *   updated_at      - string, ISO datetime
+ *
+ * Sync: syncTodoToSheet() upserts by id. On startup and when the page regains focus,
+ * pullTodosFromSheet() merges records using updated_at, so newer changes win.
  */
 
 /*

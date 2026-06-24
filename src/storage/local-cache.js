@@ -113,14 +113,19 @@ function normalizeTodos(todos) {
       id: todo.id || `TODO-${index + 1}`,
       category: normalizeTodoCategory(todo),
       content: todo.content || todo.title || "",
-      is_starred: Boolean(todo.is_starred ?? todo.isStarred ?? ["high", "urgent"].includes(String(todo.priority || "").toLowerCase())),
-      is_urgent: Boolean(todo.is_urgent ?? todo.isUrgent ?? String(todo.priority || "").toLowerCase() === "urgent"),
+      is_starred: normalizeTodoBoolean(todo.is_starred ?? todo.isStarred ?? ["high", "urgent"].includes(String(todo.priority || "").toLowerCase())),
+      is_urgent: normalizeTodoBoolean(todo.is_urgent ?? todo.isUrgent ?? String(todo.priority || "").toLowerCase() === "urgent"),
       status,
       created_at: createdAt,
       completed_at: status === "done" ? (todo.completed_at || todo.completedAt || todo.updated_at || todo.updatedAt || createdAt) : "",
       updated_at: todo.updated_at || todo.updatedAt || createdAt
     };
   });
+}
+
+function normalizeTodoBoolean(value) {
+  if (typeof value === "string") return value.trim().toLowerCase() === "true";
+  return Boolean(value);
 }
 
 function normalizeTodoCategory(todo) {

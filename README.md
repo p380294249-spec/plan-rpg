@@ -2,7 +2,7 @@
 
 Plan RPG is a lightweight web MVP for turning yearly plans, weekly quests, 20-minute focus sessions, execution logs, rewards, skills, and reviews into a game-like personal planning system.
 
-Current version: `v0.3.54`
+Current version: `v0.3.55`
 
 Live app:
 
@@ -14,7 +14,7 @@ This project is a GitHub Pages + Google Apps Script + Google Sheets web app.
 
 - `index.html` is the frontend and is published by GitHub Pages.
 - `google-apps-script/Code.gs` is the lightweight API layer.
-- Google Sheets stores shared focus-session data.
+- Google Sheets stores shared focus sessions, metric logs, and Todos.
 - Browser `localStorage` is used only as local cache/fallback for the current browser.
 - There is no Node server, backend VM, or database server required to run the current MVP.
 
@@ -36,7 +36,7 @@ GitHub Pages frontend
   -> Google Sheets
 ```
 
-`localStorage` keeps the page usable when sync is unavailable, but Google Sheets is the intended shared storage layer for completed focus logs.
+`localStorage` keeps the page usable when sync is unavailable, but Google Sheets is the intended shared storage layer for focus logs, metric logs, and Todos.
 
 ## Repository Structure
 
@@ -100,7 +100,11 @@ google-apps-script/Code.gs
 It currently supports:
 
 - `GET action=get_session_logs`: read `Session_Logs`.
+- `GET action=get_metric_logs`: read `Metric_Logs`.
+- `GET action=get_todos`: read `Todos`.
 - `POST action=append_session_log`: append a completed session log.
+- `POST action=append_metric_log`: append a monthly business metric log.
+- `POST action=upsert_todo`: create or update a Todo by its ID.
 - `POST action=ping`: test sync settings by writing to `Settings`.
 
 The script uses:
@@ -117,7 +121,7 @@ The token is lightweight protection for the MVP. Do not treat it as strong secur
 When `google-apps-script/Code.gs` changes:
 
 1. Open the Google Apps Script project.
-2. Replace the script content with `google-apps-script/Code.gs`.
+2. Replace the script content with `google-apps-script/Code.gs`, or use `clasp push` from this repository.
 3. Save.
 4. Deploy a new Web App version.
 5. Keep access settings compatible with the GitHub Pages frontend.

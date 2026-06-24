@@ -55,7 +55,7 @@ function addSimpleTodo() {
     return;
   }
   const now = new Date().toISOString();
-  data.todos.unshift({
+  const todo = {
     id: newId("TODO"),
     category: todoUiState.category,
     content,
@@ -65,13 +65,15 @@ function addSimpleTodo() {
     created_at: now,
     completed_at: "",
     updated_at: now
-  });
+  };
+  data.todos.unshift(todo);
   $("todoContent").value = "";
   todoUiState.isStarred = false;
   todoUiState.isUrgent = false;
   saveTodoUiState(todoUiState);
   save();
   renderTodos();
+  syncTodoToSheet(todo);
   $("todoContent").focus();
 }
 
@@ -84,6 +86,7 @@ function completeSimpleTodo(todoId) {
   todo.updated_at = now;
   save();
   renderTodos();
+  syncTodoToSheet(todo);
 }
 
 function todoShortDate(value) {
