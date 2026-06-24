@@ -1,5 +1,11 @@
 # Plan RPG Version Notes
 
+## v0.3.54 - 2026-06-24
+
+### Weekly Focus
+
+- Set this week's two focus entries to `DFK 制定公司规则` and `快速处理报价系统`.
+
 ## v0.3.53 - 2026-06-23
 
 ### Goal
