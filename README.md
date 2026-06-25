@@ -2,7 +2,7 @@
 
 Plan RPG is a lightweight web MVP for turning yearly plans, weekly quests, 20-minute focus sessions, execution logs, rewards, skills, and reviews into a game-like personal planning system.
 
-Current version: `v0.3.56`
+Current version: `v0.3.57`
 
 Live app:
 
@@ -118,6 +118,8 @@ const SYNC_TOKEN = 'plan-rpg-2026';
 The token is lightweight protection for the MVP. Do not treat it as strong security for sensitive data.
 
 Todo writes are saved locally first, then synced to Google Sheets. If a phone loses connection or closes the page too quickly, the app keeps the item in the browser and automatically retries when the page opens again, returns to the foreground, or the device comes back online.
+
+If a browser has an old or broken sync URL saved in `localStorage`, the app falls back to the default shared Apps Script URL, verifies it, and saves the working setting back to that browser.
 
 ## Update Apps Script
 

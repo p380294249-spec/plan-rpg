@@ -28,6 +28,7 @@ function renderTodoInputControls() {
     button.setAttribute("aria-pressed", String(active));
     button.onclick = () => setTodoFilter(button.dataset.todoFilter);
   });
+  if ($("syncTodosBtn")) $("syncTodosBtn").onclick = () => refreshTodosFromCloud({ silent: false });
 }
 
 function bindTodoToggle(id, active, onClick, hasStarIcon = false) {

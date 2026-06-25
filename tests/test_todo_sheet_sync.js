@@ -74,6 +74,16 @@ const migratedConfig = JSON.parse(vm.runInContext(`
 assert.equal(migratedConfig.url, "https://script.google.com/macros/s/AKfycbxdC5YaxjbtCFdgW5Viu19_LDZNm7wCBr7VxSqSOUWBloxROgLONp0GJ7omjinr9yarrw/exec");
 assert.equal(migratedConfig.token, "plan-rpg-2026");
 
+const fallbackCandidates = JSON.parse(vm.runInContext(`
+  JSON.stringify(sheetSyncConfigCandidates({
+    url: "https://script.google.com/macros/s/BROKEN/exec",
+    token: "OLD_TOKEN"
+  }));
+`, context));
+assert.equal(fallbackCandidates.length, 2);
+assert.equal(fallbackCandidates[1].url, "https://script.google.com/macros/s/AKfycbxdC5YaxjbtCFdgW5Viu19_LDZNm7wCBr7VxSqSOUWBloxROgLONp0GJ7omjinr9yarrw/exec");
+assert.equal(fallbackCandidates[1].token, "plan-rpg-2026");
+
 const appsScript = fs.readFileSync(path.join(root, "google-apps-script/Code.gs"), "utf8");
 assert.ok(appsScript.includes("get_todos"));
 assert.ok(appsScript.includes("upsert_todo"));

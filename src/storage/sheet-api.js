@@ -23,21 +23,55 @@ function sheetSyncConfig() {
   return config;
 }
 
+function defaultSheetSyncConfig() {
+  return {
+    url: APP_CONFIG.DEFAULT_GAS_URL,
+    token: APP_CONFIG.DEFAULT_SYNC_TOKEN
+  };
+}
+
+function persistSheetSyncConfig(config) {
+  localStorage.setItem(APP_CONFIG.SHEET_SYNC_CONFIG_KEY, JSON.stringify({
+    url: config.url || APP_CONFIG.DEFAULT_GAS_URL,
+    token: config.token || APP_CONFIG.DEFAULT_SYNC_TOKEN
+  }));
+}
+
 function syncTokenCandidates(config = sheetSyncConfig()) {
   const tokens = [config.token || APP_CONFIG.DEFAULT_SYNC_TOKEN];
   if (config.url === APP_CONFIG.DEFAULT_GAS_URL) tokens.push(...(APP_CONFIG.LEGACY_SYNC_TOKENS || []));
   return [...new Set(tokens.filter(Boolean))];
 }
 
+function sheetSyncConfigCandidates(config = sheetSyncConfig()) {
+  const defaults = defaultSheetSyncConfig();
+  const candidates = [config || defaults];
+  const isDefault = config?.url === defaults.url && config?.token === defaults.token;
+  if (!isDefault) candidates.push(defaults);
+  const seen = new Set();
+  return candidates.filter(candidate => {
+    const key = `${candidate.url}::${candidate.token}`;
+    if (!candidate.url || seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  });
+}
+
 async function resolveWorkingSheetToken(config = sheetSyncConfig()) {
   let lastError = null;
-  for (const token of syncTokenCandidates(config)) {
-    try {
-      const payload = await jsonp(config.url, { action: "get_session_logs", token });
-      if (payload?.ok) return { token, payload };
-      lastError = new Error(payload?.error || "unknown_error");
-    } catch (error) {
-      lastError = error;
+  for (const candidate of sheetSyncConfigCandidates(config)) {
+    for (const token of syncTokenCandidates(candidate)) {
+      try {
+        const payload = await jsonp(candidate.url, { action: "get_session_logs", token });
+        if (payload?.ok) {
+          const resolvedConfig = { url: candidate.url, token };
+          if (candidate.url !== config?.url || token !== config?.token) persistSheetSyncConfig(resolvedConfig);
+          return { token, payload, config: resolvedConfig };
+        }
+        lastError = new Error(payload?.error || "unknown_error");
+      } catch (error) {
+        lastError = error;
+      }
     }
   }
   throw lastError || new Error("sheet_sync_unavailable");
@@ -48,7 +82,7 @@ function saveSheetSyncConfig() {
     url: $("sheetSyncUrl").value.trim(),
     token: $("sheetSyncToken").value.trim()
   };
-  localStorage.setItem(APP_CONFIG.SHEET_SYNC_CONFIG_KEY, JSON.stringify(config));
+  persistSheetSyncConfig(config);
   renderSheetSyncConfig();
 }
 
@@ -274,8 +308,11 @@ async function flushPendingSyncQueue({ silent = false } = {}) {
   const config = sheetSyncConfig();
   if (!config.url) return 0;
   let token = config.token || "";
+  let workingConfig = config;
   try {
-    token = (await resolveWorkingSheetToken(config)).token;
+    const resolved = await resolveWorkingSheetToken(config);
+    token = resolved.token;
+    workingConfig = resolved.config;
   } catch (error) {
     if (!silent) renderSheetSyncConfig("还有本机待同步数据，等同步设置可用后会自动补传。");
     return 0;
@@ -286,8 +323,8 @@ async function flushPendingSyncQueue({ silent = false } = {}) {
   for (const payload of pending) {
     const nextPayload = { ...payload, token: payload.token || token };
     try {
-      if (nextPayload.action === "upsert_todo") await sendTodoPayload(config, nextPayload);
-      else await postSheetPayload(config, nextPayload);
+      if (nextPayload.action === "upsert_todo") await sendTodoPayload(workingConfig, nextPayload);
+      else await postSheetPayload(workingConfig, nextPayload);
       sentCount += 1;
     } catch (error) {
       remaining.push(payload);
@@ -353,10 +390,12 @@ async function uploadLocalSessionLogsToSheet() {
   }
   renderSheetSyncConfig("正在检查本机有哪些记录还没进 Google Sheet...");
   let token = config.token || "";
+  let workingConfig = config;
   let cloudRows = [];
   try {
     const resolved = await resolveWorkingSheetToken(config);
     token = resolved.token;
+    workingConfig = resolved.config;
     cloudRows = resolved.payload.rows || [];
   } catch (error) {
     renderSheetSyncConfig("上传失败：Apps Script URL 或 Token 不可用。");
@@ -379,7 +418,7 @@ async function uploadLocalSessionLogsToSheet() {
       row: logToSheetRow(log)
     };
     try {
-      await postSheetPayload(config, payload);
+      await postSheetPayload(workingConfig, payload);
       uploadedIds.add(log.id);
     } catch (error) {
       queuePendingSyncPayload(payload);
@@ -397,8 +436,11 @@ async function syncSessionLogToSheet(log) {
     return;
   }
   let token = config.token || "";
+  let workingConfig = config;
   try {
-    token = (await resolveWorkingSheetToken(config)).token;
+    const resolved = await resolveWorkingSheetToken(config);
+    token = resolved.token;
+    workingConfig = resolved.config;
   } catch (error) {
     renderSheetSyncConfig("同步失败：Apps Script URL 或 Token 不可用。");
     return;
@@ -410,7 +452,7 @@ async function syncSessionLogToSheet(log) {
     row: logToSheetRow(log)
   };
   try {
-    await postSheetPayload(config, payload);
+    await postSheetPayload(workingConfig, payload);
     renderSheetSyncConfig("已发送到 Google Sheet。刷新表格后查看 Session_Logs。");
   } catch (error) {
     queuePendingSyncPayload(payload);
@@ -422,8 +464,8 @@ async function pullMetricLogsFromSheet({ silent = false } = {}) {
   const config = sheetSyncConfig();
   if (!config.url) return;
   try {
-    const { token } = await resolveWorkingSheetToken(config);
-    const payload = await jsonp(config.url, { action: "get_metric_logs", token });
+    const resolved = await resolveWorkingSheetToken(config);
+    const payload = await jsonp(resolved.config.url, { action: "get_metric_logs", token: resolved.token });
     if (!payload || !payload.ok) throw new Error(payload?.error || "unknown_error");
     const added = mergeRemoteMetricLogs(payload.rows || []);
     renderAll();
@@ -437,12 +479,12 @@ async function pullTodosFromSheet({ silent = false } = {}) {
   const config = sheetSyncConfig();
   if (!config.url) return;
   try {
-    const { token } = await resolveWorkingSheetToken(config);
-    const payload = await jsonp(config.url, { action: "get_todos", token });
+    const resolved = await resolveWorkingSheetToken(config);
+    const payload = await jsonp(resolved.config.url, { action: "get_todos", token: resolved.token });
     if (!payload || !payload.ok) throw new Error(payload?.error || "unknown_error");
     const { remoteCount, uploads } = mergeRemoteTodos(payload.rows || []);
     renderAll();
-    for (const todo of uploads) await syncTodoToSheet(todo, { token, silent: true });
+    for (const todo of uploads) await syncTodoToSheet(todo, { token: resolved.token, config: resolved.config, silent: true });
     if (!silent) {
       const uploadNote = uploads.length ? `，已补传 ${uploads.length} 条本机待办` : "";
       renderSheetSyncConfig(`Todo 已同步，共 ${remoteCount} 条云端待办${uploadNote}。`);
@@ -456,8 +498,11 @@ async function syncMetricLogToSheet(log) {
   const config = sheetSyncConfig();
   if (!config.url) return;
   let token = config.token || "";
+  let workingConfig = config;
   try {
-    token = (await resolveWorkingSheetToken(config)).token;
+    const resolved = await resolveWorkingSheetToken(config);
+    token = resolved.token;
+    workingConfig = resolved.config;
   } catch (error) {
     renderSheetSyncConfig("Metric Log 同步失败：Apps Script URL 或 Token 不可用。");
     return;
@@ -469,7 +514,7 @@ async function syncMetricLogToSheet(log) {
     row: metricLogToSheetRow(log)
   };
   try {
-    await postSheetPayload(config, payload);
+    await postSheetPayload(workingConfig, payload);
     renderSheetSyncConfig("Metric Log 已发送到 Google Sheet。");
   } catch (error) {
     queuePendingSyncPayload(payload);
@@ -477,12 +522,17 @@ async function syncMetricLogToSheet(log) {
   }
 }
 
-async function syncTodoToSheet(todo, { token = "", silent = false } = {}) {
-  const config = sheetSyncConfig();
+async function syncTodoToSheet(todo, { token = "", config: providedConfig = null, silent = false } = {}) {
+  const config = providedConfig || sheetSyncConfig();
   if (!config.url) return;
   let workingToken = token;
+  let workingConfig = config;
   try {
-    if (!workingToken) workingToken = (await resolveWorkingSheetToken(config)).token;
+    if (!workingToken || !providedConfig) {
+      const resolved = await resolveWorkingSheetToken(config);
+      workingToken = workingToken || resolved.token;
+      workingConfig = resolved.config;
+    }
   } catch (error) {
     if (!silent) renderSheetSyncConfig("Todo 同步失败：Apps Script URL 或 Token 不可用。");
     return;
@@ -494,7 +544,7 @@ async function syncTodoToSheet(todo, { token = "", silent = false } = {}) {
     row: todoToSheetRow(todo)
   };
   try {
-    const response = await sendTodoPayload(config, payload);
+    const response = await sendTodoPayload(workingConfig, payload);
     if (!silent) renderSheetSyncConfig(response.fallback ? "Todo 已发送到 Google Sheet，稍后会自动校验。" : "Todo 已同步到 Google Sheet。");
   } catch (error) {
     queuePendingSyncPayload(payload);
@@ -509,15 +559,18 @@ async function testSheetSync() {
     return;
   }
   let token = config.token || "";
+  let workingConfig = config;
   try {
-    token = (await resolveWorkingSheetToken(config)).token;
+    const resolved = await resolveWorkingSheetToken(config);
+    token = resolved.token;
+    workingConfig = resolved.config;
   } catch (error) {
     renderSheetSyncConfig("测试失败：Apps Script URL 或 Token 不可用。");
     return;
   }
   const payload = { token, action: "ping", module: "Settings", created_at: new Date().toISOString() };
   try {
-    await fetch(config.url, { method: "POST", mode: "no-cors", headers: { "Content-Type": "text/plain;charset=utf-8" }, body: JSON.stringify(payload) });
+    await postSheetPayload(workingConfig, payload);
     renderSheetSyncConfig("测试请求已发送。去 Google Sheet 的 Settings 查看 sync_ping。");
   } catch (error) {
     renderSheetSyncConfig("测试失败，请检查 URL。");

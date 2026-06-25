@@ -1,5 +1,13 @@
 # Plan RPG Version Notes
 
+## v0.3.57 - 2026-06-25
+
+### Sync
+
+- Browsers with an old or broken Google Sheet sync URL now automatically fall back to the default shared Apps Script URL.
+- The working sync URL/token is saved back into that browser after verification, so the device stops staying on local-only cached Todos.
+- Opening the Todo page now refreshes cloud Todos, and the Todo page has a small manual `同步` button.
+
 ## v0.3.56 - 2026-06-25
 
 ### Sync

@@ -10,9 +10,16 @@ function showScreen(id) {
   document.querySelectorAll(".nav button").forEach(b => b.classList.toggle("active", b.dataset.screen === id));
   if (id === "map") renderMap();
   if (id === "focus") renderFocus();
-  if (id === "todos") renderTodos();
+  if (id === "todos") {
+    renderTodos();
+    refreshTodosFromCloud({ silent: true });
+  }
   if (id === "review") renderReview();
   if (id === "skills") renderSkills();
+}
+
+function refreshTodosFromCloud({ silent = false } = {}) {
+  return flushPendingSyncQueue({ silent }).then(() => pullTodosFromSheet({ silent }));
 }
 
 function renderAll() {
@@ -41,11 +48,11 @@ function bootstrapPlanRpg() {
   document.addEventListener("visibilitychange", () => {
     syncTimerWithClock();
     if (!document.hidden) {
-      flushPendingSyncQueue({ silent: true }).then(() => pullTodosFromSheet({ silent: true }));
+      refreshTodosFromCloud({ silent: true });
     }
   });
   window.addEventListener("online", () => {
-    flushPendingSyncQueue({ silent: true }).then(() => pullTodosFromSheet({ silent: true }));
+    refreshTodosFromCloud({ silent: true });
   });
   $("randomEventBtn").addEventListener("click", openRandomEventModal);
   $("pivotTaskBtn").addEventListener("click", openPivotModal);
