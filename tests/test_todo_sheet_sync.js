@@ -94,4 +94,33 @@ const appsScriptManifest = JSON.parse(fs.readFileSync(path.join(root, "google-ap
 assert.equal(appsScriptManifest.webapp.executeAs, "USER_DEPLOYING");
 assert.equal(appsScriptManifest.webapp.access, "ANYONE_ANONYMOUS");
 
-console.log("Plan RPG todo cloud sync tests passed.");
+(async () => {
+  const actionSpecificResolution = JSON.parse(await vm.runInContext(`
+    (async () => {
+      const brokenUrl = "https://script.google.com/macros/s/BROKEN/exec";
+      const calls = [];
+      jsonp = async (url, params) => {
+        calls.push({ url, action: params.action, token: params.token });
+        if (url === brokenUrl && params.action === "get_session_logs") return { ok: true, rows: [] };
+        if (url === brokenUrl) return { ok: false, error: "unknown_action" };
+        if (url === APP_CONFIG.DEFAULT_GAS_URL && params.action === "get_todos" && params.token === APP_CONFIG.DEFAULT_SYNC_TOKEN) {
+          return { ok: true, rows: [] };
+        }
+        return { ok: false, error: "not_expected" };
+      };
+      const resolved = await resolveWorkingSheetToken({ url: brokenUrl, token: "OLD_TOKEN" }, "get_todos");
+      const stored = JSON.parse(localStorage.getItem(APP_CONFIG.SHEET_SYNC_CONFIG_KEY));
+      return JSON.stringify({ calls, resolved, stored });
+    })()
+  `, context));
+
+  assert.equal(actionSpecificResolution.resolved.config.url, "https://script.google.com/macros/s/AKfycbxdC5YaxjbtCFdgW5Viu19_LDZNm7wCBr7VxSqSOUWBloxROgLONp0GJ7omjinr9yarrw/exec");
+  assert.equal(actionSpecificResolution.resolved.token, "plan-rpg-2026");
+  assert.equal(actionSpecificResolution.stored.url, "https://script.google.com/macros/s/AKfycbxdC5YaxjbtCFdgW5Viu19_LDZNm7wCBr7VxSqSOUWBloxROgLONp0GJ7omjinr9yarrw/exec");
+  assert.equal(actionSpecificResolution.calls[0].action, "get_todos");
+
+  console.log("Plan RPG todo cloud sync tests passed.");
+})().catch(error => {
+  console.error(error);
+  process.exit(1);
+});

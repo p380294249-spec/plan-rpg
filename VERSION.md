@@ -1,5 +1,13 @@
 # Plan RPG Version Notes
 
+## v0.3.58 - 2026-06-25
+
+### Sync
+
+- Fixed the real Todo sync bug: the app previously validated sync by checking `get_session_logs`, so an old Apps Script URL could look healthy even though it did not support `get_todos`.
+- Todo pull/write now validates the Todo endpoint itself before using a saved URL, then falls back to the shared default Apps Script URL when needed.
+- Pending Todo uploads also resolve against `get_todos`, so local-only Todos can be recovered to the cloud instead of silently writing to an old script.
+
 ## v0.3.57 - 2026-06-25
 
 ### Sync

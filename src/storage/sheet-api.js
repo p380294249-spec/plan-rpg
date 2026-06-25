@@ -57,12 +57,12 @@ function sheetSyncConfigCandidates(config = sheetSyncConfig()) {
   });
 }
 
-async function resolveWorkingSheetToken(config = sheetSyncConfig()) {
+async function resolveWorkingSheetToken(config = sheetSyncConfig(), validationAction = "get_session_logs") {
   let lastError = null;
   for (const candidate of sheetSyncConfigCandidates(config)) {
     for (const token of syncTokenCandidates(candidate)) {
       try {
-        const payload = await jsonp(candidate.url, { action: "get_session_logs", token });
+        const payload = await jsonp(candidate.url, { action: validationAction, token });
         if (payload?.ok) {
           const resolvedConfig = { url: candidate.url, token };
           if (candidate.url !== config?.url || token !== config?.token) persistSheetSyncConfig(resolvedConfig);
@@ -307,22 +307,19 @@ async function flushPendingSyncQueue({ silent = false } = {}) {
   if (!pending.length) return 0;
   const config = sheetSyncConfig();
   if (!config.url) return 0;
-  let token = config.token || "";
-  let workingConfig = config;
-  try {
-    const resolved = await resolveWorkingSheetToken(config);
-    token = resolved.token;
-    workingConfig = resolved.config;
-  } catch (error) {
-    if (!silent) renderSheetSyncConfig("还有本机待同步数据，等同步设置可用后会自动补传。");
-    return 0;
-  }
-
+  const resolvedByAction = new Map();
   const remaining = [];
   let sentCount = 0;
   for (const payload of pending) {
-    const nextPayload = { ...payload, token: payload.token || token };
     try {
+      const validationAction = validationActionForPayload(payload);
+      let resolved = resolvedByAction.get(validationAction);
+      if (!resolved) {
+        resolved = await resolveWorkingSheetToken(config, validationAction);
+        resolvedByAction.set(validationAction, resolved);
+      }
+      const nextPayload = { ...payload, token: payload.token || resolved.token };
+      const workingConfig = resolved.config;
       if (nextPayload.action === "upsert_todo") await sendTodoPayload(workingConfig, nextPayload);
       else await postSheetPayload(workingConfig, nextPayload);
       sentCount += 1;
@@ -333,6 +330,12 @@ async function flushPendingSyncQueue({ silent = false } = {}) {
   savePendingSyncQueue(remaining);
   if (sentCount && !silent) renderSheetSyncConfig(`已自动补传 ${sentCount} 条本机待同步数据。`);
   return sentCount;
+}
+
+function validationActionForPayload(payload = {}) {
+  if (payload.action === "upsert_todo") return "get_todos";
+  if (payload.action === "append_metric_log") return "get_metric_logs";
+  return "get_session_logs";
 }
 
 function jsonp(url, params = {}) {
@@ -464,7 +467,7 @@ async function pullMetricLogsFromSheet({ silent = false } = {}) {
   const config = sheetSyncConfig();
   if (!config.url) return;
   try {
-    const resolved = await resolveWorkingSheetToken(config);
+    const resolved = await resolveWorkingSheetToken(config, "get_metric_logs");
     const payload = await jsonp(resolved.config.url, { action: "get_metric_logs", token: resolved.token });
     if (!payload || !payload.ok) throw new Error(payload?.error || "unknown_error");
     const added = mergeRemoteMetricLogs(payload.rows || []);
@@ -479,7 +482,7 @@ async function pullTodosFromSheet({ silent = false } = {}) {
   const config = sheetSyncConfig();
   if (!config.url) return;
   try {
-    const resolved = await resolveWorkingSheetToken(config);
+    const resolved = await resolveWorkingSheetToken(config, "get_todos");
     const payload = await jsonp(resolved.config.url, { action: "get_todos", token: resolved.token });
     if (!payload || !payload.ok) throw new Error(payload?.error || "unknown_error");
     const { remoteCount, uploads } = mergeRemoteTodos(payload.rows || []);
@@ -500,7 +503,7 @@ async function syncMetricLogToSheet(log) {
   let token = config.token || "";
   let workingConfig = config;
   try {
-    const resolved = await resolveWorkingSheetToken(config);
+    const resolved = await resolveWorkingSheetToken(config, "get_metric_logs");
     token = resolved.token;
     workingConfig = resolved.config;
   } catch (error) {
@@ -529,7 +532,7 @@ async function syncTodoToSheet(todo, { token = "", config: providedConfig = null
   let workingConfig = config;
   try {
     if (!workingToken || !providedConfig) {
-      const resolved = await resolveWorkingSheetToken(config);
+      const resolved = await resolveWorkingSheetToken(config, "get_todos");
       workingToken = workingToken || resolved.token;
       workingConfig = resolved.config;
     }
