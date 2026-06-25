@@ -17,6 +17,13 @@ function doGet(e) {
     return jsonp_(params.callback, { ok: true, action: params.action, rows: readRows_('Todos') });
   }
 
+  if (params.action === 'upsert_todo') {
+    const row = parseRowParam_(params.row);
+    if (!row) return jsonp_(params.callback, { ok: false, error: 'invalid_row' });
+    upsertTodo_(row);
+    return jsonp_(params.callback, { ok: true, action: params.action, todo_id: row.todo_id });
+  }
+
   return jsonp_(params.callback, { ok: false, error: 'unknown_action' });
 }
 
@@ -51,6 +58,14 @@ function doPost(e) {
 function parsePayload_(e) {
   try {
     return JSON.parse(e.postData && e.postData.contents ? e.postData.contents : '{}');
+  } catch (error) {
+    return null;
+  }
+}
+
+function parseRowParam_(value) {
+  try {
+    return JSON.parse(value || '{}');
   } catch (error) {
     return null;
   }

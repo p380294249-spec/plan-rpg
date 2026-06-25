@@ -78,5 +78,10 @@ const appsScript = fs.readFileSync(path.join(root, "google-apps-script/Code.gs")
 assert.ok(appsScript.includes("get_todos"));
 assert.ok(appsScript.includes("upsert_todo"));
 assert.ok(appsScript.includes("upsertTodo_"));
+assert.ok(appsScript.includes("parseRowParam_"));
+
+const appsScriptManifest = JSON.parse(fs.readFileSync(path.join(root, "google-apps-script/appsscript.json"), "utf8"));
+assert.equal(appsScriptManifest.webapp.executeAs, "USER_DEPLOYING");
+assert.equal(appsScriptManifest.webapp.access, "ANYONE_ANONYMOUS");
 
 console.log("Plan RPG todo cloud sync tests passed.");

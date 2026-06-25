@@ -1,5 +1,13 @@
 # Plan RPG Version Notes
 
+## v0.3.56 - 2026-06-25
+
+### Sync
+
+- Todo writes now use a confirmable Google Apps Script JSONP path, which is more reliable on mobile browsers than blind POST-only writes.
+- Added an automatic retry queue for unsent sync payloads. The app retries when it opens, returns to the foreground, or the device comes back online.
+- Kept the existing POST Todo endpoint as a fallback for older deployments.
+
 ## v0.3.55 - 2026-06-24
 
 ### Sync

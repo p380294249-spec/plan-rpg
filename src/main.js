@@ -40,7 +40,12 @@ function bootstrapPlanRpg() {
   $("cancelFocusInlineBtn").addEventListener("click", cancelActiveSessionWithConfirm);
   document.addEventListener("visibilitychange", () => {
     syncTimerWithClock();
-    if (!document.hidden) pullTodosFromSheet({ silent: true });
+    if (!document.hidden) {
+      flushPendingSyncQueue({ silent: true }).then(() => pullTodosFromSheet({ silent: true }));
+    }
+  });
+  window.addEventListener("online", () => {
+    flushPendingSyncQueue({ silent: true }).then(() => pullTodosFromSheet({ silent: true }));
   });
   $("randomEventBtn").addEventListener("click", openRandomEventModal);
   $("pivotTaskBtn").addEventListener("click", openPivotModal);
@@ -69,6 +74,7 @@ function bootstrapPlanRpg() {
   document.querySelectorAll("[data-close-modal]").forEach(btn => btn.addEventListener("click", () => closeModal(btn.dataset.closeModal)));
   document.querySelectorAll(".pivot-option").forEach(btn => btn.addEventListener("click", () => setPivotType(btn.dataset.pivotType)));
   renderAll();
+  flushPendingSyncQueue({ silent: true });
   pullSessionLogsFromSheet({ silent: true });
   pullMetricLogsFromSheet({ silent: true });
   pullTodosFromSheet({ silent: true });

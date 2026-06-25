@@ -2,7 +2,7 @@
 
 Plan RPG is a lightweight web MVP for turning yearly plans, weekly quests, 20-minute focus sessions, execution logs, rewards, skills, and reviews into a game-like personal planning system.
 
-Current version: `v0.3.55`
+Current version: `v0.3.56`
 
 Live app:
 
@@ -102,6 +102,7 @@ It currently supports:
 - `GET action=get_session_logs`: read `Session_Logs`.
 - `GET action=get_metric_logs`: read `Metric_Logs`.
 - `GET action=get_todos`: read `Todos`.
+- `GET action=upsert_todo`: create or update a Todo by ID with JSONP confirmation.
 - `POST action=append_session_log`: append a completed session log.
 - `POST action=append_metric_log`: append a monthly business metric log.
 - `POST action=upsert_todo`: create or update a Todo by its ID.
@@ -115,6 +116,8 @@ const SYNC_TOKEN = 'plan-rpg-2026';
 ```
 
 The token is lightweight protection for the MVP. Do not treat it as strong security for sensitive data.
+
+Todo writes are saved locally first, then synced to Google Sheets. If a phone loses connection or closes the page too quickly, the app keeps the item in the browser and automatically retries when the page opens again, returns to the foreground, or the device comes back online.
 
 ## Update Apps Script
 

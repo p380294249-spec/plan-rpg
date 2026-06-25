@@ -219,6 +219,85 @@ function mergeRemoteTodos(rows = []) {
   return { remoteCount: remoteById.size, uploads };
 }
 
+function readPendingSyncQueue() {
+  try {
+    return JSON.parse(localStorage.getItem(APP_CONFIG.PENDING_SYNC_KEY) || "[]");
+  } catch (error) {
+    return [];
+  }
+}
+
+function savePendingSyncQueue(items = []) {
+  localStorage.setItem(APP_CONFIG.PENDING_SYNC_KEY, JSON.stringify(items));
+}
+
+function pendingPayloadKey(payload) {
+  const row = payload?.row || {};
+  const rowId = row.todo_id || row.log_id || row.metric_log_id || payload.created_at || "";
+  return `${payload?.action || "unknown"}:${rowId}`;
+}
+
+function queuePendingSyncPayload(payload) {
+  const key = pendingPayloadKey(payload);
+  const pending = readPendingSyncQueue().filter(item => pendingPayloadKey(item) !== key);
+  pending.push(payload);
+  savePendingSyncQueue(pending);
+}
+
+async function postSheetPayload(config, payload) {
+  await fetch(config.url, {
+    method: "POST",
+    mode: "no-cors",
+    headers: { "Content-Type": "text/plain;charset=utf-8" },
+    body: JSON.stringify(payload)
+  });
+}
+
+async function sendTodoPayload(config, payload) {
+  try {
+    const response = await jsonp(config.url, {
+      action: "upsert_todo",
+      token: payload.token,
+      row: JSON.stringify(payload.row || {})
+    });
+    if (!response || !response.ok) throw new Error(response?.error || "todo_upsert_failed");
+    return response;
+  } catch (error) {
+    await postSheetPayload(config, payload);
+    return { ok: true, fallback: true };
+  }
+}
+
+async function flushPendingSyncQueue({ silent = false } = {}) {
+  const pending = readPendingSyncQueue();
+  if (!pending.length) return 0;
+  const config = sheetSyncConfig();
+  if (!config.url) return 0;
+  let token = config.token || "";
+  try {
+    token = (await resolveWorkingSheetToken(config)).token;
+  } catch (error) {
+    if (!silent) renderSheetSyncConfig("还有本机待同步数据，等同步设置可用后会自动补传。");
+    return 0;
+  }
+
+  const remaining = [];
+  let sentCount = 0;
+  for (const payload of pending) {
+    const nextPayload = { ...payload, token: payload.token || token };
+    try {
+      if (nextPayload.action === "upsert_todo") await sendTodoPayload(config, nextPayload);
+      else await postSheetPayload(config, nextPayload);
+      sentCount += 1;
+    } catch (error) {
+      remaining.push(payload);
+    }
+  }
+  savePendingSyncQueue(remaining);
+  if (sentCount && !silent) renderSheetSyncConfig(`已自动补传 ${sentCount} 条本机待同步数据。`);
+  return sentCount;
+}
+
 function jsonp(url, params = {}) {
   return new Promise((resolve, reject) => {
     const callbackName = `planRpgSheetCallback_${Date.now()}_${Math.random().toString(36).slice(2)}`;
@@ -300,17 +379,10 @@ async function uploadLocalSessionLogsToSheet() {
       row: logToSheetRow(log)
     };
     try {
-      await fetch(config.url, {
-        method: "POST",
-        mode: "no-cors",
-        headers: { "Content-Type": "text/plain;charset=utf-8" },
-        body: JSON.stringify(payload)
-      });
+      await postSheetPayload(config, payload);
       uploadedIds.add(log.id);
     } catch (error) {
-      const pending = JSON.parse(localStorage.getItem(APP_CONFIG.PENDING_SYNC_KEY) || "[]");
-      pending.push(payload);
-      localStorage.setItem(APP_CONFIG.PENDING_SYNC_KEY, JSON.stringify(pending));
+      queuePendingSyncPayload(payload);
     }
   }
   clearPreservedUploadedLogs(uploadedIds);
@@ -338,17 +410,10 @@ async function syncSessionLogToSheet(log) {
     row: logToSheetRow(log)
   };
   try {
-    await fetch(config.url, {
-      method: "POST",
-      mode: "no-cors",
-      headers: { "Content-Type": "text/plain;charset=utf-8" },
-      body: JSON.stringify(payload)
-    });
+    await postSheetPayload(config, payload);
     renderSheetSyncConfig("已发送到 Google Sheet。刷新表格后查看 Session_Logs。");
   } catch (error) {
-    const pending = JSON.parse(localStorage.getItem(APP_CONFIG.PENDING_SYNC_KEY) || "[]");
-    pending.push(payload);
-    localStorage.setItem(APP_CONFIG.PENDING_SYNC_KEY, JSON.stringify(pending));
+    queuePendingSyncPayload(payload);
     renderSheetSyncConfig("同步失败，已暂存到本机待重试队列。");
   }
 }
@@ -404,17 +469,10 @@ async function syncMetricLogToSheet(log) {
     row: metricLogToSheetRow(log)
   };
   try {
-    await fetch(config.url, {
-      method: "POST",
-      mode: "no-cors",
-      headers: { "Content-Type": "text/plain;charset=utf-8" },
-      body: JSON.stringify(payload)
-    });
+    await postSheetPayload(config, payload);
     renderSheetSyncConfig("Metric Log 已发送到 Google Sheet。");
   } catch (error) {
-    const pending = JSON.parse(localStorage.getItem(APP_CONFIG.PENDING_SYNC_KEY) || "[]");
-    pending.push(payload);
-    localStorage.setItem(APP_CONFIG.PENDING_SYNC_KEY, JSON.stringify(pending));
+    queuePendingSyncPayload(payload);
     renderSheetSyncConfig("Metric Log 同步失败，已暂存到本机待重试队列。");
   }
 }
@@ -436,17 +494,10 @@ async function syncTodoToSheet(todo, { token = "", silent = false } = {}) {
     row: todoToSheetRow(todo)
   };
   try {
-    await fetch(config.url, {
-      method: "POST",
-      mode: "no-cors",
-      headers: { "Content-Type": "text/plain;charset=utf-8" },
-      body: JSON.stringify(payload)
-    });
-    if (!silent) renderSheetSyncConfig("Todo 已同步到 Google Sheet。");
+    const response = await sendTodoPayload(config, payload);
+    if (!silent) renderSheetSyncConfig(response.fallback ? "Todo 已发送到 Google Sheet，稍后会自动校验。" : "Todo 已同步到 Google Sheet。");
   } catch (error) {
-    const pending = JSON.parse(localStorage.getItem(APP_CONFIG.PENDING_SYNC_KEY) || "[]");
-    pending.push(payload);
-    localStorage.setItem(APP_CONFIG.PENDING_SYNC_KEY, JSON.stringify(pending));
+    queuePendingSyncPayload(payload);
     if (!silent) renderSheetSyncConfig("Todo 同步失败，已暂存到本机待重试队列。");
   }
 }
