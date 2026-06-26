@@ -101,12 +101,17 @@ function renderActiveTimerPanel() {
   const panel = $("activeTimerPanel");
   if (!panel) return;
   const task = taskById(timerTaskId || selectedTaskId);
-  const show = Boolean(task && timerSessionActive && seconds > 0);
+  const show = Boolean(task && timerSessionActive);
   panel.classList.toggle("hide", !show);
   if (!show) return;
+  const ended = !running && seconds <= 0;
+  panel.classList.toggle("session-ended", ended);
+  if ($("activeTimerTitle")) $("activeTimerTitle").textContent = ended ? "专注已到点" : "正在专注";
   $("activeTimerLeft").textContent = `${String(Math.floor(seconds / 60)).padStart(2, "0")}:${String(seconds % 60).padStart(2, "0")}`;
-  $("activeTimerState").textContent = running ? "计时中" : "已暂停";
+  $("activeTimerState").textContent = running ? "计时中" : (ended ? "待填写记录" : "已暂停");
   $("activeTimerTask").textContent = task.current_title || task.name;
+  $("returnFocusBtn").textContent = ended ? "填写并结算" : "返回计时";
+  $("cancelFocusBtn").textContent = ended ? "放弃本次" : "取消专注";
   $("returnFocusBtn").onclick = () => {
     selectedTaskId = task.id;
     selectedQuestId = task.questId;

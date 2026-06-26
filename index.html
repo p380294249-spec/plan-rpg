@@ -3,8 +3,8 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Plan RPG v0.3.58 / 计划 RPG</title>
-  <link rel="stylesheet" href="src/ui/styles.css?v=0.3.58" />
+  <title>Plan RPG v0.3.59 / 计划 RPG</title>
+  <link rel="stylesheet" href="src/ui/styles.css?v=0.3.59" />
 </head>
 <body>
   <div class="app">
@@ -14,7 +14,7 @@
         <div>
           <h1>计划 RPG</h1>
           <p>把目标变成冒险</p>
-          <span class="version">v0.3.58 在线网页软件</span>
+          <span class="version">v0.3.59 在线网页软件</span>
         </div>
       </div>
 
@@ -109,15 +109,6 @@
                 </div>
                 <div class="collapsible-body"><div class="weekly-map" id="weeklyMap"></div></div>
               </section>
-            </div>
-            <div class="week-panel hide" id="activeTimerPanel">
-              <b>正在专注</b>
-              <p><span id="activeTimerLeft">00:00</span> · <span id="activeTimerState">进行中</span></p>
-              <p id="activeTimerTask">当前任务</p>
-              <div class="timer-panel-actions">
-                <button class="secondary" id="cancelFocusBtn">取消专注</button>
-                <button class="primary" id="returnFocusBtn">返回计时</button>
-              </div>
             </div>
           </div>
           <aside class="detail" id="questDetail"></aside>
@@ -313,6 +304,15 @@
         </div>
       </section>
     </main>
+    <div class="week-panel hide" id="activeTimerPanel">
+      <b id="activeTimerTitle">正在专注</b>
+      <p><span id="activeTimerLeft">00:00</span> · <span id="activeTimerState">进行中</span></p>
+      <p id="activeTimerTask">当前任务</p>
+      <div class="timer-panel-actions">
+        <button class="secondary" id="cancelFocusBtn">取消专注</button>
+        <button class="primary" id="returnFocusBtn">返回计时</button>
+      </div>
+    </div>
   </div>
 
   <div class="modal-backdrop hide" id="randomEventModal">
@@ -374,23 +374,24 @@
     </div>
   </div>
 
-  <script src="src/config/app-config.js?v=0.3.58"></script>
-  <script src="src/models/seed-data.js?v=0.3.58"></script>
-  <script src="src/state/app-state.js?v=0.3.58"></script>
-  <script src="src/storage/local-cache.js?v=0.3.58"></script>
-  <script src="src/storage/sheet-api.js?v=0.3.58"></script>
-  <script src="src/services/task-service.js?v=0.3.58"></script>
-  <script src="src/services/todo-service.js?v=0.3.58"></script>
-  <script src="src/services/session-service.js?v=0.3.58"></script>
-  <script src="src/ui/render-dashboard.js?v=0.3.58"></script>
-  <script src="src/ui/render-detail.js?v=0.3.58"></script>
-  <script src="src/ui/render-focus.js?v=0.3.58"></script>
-  <script src="src/ui/render-todos.js?v=0.3.58"></script>
-  <script src="src/ui/render-review.js?v=0.3.58"></script>
-  <script src="src/ui/render-skills.js?v=0.3.58"></script>
-  <script src="src/ui/render-model.js?v=0.3.58"></script>
-  <script src="src/ui/render-sheet-settings.js?v=0.3.58"></script>
-  <script src="src/main.js?v=0.3.58"></script>
+  <script src="src/config/app-config.js?v=0.3.59"></script>
+  <script src="src/models/seed-data.js?v=0.3.59"></script>
+  <script src="src/state/app-state.js?v=0.3.59"></script>
+  <script src="src/storage/local-cache.js?v=0.3.59"></script>
+  <script src="src/storage/sheet-api.js?v=0.3.59"></script>
+  <script src="src/services/task-service.js?v=0.3.59"></script>
+  <script src="src/services/todo-service.js?v=0.3.59"></script>
+  <script src="src/services/session-service.js?v=0.3.59"></script>
+  <script src="src/ui/render-dashboard.js?v=0.3.59"></script>
+  <script src="src/ui/render-detail.js?v=0.3.59"></script>
+  <script src="src/ui/render-focus.js?v=0.3.59"></script>
+  <script src="src/ui/render-todos.js?v=0.3.59"></script>
+  <script src="src/ui/render-review.js?v=0.3.59"></script>
+  <script src="src/ui/render-skills.js?v=0.3.59"></script>
+  <script src="src/ui/render-model.js?v=0.3.59"></script>
+  <script src="src/ui/render-sheet-settings.js?v=0.3.59"></script>
+  <script src="src/main.js?v=0.3.59"></script>
 </body>
 </html>
+
 

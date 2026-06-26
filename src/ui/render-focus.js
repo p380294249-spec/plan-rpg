@@ -95,7 +95,9 @@ function renderRecordBoardMode(task) {
 
 function renderTimer() {
   $("timerValue").textContent = `${String(Math.floor(seconds / 60)).padStart(2, "0")}:${String(seconds % 60).padStart(2, "0")}`;
-  $("startPauseBtn").textContent = running ? "暂停" : "开始";
+  const ended = timerSessionActive && !running && seconds <= 0;
+  $("startPauseBtn").textContent = running ? "暂停" : (ended ? "继续计时" : "开始");
+  $("saveSessionBtn").textContent = ended ? "填写完成并结算" : "完成并结算";
   renderActiveTimerPanel();
 }
 

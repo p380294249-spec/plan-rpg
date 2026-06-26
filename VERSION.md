@@ -1,5 +1,14 @@
 # Plan RPG Version Notes
 
+## v0.3.59 - 2026-06-26
+
+### Focus Timer
+
+- Regular focus sessions now stay in a `待填写记录` state when the timer reaches zero instead of disappearing.
+- The active timer return panel is now global, so it remains visible from Todo, Review, Skills, and other screens.
+- The floating panel changes to `专注已到点` with a `填写并结算` action that returns to the session log form.
+- Meditation keeps its existing auto-save behavior when its countdown ends.
+
 ## v0.3.58 - 2026-06-25
 
 ### Sync

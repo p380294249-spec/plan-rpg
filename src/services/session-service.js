@@ -364,17 +364,23 @@ function syncTimerWithClock() {
     const completedTask = taskById(timerTaskId || selectedTaskId);
     const shouldAutoSaveMeditation = isMeditationTask(completedTask);
     running = false;
-    timerSessionActive = false;
     clearInterval(timer);
     timer = null;
     timerEndsAt = 0;
     seconds = 0;
     if (shouldAutoSaveMeditation) {
+      timerSessionActive = false;
       selectedTaskId = completedTask.id;
       selectedQuestId = completedTask.questId;
       syncGoalForQuest(selectedQuestId);
       saveSession();
       return;
+    }
+    if (completedTask) {
+      timerSessionActive = true;
+      selectedTaskId = completedTask.id;
+      selectedQuestId = completedTask.questId;
+      syncGoalForQuest(selectedQuestId);
     }
     renderTimer();
   }
