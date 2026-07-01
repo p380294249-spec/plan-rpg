@@ -1193,3 +1193,193 @@ td { color: #475569; }
   .form-grid, .review-cards, .skill-node-row, .reward-line, .option-row, .summary-strip, .weekly-command-grid { grid-template-columns: 1fr; }
   .timer-value { font-size: 58px; }
 }
+
+/* ============================================================
+   v0.3.59 UI 打磨层 / UI Polish Layer
+   ------------------------------------------------------------
+   只增强交互细节，不改动原有结构、类名与配色方向。
+   纯 CSS，可整体删除以一键回退。
+   ============================================================ */
+
+:root {
+  --r-sm: 8px;
+  --r-md: 12px;
+  --r-lg: 16px;
+  --shadow-1: 0 1px 2px rgba(20, 31, 52, .06), 0 2px 6px rgba(20, 31, 52, .06);
+  --shadow-2: 0 6px 16px rgba(20, 31, 52, .08), 0 2px 6px rgba(20, 31, 52, .05);
+  --shadow-3: 0 18px 45px rgba(20, 31, 52, .14), 0 6px 16px rgba(20, 31, 52, .06);
+  --ease: cubic-bezier(.2, .7, .3, 1);
+  --ring-strong: 0 0 0 3px rgba(37, 99, 235, .32);
+}
+
+/* 字体渲染更顺滑 */
+body {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+/* 统一交互过渡 */
+.primary, .secondary, .danger, .ghost,
+.nav button, .utility-actions button,
+.todo-choice, .todo-filter, .todo-toggle,
+.pivot-option, .layer-toggle, .stat, .pill {
+  transition: transform .16s var(--ease), box-shadow .18s var(--ease),
+              background-color .18s var(--ease), border-color .18s var(--ease),
+              color .18s var(--ease), filter .18s var(--ease);
+}
+
+/* ---- 卡片圆角与阴影层级（更有纵深） ---- */
+.panel, .detail, .map-stage, .modal { border-radius: var(--r-md); }
+.panel { box-shadow: var(--shadow-2); }
+.detail { box-shadow: var(--shadow-2); }
+.map-stage { box-shadow: var(--shadow-3); }
+.map-layer, .side-card, .stat, .weekly-command-card,
+.life-cell, .campaign-card, .quest-map-node, .task-map-card,
+.review-block, .summary-stat, .metric, .skill-node,
+.task-card, .route-item, .log-card, .skill-card,
+.todo-item, .timer, .reward, .table-wrap { border-radius: var(--r-md); }
+
+/* ---- 按钮交互状态（原本缺失 hover / active） ---- */
+.primary:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 16px 28px rgba(37, 99, 235, .30);
+  filter: brightness(1.04);
+}
+.primary:active {
+  transform: translateY(0);
+  box-shadow: 0 8px 16px rgba(37, 99, 235, .22);
+  filter: brightness(.97);
+}
+.secondary:hover {
+  transform: translateY(-1px);
+  background: #fff;
+  border-color: rgba(37, 99, 235, .4);
+  box-shadow: var(--shadow-1);
+}
+.secondary:active { transform: translateY(0); box-shadow: none; }
+.danger:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 16px 28px rgba(220, 38, 38, .28);
+  filter: brightness(1.04);
+}
+.danger:active { transform: translateY(0); }
+.ghost:hover { background: rgba(148, 163, 184, .16); }
+
+/* 键盘可达性：统一 focus-visible 焦点环 */
+button:focus-visible,
+.todo-choice:focus-visible, .todo-filter:focus-visible,
+.todo-toggle:focus-visible, .pivot-option:focus-visible,
+.layer-toggle:focus-visible {
+  outline: none;
+  box-shadow: var(--ring-strong);
+}
+
+/* ---- 侧边栏导航 hover（原本只有 active 态有样式） ---- */
+.nav button:hover {
+  color: #fff;
+  background: rgba(255, 255, 255, .08);
+}
+.nav button.active:hover {
+  background: linear-gradient(135deg, rgba(37, 99, 235, .52), rgba(109, 93, 252, .42));
+}
+
+/* 侧栏工具按钮 hover（深色背景） */
+.utility-actions button:hover {
+  background: rgba(255, 255, 255, .14);
+  border-color: rgba(255, 255, 255, .22);
+  color: #fff;
+}
+
+/* ---- 待办按钮 hover ---- */
+.todo-choice:hover, .todo-filter:hover, .todo-toggle:hover {
+  border-color: rgba(37, 99, 235, .4);
+  background: #fff;
+}
+.todo-choice.active:hover, .todo-filter.active:hover {
+  background: #1d4ed8;
+  border-color: #1d4ed8;
+}
+
+/* ---- 品牌标记轻微动效 ---- */
+.brand-mark {
+  transition: transform .3s var(--ease), box-shadow .3s var(--ease);
+}
+.brand:hover .brand-mark {
+  transform: rotate(-4deg) scale(1.05);
+  box-shadow: 0 12px 30px rgba(37, 99, 235, .34);
+}
+
+/* ---- 待办项 hover ---- */
+.todo-item {
+  transition: transform .16s var(--ease), box-shadow .16s var(--ease), border-color .16s var(--ease);
+}
+.todo-item:hover {
+  border-color: rgba(148, 163, 184, .5);
+  box-shadow: var(--shadow-1);
+}
+
+/* ---- 顶部统计卡 hover ---- */
+.stat:hover {
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-2);
+}
+
+/* ---- 数据模型表格行 hover ---- */
+tbody tr { transition: background-color .15s var(--ease); }
+tbody tr:hover td { background: rgba(37, 99, 235, .045); }
+
+/* ---- 滚动条美化 ---- */
+.sidebar, .map-stage, .detail, .table-wrap, .modal, .task-rail {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(148, 163, 184, .5) transparent;
+}
+.map-stage::-webkit-scrollbar, .detail::-webkit-scrollbar,
+.table-wrap::-webkit-scrollbar, .modal::-webkit-scrollbar,
+.task-rail::-webkit-scrollbar { width: 10px; height: 10px; }
+.map-stage::-webkit-scrollbar-thumb, .detail::-webkit-scrollbar-thumb,
+.table-wrap::-webkit-scrollbar-thumb, .modal::-webkit-scrollbar-thumb,
+.task-rail::-webkit-scrollbar-thumb {
+  background: rgba(148, 163, 184, .45);
+  border-radius: 999px;
+  border: 2px solid transparent;
+  background-clip: padding-box;
+}
+.map-stage::-webkit-scrollbar-thumb:hover, .detail::-webkit-scrollbar-thumb:hover,
+.table-wrap::-webkit-scrollbar-thumb:hover, .modal::-webkit-scrollbar-thumb:hover,
+.task-rail::-webkit-scrollbar-thumb:hover {
+  background: rgba(100, 116, 139, .6);
+  background-clip: padding-box;
+}
+.sidebar::-webkit-scrollbar { width: 8px; }
+.sidebar::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, .16);
+  border-radius: 999px;
+}
+.sidebar::-webkit-scrollbar-thumb:hover { background: rgba(255, 255, 255, .26); }
+
+/* ---- 弹窗入场动画 ---- */
+@keyframes prpg-backdrop-in { from { opacity: 0; } to { opacity: 1; } }
+@keyframes prpg-modal-in {
+  from { opacity: 0; transform: translateY(10px) scale(.98); }
+  to { opacity: 1; transform: none; }
+}
+.modal-backdrop:not(.hide) { animation: prpg-backdrop-in .18s var(--ease); }
+.modal-backdrop:not(.hide) .modal { animation: prpg-modal-in .22s var(--ease); }
+
+/* ---- 活动计时器面板入场 ---- */
+@keyframes prpg-timer-in {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: none; }
+}
+#activeTimerPanel:not(.hide) { animation: prpg-timer-in .26s var(--ease); }
+
+/* ---- 尊重系统「减少动态效果」偏好（无障碍） ---- */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: .001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: .001ms !important;
+    scroll-behavior: auto !important;
+  }
+}
