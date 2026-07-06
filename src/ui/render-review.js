@@ -3,8 +3,9 @@
 
 function renderReview() {
   const logs = data.logs;
-  const thisWeek = logsForWeek(0);
-  const lastWeek = logsForWeek(1);
+  const thisWeek = logsForWeek(reviewWeeksAgo);
+  const lastWeek = logsForWeek(reviewWeeksAgo + 1);
+  const currentWeek = logsForWeek(0);
   const total = thisWeek.length;
   const g = thisWeek.filter(l => l.gmn === "G").length;
   const m = thisWeek.filter(l => l.gmn === "M").length;
@@ -15,8 +16,10 @@ function renderReview() {
   const pivotLogs = thisWeek.filter(l => l.is_pivoted);
   const maintenanceLogs = thisWeek.filter(l => taskById(l.actual_task_id || l.taskId)?.quest_type === "maintenance" || l.gmn === "M");
   const noiseLogs = thisWeek.filter(l => taskById(l.actual_task_id || l.taskId)?.quest_type === "noise" || l.gmn === "N");
-  const range = weekRange(0);
-  $("reviewWeekTitle").textContent = `本周复盘 · ${formatShortDate(range.start)} - ${formatShortDate(range.end)}`;
+  const currentWeekG = currentWeek.filter(l => l.gmn === "G").length;
+  const range = weekRange(reviewWeeksAgo);
+  $("reviewWeekTitle").textContent = `${reviewWeeksAgo === 0 ? "本周复盘" : "周复盘"} · ${formatShortDate(range.start)} - ${formatShortDate(range.end)}`;
+  renderReviewWeekPicker();
   $("metricTotal").textContent = total;
   $("metricG").textContent = g;
   $("metricM").textContent = m;
@@ -25,18 +28,35 @@ function renderReview() {
   $("reviewVsLastWeek").textContent = formatMinuteDelta(thisWeekMinutes - lastWeekMinutes);
   $("reviewDirectionBadge").textContent = directionLabelForWeek(thisWeek, thisWeekMinutes);
   $("totalMinutes").textContent = `${logs.reduce((s, l) => s + Number(l.minutes || 0), 0)} min`;
-  $("gRatio").textContent = total ? pct(g / total * 100) : "0%";
+  $("gRatio").textContent = currentWeek.length ? pct(currentWeekG / currentWeek.length * 100) : "0%";
   renderWeeklyFocusAreas(thisWeek, lastWeek);
   renderWeeklyMergedNotes(thisWeek);
   renderDynamicReview(randomLogs, pivotLogs, maintenanceLogs, noiseLogs);
-  $("logList").innerHTML = thisWeek.map(logCard).join("") || `<p>本周还没有日志。先开始一次 20 分钟。</p>`;
+  $("logList").innerHTML = thisWeek.map(logCard).join("") || `<p>这一周还没有日志。</p>`;
   document.querySelectorAll("[data-edit-log]").forEach(btn => btn.onclick = () => editLog(btn.dataset.editLog));
   document.querySelectorAll("[data-delete-log]").forEach(btn => btn.onclick = () => deleteLog(btn.dataset.deleteLog));
   renderNextRouteSuggestions(thisWeek);
   $("weeklyFocus").innerHTML = `
     <p style="margin:0 0 8px;color:#cbd5e1;">MINDSET：每周复盘</p>
-    <div class="bar"><div class="fill" style="--value:${total ? Math.min(100, Math.round(thisWeekMinutes / 4)) : 0}%"></div></div>
+    <div class="bar"><div class="fill" style="--value:${currentWeek.length ? Math.min(100, Math.round(totalMinutesOf(currentWeek) / 4)) : 0}%"></div></div>
   `;
+}
+
+function renderReviewWeekPicker() {
+  const previousButton = $("reviewPreviousWeekBtn");
+  const currentButton = $("reviewCurrentWeekBtn");
+  const nextButton = $("reviewNextWeekBtn");
+  currentButton.className = reviewWeeksAgo === 0 ? "primary" : "secondary";
+  currentButton.setAttribute("aria-pressed", reviewWeeksAgo === 0 ? "true" : "false");
+  nextButton.disabled = reviewWeeksAgo === 0;
+  previousButton.onclick = () => setReviewWeek(reviewWeeksAgo + 1);
+  currentButton.onclick = () => setReviewWeek(0);
+  nextButton.onclick = () => setReviewWeek(reviewWeeksAgo - 1);
+}
+
+function setReviewWeek(weeksAgo) {
+  reviewWeeksAgo = Math.max(0, Math.min(104, Number(weeksAgo) || 0));
+  renderReview();
 }
 
 function renderWeeklyFocusAreas(thisWeek, lastWeek) {
@@ -52,7 +72,7 @@ function renderWeeklyFocusAreas(thisWeek, lastWeek) {
         ${area.nextMove ? `<br><small>${escapeHtml(area.nextMove)}</small>` : ""}
       </div>
     `;
-  }).join("") : `<div class="review-text-item">本周还没有足够记录，先从一次 20 分钟开始。</div>`;
+  }).join("") : `<div class="review-text-item">这一周还没有足够记录。</div>`;
 }
 
 function renderTextItems(items, emptyText) {
@@ -67,12 +87,12 @@ function renderWeeklyMergedNotes(thisWeek) {
   const good = collectUniqueNotes(thisWeek, "good");
   const bad = collectUniqueNotes(thisWeek, "bad");
   $("reviewProblemSolve").innerHTML = `
-    <div><b>遇到的问题</b>${renderTextItems(problems, "本周没有记录明显问题。")}</div>
-    <div style="margin-top:12px;"><b>采取的解决方式</b>${renderTextItems(solutions, "本周还没有写出解决方式。")}</div>
+    <div><b>遇到的问题</b>${renderTextItems(problems, "这一周没有记录明显问题。")}</div>
+    <div style="margin-top:12px;"><b>采取的解决方式</b>${renderTextItems(solutions, "这一周还没有写出解决方式。")}</div>
   `;
   $("reviewGoodBad").innerHTML = `
-    <div><b>做得好的地方</b>${renderTextItems(good, "本周还没有记录明显亮点。")}</div>
-    <div style="margin-top:12px;"><b>需要调整的地方</b>${renderTextItems(bad, "本周还没有记录明显偏差。")}</div>
+    <div><b>做得好的地方</b>${renderTextItems(good, "这一周还没有记录明显亮点。")}</div>
+    <div style="margin-top:12px;"><b>需要调整的地方</b>${renderTextItems(bad, "这一周还没有记录明显偏差。")}</div>
   `;
 }
 
@@ -111,7 +131,7 @@ function renderDynamicReview(randomLogs, pivotLogs, maintenanceLogs, noiseLogs) 
         const original = taskById(l.original_task_id);
         const actual = taskById(l.actual_task_id);
         return `<p>${escapeHtml(original?.original_title || original?.name || l.original_task_id)} → ${escapeHtml(actual?.current_title || actual?.name || l.actual_task_id)}<br><small>${escapeHtml(l.pivot_note || "")}</small></p>`;
-      }).join("") : `<p>本周没有任务转向。</p>`}
+      }).join("") : `<p>这一周没有任务转向。</p>`}
     </div>
     <div class="route-item">
       <b>维护 / 噪音</b>

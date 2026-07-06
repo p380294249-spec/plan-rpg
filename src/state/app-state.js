@@ -16,14 +16,15 @@ let timerSessionActive = false;
 let pendingAfterSessionSave = null;
 let selectedPivotType = "renamed";
 let todoUiState = { category: "DFK", filter: "ALL", isStarred: false, isUrgent: false };
+let reviewWeeksAgo = 0;
 const MINDSET_CANONICAL_QUEST_ID = "Q-004";
 const MINDSET_CANONICAL_TASK_ID = "T-007";
 const MINDSET_MERGED_QUEST_IDS = ["Q-028", "Q-029", "Q-030", "Q-031", "Q-032", "Q-033", "Q-034", "Q-035", "Q-036", "Q-037"];
 const MINDSET_MERGED_TASK_IDS = ["T-033", "T-034", "T-035", "T-036", "T-037", "T-038", "T-039", "T-040"];
 const DFK_LEGACY_QUEST_MAP = { "Q-018": "Q-009", "Q-019": "Q-010" };
 const weeklyCommandFocus = [
-  { id: "dfk-company-rules", label: "W1", title: "DFK 制定公司规则", questId: "Q-010", taskId: "T-002", note: "本周先定下一条公司内部规则：责任、流程和检查方式。" },
-  { id: "inso-quote-system", label: "W2", title: "快速处理报价系统", questId: "Q-011", taskId: "T-004", note: "本周先把未处理报价快速录入、分配并标记下一步。" }
+  { id: "dfk-finance-rules", label: "W1", title: "DFK 核对财务和制定制度", questId: "Q-010", taskId: "T-002" },
+  { id: "inso-development-system", label: "W2", title: "INSO 快速开发系统", questId: "Q-012", taskId: "T-016" }
 ];
 
 const $ = (id) => document.getElementById(id);

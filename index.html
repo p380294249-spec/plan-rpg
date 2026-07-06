@@ -3,8 +3,8 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Plan RPG v0.3.59 / 计划 RPG</title>
-  <link rel="stylesheet" href="src/ui/styles.css?v=0.3.59" />
+  <title>Plan RPG v0.3.60 / 计划 RPG</title>
+  <link rel="stylesheet" href="src/ui/styles.css?v=0.3.60" />
 </head>
 <body>
   <div class="app">
@@ -14,7 +14,7 @@
         <div>
           <h1>计划 RPG</h1>
           <p>把目标变成冒险</p>
-          <span class="version">v0.3.59 在线网页软件</span>
+          <span class="version">v0.3.60 在线网页软件</span>
         </div>
       </div>
 
@@ -27,7 +27,7 @@
         <button class="active" data-screen="map">地图 / Dashboard</button>
         <button data-screen="focus">20分钟专注</button>
         <button data-screen="todos">待办 / 今日提醒</button>
-        <button data-screen="review">日志 / 复盘</button>
+        <button data-screen="review">周复盘</button>
         <button data-screen="skills">CEO 技能树</button>
         <button data-screen="model">数据模型</button>
       </nav>
@@ -227,6 +227,11 @@
         <div class="review-grid">
           <div class="panel">
             <span class="pill">Weekly Review</span>
+            <div class="review-week-picker" aria-label="选择复盘周">
+              <button class="secondary" id="reviewPreviousWeekBtn" type="button">← 上一周</button>
+              <button class="secondary" id="reviewCurrentWeekBtn" type="button">本周</button>
+              <button class="secondary" id="reviewNextWeekBtn" type="button">下一周 →</button>
+            </div>
             <h3 id="reviewWeekTitle">本周自动汇总</h3>
             <div class="review-cards">
               <div class="metric"><span>Total</span><b id="metricTotal">0</b></div>
@@ -235,21 +240,21 @@
               <div class="metric"><span>Noise</span><b id="metricN">0</b></div>
             </div>
             <div class="summary-strip">
-              <div class="summary-stat"><span>本周总时长</span><b id="reviewThisWeekMinutes">0 min</b></div>
-              <div class="summary-stat"><span>对比上周</span><b id="reviewVsLastWeek">0 min</b></div>
+              <div class="summary-stat"><span>该周总时长</span><b id="reviewThisWeekMinutes">0 min</b></div>
+              <div class="summary-stat"><span>对比前一周</span><b id="reviewVsLastWeek">0 min</b></div>
               <div class="summary-stat"><span>方向判断</span><b id="reviewDirectionBadge">待开始</b></div>
             </div>
             <div class="review-section">
               <div class="review-block">
-                <h4>本周主要花在哪里</h4>
+                <h4>主要花在哪里</h4>
                 <div id="reviewFocusAreas"></div>
               </div>
               <div class="review-block">
-                <h4>本周问题与解决</h4>
+                <h4>问题与解决</h4>
                 <div id="reviewProblemSolve"></div>
               </div>
               <div class="review-block">
-                <h4>本周好的 / 不好的</h4>
+                <h4>好的 / 不好的</h4>
                 <div id="reviewGoodBad"></div>
               </div>
             </div>
@@ -374,23 +379,23 @@
     </div>
   </div>
 
-  <script src="src/config/app-config.js?v=0.3.59"></script>
-  <script src="src/models/seed-data.js?v=0.3.59"></script>
-  <script src="src/state/app-state.js?v=0.3.59"></script>
-  <script src="src/storage/local-cache.js?v=0.3.59"></script>
-  <script src="src/storage/sheet-api.js?v=0.3.59"></script>
-  <script src="src/services/task-service.js?v=0.3.59"></script>
-  <script src="src/services/todo-service.js?v=0.3.59"></script>
-  <script src="src/services/session-service.js?v=0.3.59"></script>
-  <script src="src/ui/render-dashboard.js?v=0.3.59"></script>
-  <script src="src/ui/render-detail.js?v=0.3.59"></script>
-  <script src="src/ui/render-focus.js?v=0.3.59"></script>
-  <script src="src/ui/render-todos.js?v=0.3.59"></script>
-  <script src="src/ui/render-review.js?v=0.3.59"></script>
-  <script src="src/ui/render-skills.js?v=0.3.59"></script>
-  <script src="src/ui/render-model.js?v=0.3.59"></script>
-  <script src="src/ui/render-sheet-settings.js?v=0.3.59"></script>
-  <script src="src/main.js?v=0.3.59"></script>
+  <script src="src/config/app-config.js?v=0.3.60"></script>
+  <script src="src/models/seed-data.js?v=0.3.60"></script>
+  <script src="src/state/app-state.js?v=0.3.60"></script>
+  <script src="src/storage/local-cache.js?v=0.3.60"></script>
+  <script src="src/storage/sheet-api.js?v=0.3.60"></script>
+  <script src="src/services/task-service.js?v=0.3.60"></script>
+  <script src="src/services/todo-service.js?v=0.3.60"></script>
+  <script src="src/services/session-service.js?v=0.3.60"></script>
+  <script src="src/ui/render-dashboard.js?v=0.3.60"></script>
+  <script src="src/ui/render-detail.js?v=0.3.60"></script>
+  <script src="src/ui/render-focus.js?v=0.3.60"></script>
+  <script src="src/ui/render-todos.js?v=0.3.60"></script>
+  <script src="src/ui/render-review.js?v=0.3.60"></script>
+  <script src="src/ui/render-skills.js?v=0.3.60"></script>
+  <script src="src/ui/render-model.js?v=0.3.60"></script>
+  <script src="src/ui/render-sheet-settings.js?v=0.3.60"></script>
+  <script src="src/main.js?v=0.3.60"></script>
 </body>
 </html>
 

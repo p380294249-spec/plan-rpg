@@ -997,6 +997,20 @@ small { color: var(--muted); line-height: 1.5; }
   gap: 12px;
   margin-bottom: 16px;
 }
+.review-week-picker {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, max-content));
+  gap: 8px;
+  margin: 14px 0 8px;
+}
+.review-week-picker button {
+  min-height: 38px;
+  padding: 8px 12px;
+}
+.review-week-picker button:disabled {
+  cursor: not-allowed;
+  opacity: .42;
+}
 .metric {
   background: rgba(255, 255, 255, .86);
   border: 1px solid var(--line);
@@ -1191,5 +1205,7 @@ td { color: #475569; }
   }
   .quest-lane:before { display: none; }
   .form-grid, .review-cards, .skill-node-row, .reward-line, .option-row, .summary-strip, .weekly-command-grid { grid-template-columns: 1fr; }
+  .review-week-picker { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .review-week-picker button { min-width: 0; padding: 8px 5px; font-size: 12px; }
   .timer-value { font-size: 58px; }
 }

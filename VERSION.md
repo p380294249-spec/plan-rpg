@@ -1,5 +1,19 @@
 # Plan RPG Version Notes
 
+## v0.3.60 - 2026-07-06
+
+### Weekly Planning
+
+- Updated this week's two focus cards to `DFK 核对财务和制定制度` and `INSO 快速开发系统`.
+- The matching 20-minute focus sessions now open with the same task names as the weekly cards.
+
+### Weekly Review
+
+- Added a compact previous week / current week / next week selector to the review page.
+- Renamed the navigation entry to `周复盘` so the feature is easier to find.
+- Review totals, GMN counts, focus areas, notes, logs, comparison, and next-route suggestions now follow the selected week.
+- The next-week button stops at the current week, so the review never drifts into empty future weeks.
+
 ## v0.3.59 - 2026-06-26
 
 ### Focus Timer

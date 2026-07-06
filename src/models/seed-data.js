@@ -38,7 +38,7 @@ const seed = {
   ],
   tasks: [
     { id: "T-001", questId: "Q-009", name: "维护公司系统", instruction: "选择一个公司系统、打印模板、资料流程或重复问题，完成一次维护或修复。", minutes: 20, standard: "完成一个系统维护动作并写清下一步", gmn: "G", skillIds: ["operations", "strategy"], status: "Not Started", quest_type: "side" },
-    { id: "T-002", questId: "Q-010", name: "整理公司内部管理", instruction: "整理一个岗位责任、内部协作、交接或检查事项。", minutes: 20, standard: "写清一个内部管理事项的责任和下一步", gmn: "M", skillIds: ["operations", "leadership"], status: "Not Started", quest_type: "side" },
+    { id: "T-002", questId: "Q-010", name: "核对财务和制定制度", instruction: "核对本周财务情况，并把发现的问题落实成一条清楚、可检查的公司制度。", minutes: 20, standard: "完成一次财务核对，并写清一条制度的责任、流程和检查方式", gmn: "G", skillIds: ["finance", "operations", "leadership"], status: "Not Started", quest_type: "main" },
     { id: "T-003", questId: "Q-009", name: "更新公司系统记录", instruction: "把公司系统的问题、负责人和下一步集中记录到一个可复盘的位置。", minutes: 20, standard: "完成一次公司系统记录更新", gmn: "G", skillIds: ["operations", "personal-system"], status: "Not Started", quest_type: "side" },
     { id: "T-004", questId: "Q-011", name: "录入所有未处理报价，分配和整理报价", instruction: "把所有未处理报价录入系统，分配责任人并整理当前状态。", minutes: 20, standard: "完成一批未处理报价的录入、分配和整理", gmn: "G", skillIds: ["revenue", "market"], status: "Not Started", quest_type: "side" },
     { id: "T-005", questId: "Q-016", name: "处理客户与物流事务", instruction: "处理一条客户信息回复、物流、单据或交付杂事，并写清下一步。", minutes: 20, standard: "完成一条客户或物流事务处理记录", gmn: "N", skillIds: ["operations", "communication"], status: "Not Started", quest_type: "side" },
@@ -47,7 +47,7 @@ const seed = {
     { id: "T-013", questId: "Q-010", name: "写岗位检查标准", instruction: "选择一个岗位或人员协作点，写清责任、检查标准和交接方式。", minutes: 20, standard: "一个岗位/事项的责任清单", gmn: "M", skillIds: ["operations", "leadership"], status: "Not Started", quest_type: "side" },
     { id: "T-014", questId: "Q-011", name: "打开历史报价筛选重点报价", instruction: "打开历史报价记录，筛选重点报价，标记成交可能、卡点和下一步。", minutes: 20, standard: "筛出一批重点报价并写清下一步", gmn: "G", skillIds: ["revenue", "operations"], status: "Not Started", quest_type: "side" },
     { id: "T-015", questId: "Q-011", name: "整理 INSO 订单下一步", instruction: "把正在推进的订单或 RFQ 写清楚当前状态、责任人和下一步。", minutes: 20, standard: "完成一批订单跟进记录", gmn: "G", skillIds: ["revenue", "communication"], status: "Not Started", quest_type: "side" },
-    { id: "T-016", questId: "Q-012", name: "打开麦穗采集客户并发送邮件", instruction: "打开麦穗，选择一批合适客户，采集客户信息并发送开发邮件。", minutes: 20, standard: "完成一批客户采集和邮件发送", gmn: "G", skillIds: ["revenue", "market"], status: "Not Started", quest_type: "main" },
+    { id: "T-016", questId: "Q-012", name: "快速开发系统", instruction: "用麦穗、LinkedIn、邮件或 Google 搜索快速开发一批客户，并记录来源和下一步。", minutes: 20, standard: "跑完一次可重复的客户开发流程，并产生一批有效客户动作", gmn: "G", skillIds: ["revenue", "market"], status: "Not Started", quest_type: "main" },
     { id: "T-017", questId: "Q-012", name: "打开历史邮件筛选客户并发送", instruction: "打开历史邮件，筛选可继续开发的客户信息，并发送跟进或开发邮件。", minutes: 20, standard: "筛出一批历史客户并完成发送", gmn: "G", skillIds: ["revenue", "communication"], status: "Not Started", quest_type: "main" },
     { id: "T-018", questId: "Q-013", name: "打开客户管理系统选择客户发送信息", instruction: "打开客户管理系统，选择需要维护的客户，发送信息并记录状态。", minutes: 20, standard: "完成一批客户维护信息发送", gmn: "M", skillIds: ["communication", "revenue"], status: "Not Started", quest_type: "side" },
     { id: "T-019", questId: "Q-013", name: "优化客户管理系统", instruction: "优化客户管理系统里的分类、状态、下一步或提醒方式。", minutes: 20, standard: "完成一处客户管理系统优化", gmn: "M", skillIds: ["communication", "personal-system"], status: "Not Started", quest_type: "side" },
