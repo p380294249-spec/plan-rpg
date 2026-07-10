@@ -4,7 +4,8 @@
 function renderFocus() {
   populateMetricGoalSelect();
   if (!$("metricLogDate").value) $("metricLogDate").value = todayISO();
-  setRecordType($("recordTypeSelect")?.value || "session");
+  const recordType = timerSessionActive && timerTaskId ? "session" : ($("recordTypeSelect")?.value || "session");
+  setRecordType(recordType);
   if (timerSessionActive && timerTaskId) {
     const activeTask = taskById(timerTaskId);
     if (activeTask) {
@@ -62,11 +63,12 @@ function renderFocus() {
     renderAll();
   };
   renderTimer();
-  setRecordType($("recordTypeSelect")?.value || "session");
+  setRecordType(timerSessionActive && timerTaskId ? "session" : ($("recordTypeSelect")?.value || "session"));
 }
 
 function setRecordType(type) {
   const isMetric = type === "metric";
+  $("focus")?.classList.toggle("record-mode-metric", isMetric);
   if ($("recordTypeSelect")) $("recordTypeSelect").value = isMetric ? "metric" : "session";
   $("sessionRecordFields")?.classList.toggle("hide", isMetric);
   $("sessionLogPanel")?.classList.toggle("hide", isMetric);

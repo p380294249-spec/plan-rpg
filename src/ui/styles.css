@@ -795,6 +795,11 @@ small { color: var(--muted); line-height: 1.5; }
   gap: 18px;
   align-items: start;
 }
+#focus.record-mode-metric .focus-grid {
+  width: min(560px, 100%);
+  margin: 0 auto;
+  grid-template-columns: minmax(0, 1fr);
+}
 .review-grid {
   display: grid;
   grid-template-columns: minmax(0, 1fr) 420px;

@@ -103,4 +103,22 @@ const mapSectionEnd = indexHtml.indexOf("</section>", indexHtml.indexOf('<sectio
 const activePanelIndex = indexHtml.indexOf('id="activeTimerPanel"');
 assert.ok(activePanelIndex > mapSectionEnd, "active timer panel should live outside the map screen");
 
+const renderFocusJs = fs.readFileSync(path.join(root, "src/ui/render-focus.js"), "utf8");
+assert.ok(
+  renderFocusJs.includes('timerSessionActive && timerTaskId ? "session"'),
+  "active unfinished sessions should force the focus screen back to session record mode"
+);
+
+const renderDashboardJs = fs.readFileSync(path.join(root, "src/ui/render-dashboard.js"), "utf8");
+assert.ok(
+  renderDashboardJs.includes('setRecordType("session")'),
+  "floating timer return action should reveal the session settlement form"
+);
+
+const stylesCss = fs.readFileSync(path.join(root, "src/ui/styles.css"), "utf8");
+assert.ok(
+  stylesCss.includes("#focus.record-mode-metric .focus-grid"),
+  "metric log mode should use its own compact layout"
+);
+
 console.log("Plan RPG timer completion tests passed.");

@@ -117,6 +117,7 @@ function renderActiveTimerPanel() {
     selectedQuestId = task.questId;
     syncGoalForQuest(selectedQuestId);
     showScreen("focus");
+    setRecordType("session");
   };
   $("cancelFocusBtn").onclick = () => {
     cancelActiveSessionWithConfirm();

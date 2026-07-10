@@ -1,5 +1,16 @@
 # Plan RPG Version Notes
 
+## v0.3.61 - 2026-07-10
+
+### Focus Timer
+
+- Fixed the pending focus settlement flow: if a timer has reached zero and the user had switched to `Quick Metric Log`, the `填写并结算` action now forces the page back to the normal session log form.
+- The floating timer panel return button also resets the record type to `20min Session`, so the completed focus record is always editable before settlement.
+
+### Metric Log UI
+
+- Centered the `Quick Metric Log` form when metric mode is selected, avoiding the previous left-column-only layout that looked broken on desktop.
+
 ## v0.3.60 - 2026-07-06
 
 ### Weekly Planning
