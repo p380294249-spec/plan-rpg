@@ -4,7 +4,7 @@ let selectedCampaignId = "Q-001";
 let selectedQuestId = "Q-009";
 let selectedTaskId = "T-003";
 let selectedGoalId = "BUSINESS";
-let selectedSkillId = "personal-system";
+let selectedSkillId = "focus";
 let editingLogId = null;
 let lastSession = null;
 let seconds = APP_CONFIG.SESSION_DURATION_SECONDS;
@@ -32,7 +32,7 @@ const weeklyCommandFocus = [
 const $ = (id) => document.getElementById(id);
 const questById = (id) => data.quests.find(q => q.id === id);
 const taskById = (id) => data.tasks.find(t => t.id === id);
-const skillById = (id) => data.skills.find(s => s.id === id);
+const skillById = (id) => (data.legacySkills || data.skills || []).find(s => s.id === id);
 const tasksForQuest = (id) => data.tasks.filter(t => t.questId === id);
 const pct = (n) => Math.round(n) + "%";
 const escapeHtml = (value = "") => String(value).replace(/[&<>"']/g, ch => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[ch]));

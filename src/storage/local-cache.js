@@ -45,6 +45,8 @@ function loadData() {
 
 function normalizeData(raw) {
   const merged = { ...structuredClone(seed), ...raw };
+  merged.legacySkills = normalizeLegacySkills(mergeById(seed.skills, merged.legacySkills || merged.skills || []));
+  merged.skills = merged.legacySkills;
   merged.goals2030 = normalizeGoals(mergeById(seed.goals2030, merged.goals2030 || []));
   merged.quests = normalizeQuests(mergeById(seed.quests, merged.quests || []));
   merged.tasks = normalizeTasks(mergeById(seed.tasks, merged.tasks || []));
@@ -54,6 +56,17 @@ function normalizeData(raw) {
   merged.gameEvents = normalizeGameEvents(merged.gameEvents || merged.game?.events || []);
   applyMetricLogsToDashboard(merged.metricLogs, merged);
   return merged;
+}
+
+function normalizeLegacySkills(skills = []) {
+  return skills.map(skill => ({
+    ...skill,
+    archived: true,
+    legacy: true,
+    xp: Number(skill.xp || 0),
+    maxXp: Number(skill.maxXp || 100),
+    level: Number(skill.level || 1)
+  }));
 }
 
 function isMergedMindsetQuestId(questId) {

@@ -1,5 +1,14 @@
 # Plan RPG Version Notes
 
+## v0.3.67 - 2026-07-15
+
+### Active Skills
+
+- Added a new Active Skills architecture with seven RPG character attributes: Focus, Sales, Communication, Language, Management, Investment, and AI & Systems.
+- Preserved legacy `data.skills` for historical `skillXp` records, and separated them from active character progression.
+- Focus now has the first confirmed progression rule: one completed 20-minute focus session equals one Focus progress.
+- Rebuilt the Skills screen around level, title, lifetime progress, annual progress, 2030-ready fields, milestones, achievements, mentor inspiration, recent activity, and legacy archive.
+
 ## v0.3.66 - 2026-07-15
 
 ### Skills Navigation

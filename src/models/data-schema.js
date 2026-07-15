@@ -186,9 +186,11 @@
  */
 
 /*
- * SKILL
- * Stored in: localStorage (STORAGE_KEY) under data.skills
+ * LEGACY_SKILL
+ * Stored in: localStorage (STORAGE_KEY) under data.skills and data.legacySkills
  * Seed: seed.skills
+ * Purpose: preserved historical XP categories for old SessionLog.skillXp events.
+ * These are archived and should not be treated as active character attributes.
  * Fields:
  *   id            - string, unique skill ID (e.g. "strategy", "operations")
  *   name          - string, display name with Chinese translation
@@ -198,6 +200,36 @@
  *   description   - string, what this skill covers
  *   requirements  - string[], LinkedIn-style requirement descriptions
  *   unlock        - string, reward unlocked at next level
+ */
+
+/*
+ * ACTIVE_SKILL
+ * Config-only active character attributes in src/skills/skill-config.js.
+ * Rendered by: renderSkills(), renderSkillMini()
+ * Computed by: activeSkillStates()
+ *
+ * Active Skill IDs:
+ *   focus, sales, communication, language, management, investment, ai-systems
+ *
+ * Fields:
+ *   id                 - string, active skill ID
+ *   name / cnName      - display labels
+ *   source             - progression source; only focus is active now
+ *   levelStep          - number|null, progress required per level
+ *   annualTarget       - number|null, optional annual progression target
+ *   target2030         - number|null, optional 2030 progression target
+ *   baseTitle / titles - current and future RPG titles
+ *   milestones         - major progress milestones
+ *   achievements       - unlockable achievement definitions
+ *   mentor             - optional mentor/master inspiration
+ *   legacySkillIds     - old archived skills shown for reference only
+ *
+ * Confirmed rule:
+ *   focus: 1 completed 20-minute focus session = 1 Focus progress.
+ *
+ * Planned rules:
+ *   sales, communication, language, management, investment, ai-systems
+ *   are structural placeholders until exact progression rules are designed.
  */
 
 /*

@@ -2,7 +2,7 @@
 
 Plan RPG is a lightweight web MVP for turning yearly plans, weekly quests, 20-minute focus sessions, execution logs, rewards, skills, and reviews into a game-like personal planning system.
 
-Current version: `v0.3.66`
+Current version: `v0.3.67`
 
 Live app:
 
@@ -44,6 +44,7 @@ GitHub Pages frontend
 index.html                  GitHub Pages shell: DOM skeleton + script/style links
 src/config/                 App constants and sync keys
 src/game/                   Reward engine, reward pool config, pity, and inventory logic
+src/skills/                 Active RPG skill config and progression computation
 src/models/                 Seed data and schema documentation
 src/storage/                localStorage cache and Google Sheet API client
 src/services/               Session, task, XP, timer, review, and classification logic

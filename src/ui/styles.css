@@ -1510,6 +1510,38 @@ small { color: var(--muted); line-height: 1.5; }
   outline: 2px solid rgba(133, 87, 232, .45);
   background: #fff;
 }
+.skill-title-line {
+  margin-top: -4px;
+  color: #475467;
+  font-weight: 900;
+}
+.active-skill-stats {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px;
+  margin: 14px 0;
+}
+.skill-lore {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+  margin: 16px 0;
+}
+.skill-lore > div {
+  border: 1px solid var(--line);
+  background: rgba(255, 255, 255, .72);
+  border-radius: 8px;
+  padding: 12px;
+}
+.skill-lore b {
+  display: block;
+  margin-bottom: 6px;
+}
+.skill-lore p {
+  margin: 0;
+  color: #475467;
+  line-height: 1.55;
+}
 .skill-node-row {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
@@ -1522,6 +1554,35 @@ small { color: var(--muted); line-height: 1.5; }
   background: rgba(255,255,255,.72);
   padding: 14px;
   min-height: 120px;
+}
+.achievement-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+}
+.skill-node.done {
+  border-color: rgba(5, 150, 105, .36);
+  background: rgba(5, 150, 105, .08);
+}
+.skill-node.locked {
+  color: #64748b;
+  background: rgba(148, 163, 184, .1);
+}
+.compact-log-list {
+  margin-bottom: 10px;
+}
+.legacy-skill-archive {
+  margin-top: 14px;
+  border-top: 1px solid var(--line);
+  padding-top: 12px;
+}
+.legacy-skill-archive summary {
+  cursor: pointer;
+  font-weight: 900;
+}
+.legacy-skill-archive > p {
+  color: #64748b;
+  line-height: 1.55;
 }
 
 .table-wrap {
@@ -1601,7 +1662,8 @@ td { color: #475569; }
     margin-bottom: 22px;
   }
   .quest-lane:before { display: none; }
-  .form-grid, .review-cards, .skill-node-row, .reward-line, .option-row, .summary-strip, .weekly-command-grid { grid-template-columns: 1fr; }
+  .form-grid, .review-cards, .skill-node-row, .reward-line, .option-row, .summary-strip, .weekly-command-grid,
+  .active-skill-stats, .skill-lore, .achievement-grid { grid-template-columns: 1fr; }
   .review-week-picker { grid-template-columns: repeat(3, minmax(0, 1fr)); }
   .review-week-picker button { min-width: 0; padding: 8px 5px; font-size: 12px; }
   .timer-value { font-size: 58px; }

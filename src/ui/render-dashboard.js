@@ -11,15 +11,16 @@ function renderGoals() {
 }
 
 function renderSkillMini() {
-  const previewSkills = data.skills.slice(0, 4);
+  const skills = activeSkillStates();
+  const previewSkills = skills.slice(0, 4);
   $("skillMini").innerHTML = `
     ${previewSkills.map(s => `
     <div class="skill-mini">
-      <div class="goal-head"><span>${escapeHtml(s.name.split(" / ")[0])}</span><span>Lv.${s.level}</span></div>
-      <div class="bar"><div class="fill" style="--value:${Math.min(100, s.xp / s.maxXp * 100)}%"></div></div>
+      <div class="goal-head"><span>${escapeHtml(s.name)}</span><span>Lv.${s.level}</span></div>
+      <div class="bar"><div class="fill" style="--value:${s.progressToNext ?? 0}%"></div></div>
     </div>
     `).join("")}
-    <button class="side-link-button" data-open-skills>查看全部 ${data.skills.length} 个 Skills</button>
+    <button class="side-link-button" data-open-skills>查看全部 ${skills.length} 个 Skills</button>
   `;
   const openSkillsBtn = document.querySelector("[data-open-skills]");
   if (openSkillsBtn) openSkillsBtn.onclick = () => showScreen("skills");
