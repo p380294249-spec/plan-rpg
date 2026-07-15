@@ -32,6 +32,7 @@ function renderFocus() {
   $("sessionGmn").value = t.gmn || "G";
   $("sessionGmn").onchange = (e) => updateTaskGmn(t.id, e.target.value);
   $("focusTaskName").textContent = t.current_title || t.name;
+  renderFocusContext(q, t);
   $("sessionTypePill").textContent = `${selectedDurationMinutes()}min Session`;
   $("durationInput").onchange = () => {
     const minutes = selectedDurationMinutes();
@@ -69,7 +70,9 @@ function renderFocus() {
 function setRecordType(type) {
   const isMetric = type === "metric";
   $("focus")?.classList.toggle("record-mode-metric", isMetric);
+  $("focus")?.classList.toggle("record-mode-session", !isMetric);
   if ($("recordTypeSelect")) $("recordTypeSelect").value = isMetric ? "metric" : "session";
+  $("recordTypeLabel")?.classList.toggle("hide", !isMetric);
   $("sessionRecordFields")?.classList.toggle("hide", isMetric);
   $("sessionLogPanel")?.classList.toggle("hide", isMetric);
   if (isMetric) $("sessionResult")?.classList.add("hide");
@@ -84,15 +87,30 @@ function populateMetricGoalSelect() {
   $("metricLogGoal").value = data.goals2030.some(goal => goal.id === current) ? current : selectedGoalId;
 }
 
+function renderFocusContext(quest, task) {
+  if (!$("focusContext")) return;
+  const root = questById(rootQuestId(quest.id));
+  const goal = data.goals2030.find(item => item.id === questGoalIds(root || quest)[0] || item.id === selectedGoalId);
+  const parts = [
+    goalLabel(goal) || selectedGoalId,
+    root?.name,
+    quest.id !== root?.id ? quest.name : "",
+    task?.gmn ? gmnText(task.gmn) : ""
+  ].filter(Boolean);
+  $("focusContext").innerHTML = parts.map(part => `<span>${escapeHtml(part)}</span>`).join("");
+}
+
 function renderRecordBoardMode(task) {
   const meditation = isMeditationTask(task);
-  $("recordBoardTitle").textContent = meditation ? "冥想记录板" : "战斗记录板";
+  $("focus")?.classList.toggle("meditation-session", meditation);
+  $("focus")?.classList.toggle("simple-session", !meditation);
+  $("recordBoardTitle").textContent = meditation ? "冥想记录" : "行动记录";
   $("whatDoneLabel").firstChild.textContent = meditation ? "场景" : "做了什么";
-  $("problemLabel").firstChild.textContent = meditation ? "感受 / Mood" : "遇到什么问题";
-  $("whatDone").placeholder = meditation ? "在哪里、什么姿势、周围环境、冥想前的状态..." : `这 ${selectedDurationMinutes()} 分钟具体推进了什么？`;
-  $("problem").placeholder = meditation ? "身体、呼吸、情绪、念头有没有变化？" : "卡点、阻力、情绪、信息缺口...";
-  ["solutionLabel", "goodLabel", "badLabel", "nextStepLabel"].forEach(id => $(id).classList.toggle("hide", meditation));
-  $("moodStressLabel").classList.toggle("hide", meditation);
+  $("problemLabel").firstChild.textContent = meditation ? "感受 / Mood" : "补充";
+  $("whatDone").placeholder = meditation ? "在哪里、什么姿势、冥想前的状态..." : "这 20 分钟实际做了什么？一句话也可以。";
+  $("problem").placeholder = meditation ? "身体、呼吸、情绪、念头有没有变化？" : "可不填：卡点、下一步、结果...";
+  ["solutionLabel", "goodLabel", "badLabel", "nextStepLabel", "moodStressLabel"].forEach(id => $(id).classList.add("hide"));
+  $("problemLabel").classList.toggle("hide", !meditation);
 }
 
 function renderTimer() {
@@ -123,8 +141,7 @@ function renderSessionResult(log) {
       ${log.is_pivoted ? `<div class="reward"><span>任务转向</span><b>Discovery</b></div>` : ""}
     </div>
     <p><b>${meditation ? "场景" : "做了什么"}：</b>${escapeHtml(log.whatDone)}</p>
-    <p><b>${meditation ? "感受" : "问题"}：</b>${escapeHtml(log.problem || "未填写")}</p>
-    ${meditation ? "" : `<p><b>下一步：</b>${escapeHtml(log.nextStep || "未填写")}</p>`}
+    ${meditation ? `<p><b>感受：</b>${escapeHtml(log.problem || "未填写")}</p>` : ""}
     ${log.is_pivoted ? `<p><b>转向说明：</b>${escapeHtml(log.pivot_note || "已记录转向")}</p>` : ""}
     ${log.is_random_event ? `
       <div class="route-item">

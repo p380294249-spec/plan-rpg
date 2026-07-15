@@ -795,10 +795,45 @@ small { color: var(--muted); line-height: 1.5; }
   gap: 18px;
   align-items: start;
 }
+#focus.simple-session .focus-grid {
+  grid-template-columns: minmax(280px, 340px) minmax(0, 760px) 280px;
+}
 #focus.record-mode-metric .focus-grid {
   width: min(560px, 100%);
   margin: 0 auto;
   grid-template-columns: minmax(0, 1fr);
+}
+.focus-context {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+  margin: 8px 0 12px;
+}
+.focus-context span {
+  display: inline-flex;
+  align-items: center;
+  min-height: 24px;
+  border-radius: 999px;
+  padding: 4px 8px;
+  color: #475569;
+  background: rgba(248, 250, 252, .94);
+  border: 1px solid rgba(148, 163, 184, .34);
+  font-size: 12px;
+  font-weight: 900;
+}
+.advanced-session-action {
+  display: none;
+}
+#focus.simple-session #sessionLogPanel .form-grid,
+#focus.meditation-session #sessionLogPanel .form-grid {
+  grid-template-columns: 1fr;
+}
+#focus.simple-session #sessionLogPanel textarea {
+  min-height: 190px;
+  font-size: 16px;
+}
+#focus.simple-session #recordBoardTitle {
+  margin-bottom: 14px;
 }
 .review-grid {
   display: grid;
@@ -1174,6 +1209,9 @@ td { color: #475569; }
     grid-template-columns: 1fr;
     height: auto;
     min-height: 0;
+  }
+  #focus.simple-session .focus-grid {
+    grid-template-columns: 1fr;
   }
   .map-stage { min-height: 0; }
   .detail { max-height: none; }

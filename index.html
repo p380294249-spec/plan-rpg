@@ -3,8 +3,8 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Plan RPG v0.3.61 / 计划 RPG</title>
-  <link rel="stylesheet" href="src/ui/styles.css?v=0.3.61" />
+  <title>Plan RPG v0.3.62 / 计划 RPG</title>
+  <link rel="stylesheet" href="src/ui/styles.css?v=0.3.62" />
 </head>
 <body>
   <div class="app">
@@ -14,7 +14,7 @@
         <div>
           <h1>计划 RPG</h1>
           <p>把目标变成冒险</p>
-          <span class="version">v0.3.61 在线网页软件</span>
+          <span class="version">v0.3.62 在线网页软件</span>
         </div>
       </div>
 
@@ -122,9 +122,10 @@
               <span class="pill" id="sessionTypePill">20min Session</span>
               <button class="ghost" id="backToMapBtn">返回地图</button>
             </div>
-            <label>Record Type<select id="recordTypeSelect"><option value="session">20min Session</option><option value="metric">Quick Metric Log</option></select></label>
+            <label id="recordTypeLabel">Record Type<select id="recordTypeSelect"><option value="session">20min Session</option><option value="metric">Quick Metric Log</option></select></label>
             <div id="sessionRecordFields">
             <h3 id="focusTaskName">选择一个任务开始</h3>
+            <div class="focus-context" id="focusContext"></div>
             <label>当前任务<select id="taskSelect"></select></label>
             <label class="duration-control">本次时间（分钟）<input id="durationInput" type="number" min="1" max="180" step="1" value="20" /></label>
             <label>本次 GMN<select id="sessionGmn"><option value="G">G 成长</option><option value="M">M 维护</option><option value="N">N 噪音</option></select></label>
@@ -138,9 +139,9 @@
             </div>
             <div id="skillRewardPreview"></div>
             <div class="actions">
-              <button class="secondary" id="randomEventBtn">+ 突发任务</button>
-              <button class="secondary" id="pivotTaskBtn">任务转向</button>
-              <button class="secondary" id="saveDraftBtn">保存草稿</button>
+              <button class="secondary advanced-session-action" id="randomEventBtn">+ 突发任务</button>
+              <button class="secondary advanced-session-action" id="pivotTaskBtn">任务转向</button>
+              <button class="secondary advanced-session-action" id="saveDraftBtn">保存草稿</button>
               <button class="primary" id="saveSessionBtn">完成并结算</button>
             </div>
             </div>
@@ -379,23 +380,23 @@
     </div>
   </div>
 
-  <script src="src/config/app-config.js?v=0.3.61"></script>
-  <script src="src/models/seed-data.js?v=0.3.61"></script>
-  <script src="src/state/app-state.js?v=0.3.61"></script>
-  <script src="src/storage/local-cache.js?v=0.3.61"></script>
-  <script src="src/storage/sheet-api.js?v=0.3.61"></script>
-  <script src="src/services/task-service.js?v=0.3.61"></script>
-  <script src="src/services/todo-service.js?v=0.3.61"></script>
-  <script src="src/services/session-service.js?v=0.3.61"></script>
-  <script src="src/ui/render-dashboard.js?v=0.3.61"></script>
-  <script src="src/ui/render-detail.js?v=0.3.61"></script>
-  <script src="src/ui/render-focus.js?v=0.3.61"></script>
-  <script src="src/ui/render-todos.js?v=0.3.61"></script>
-  <script src="src/ui/render-review.js?v=0.3.61"></script>
-  <script src="src/ui/render-skills.js?v=0.3.61"></script>
-  <script src="src/ui/render-model.js?v=0.3.61"></script>
-  <script src="src/ui/render-sheet-settings.js?v=0.3.61"></script>
-  <script src="src/main.js?v=0.3.61"></script>
+  <script src="src/config/app-config.js?v=0.3.62"></script>
+  <script src="src/models/seed-data.js?v=0.3.62"></script>
+  <script src="src/state/app-state.js?v=0.3.62"></script>
+  <script src="src/storage/local-cache.js?v=0.3.62"></script>
+  <script src="src/storage/sheet-api.js?v=0.3.62"></script>
+  <script src="src/services/task-service.js?v=0.3.62"></script>
+  <script src="src/services/todo-service.js?v=0.3.62"></script>
+  <script src="src/services/session-service.js?v=0.3.62"></script>
+  <script src="src/ui/render-dashboard.js?v=0.3.62"></script>
+  <script src="src/ui/render-detail.js?v=0.3.62"></script>
+  <script src="src/ui/render-focus.js?v=0.3.62"></script>
+  <script src="src/ui/render-todos.js?v=0.3.62"></script>
+  <script src="src/ui/render-review.js?v=0.3.62"></script>
+  <script src="src/ui/render-skills.js?v=0.3.62"></script>
+  <script src="src/ui/render-model.js?v=0.3.62"></script>
+  <script src="src/ui/render-sheet-settings.js?v=0.3.62"></script>
+  <script src="src/main.js?v=0.3.62"></script>
 </body>
 </html>
 

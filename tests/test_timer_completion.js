@@ -120,5 +120,24 @@ assert.ok(
   stylesCss.includes("#focus.record-mode-metric .focus-grid"),
   "metric log mode should use its own compact layout"
 );
+assert.ok(
+  stylesCss.includes("#focus.simple-session #sessionLogPanel textarea"),
+  "ordinary focus sessions should use the simplified one-field log layout"
+);
+
+assert.ok(
+  indexHtml.includes("advanced-session-action"),
+  "advanced random/pivot/draft actions should be hidden from the main focus flow"
+);
+
+const sessionServiceJs = fs.readFileSync(path.join(root, "src/services/session-service.js"), "utf8");
+assert.ok(
+  sessionServiceJs.includes('problem: meditation ? feeling : ""'),
+  "ordinary sessions should not save hidden reflection-field leftovers"
+);
+assert.ok(
+  sessionServiceJs.includes('moodStress: meditation ? feeling : ""'),
+  "ordinary sessions should not save hidden mood-field leftovers"
+);
 
 console.log("Plan RPG timer completion tests passed.");

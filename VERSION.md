@@ -1,5 +1,14 @@
 # Plan RPG Version Notes
 
+## v0.3.62 - 2026-07-15
+
+### Focus Session
+
+- Simplified ordinary 20-minute sessions into a lightweight action log: current context, current task, timer, GMN, and one `做了什么` field.
+- Hid random-event, pivot, and draft buttons from the main focus flow so the daily recording path stays one-button start and one-button settlement.
+- Meditation keeps its special two-field mode: scene plus feeling/mood.
+- Ordinary session saves now ignore hidden legacy reflection fields, preventing stale text from being written into new logs.
+
 ## v0.3.61 - 2026-07-10
 
 ### Focus Timer
