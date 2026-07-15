@@ -1,5 +1,12 @@
 # Plan RPG Version Notes
 
+## v0.3.68 - 2026-07-15
+
+### Mindset
+
+- Added a separate `复盘` chapter under MINDSET, with a default 20-minute `G` action.
+- Grouped MINDSET into `冥想` and `复盘` cards while keeping meditation history and its 80-session baseline separate from review records.
+
 ## v0.3.67 - 2026-07-15
 
 ### Active Skills
