@@ -33,6 +33,8 @@ function renderFocus() {
   $("sessionGmn").onchange = (e) => updateTaskGmn(t.id, e.target.value);
   $("focusTaskName").textContent = t.current_title || t.name;
   renderFocusContext(q, t);
+  renderFocusChoiceBoard(t);
+  renderWorthRecordToggle();
   $("sessionTypePill").textContent = `${selectedDurationMinutes()}min Session`;
   $("durationInput").onchange = () => {
     const minutes = selectedDurationMinutes();
@@ -45,13 +47,7 @@ function renderFocus() {
     }
   };
   renderRecordBoardMode(t);
-  $("skillRewardPreview").innerHTML = `
-    <div class="reward-line">
-      ${buildSkillXp(t).map(x => `<div class="reward"><span>${escapeHtml(skillById(x.skillId).name.split(" / ")[0])}</span><b>+${x.xp} XP</b></div>`).join("")}
-      <div class="reward"><span>GMN</span><b>${t.gmn}</b></div>
-      ${t.is_random_event ? `<div class="reward"><span>突发</span><b>${typeBadge(t.quest_type)}</b></div>` : ""}
-    </div>
-  `;
+  renderSkillRewardPreview(t);
   $("taskSelect").onchange = (e) => {
     const nextTaskId = e.target.value;
     if (!confirmStartNewSession(nextTaskId)) {
@@ -98,6 +94,122 @@ function renderFocusContext(quest, task) {
     task?.gmn ? gmnText(task.gmn) : ""
   ].filter(Boolean);
   $("focusContext").innerHTML = parts.map(part => `<span>${escapeHtml(part)}</span>`).join("");
+}
+
+function focusSessionTasks() {
+  return data.tasks.filter(task => !isMetricOnlyTask(task));
+}
+
+function focusQuestOptions(campaignId = selectedCampaignId) {
+  const children = chapterQuestsForCampaign(campaignId).filter(quest => tasksForQuest(quest.id).some(task => !isMetricOnlyTask(task)));
+  const campaign = questById(campaignId);
+  return children.length ? children : (campaign && tasksForQuest(campaign.id).some(task => !isMetricOnlyTask(task)) ? [campaign] : []);
+}
+
+function firstSessionTaskForQuest(questId) {
+  return tasksForQuest(questId).find(task => !isMetricOnlyTask(task)) || null;
+}
+
+function firstSessionTaskForCampaign(campaignId) {
+  return focusQuestOptions(campaignId).map(quest => firstSessionTaskForQuest(quest.id)).find(Boolean) || null;
+}
+
+function renderFocusChoiceBoard(task) {
+  if (!$("focusChoiceBoard")) return;
+  const campaignOptions = campaignQuestsForGoal(selectedGoalId).filter(campaign => firstSessionTaskForCampaign(campaign.id));
+  const questOptions = focusQuestOptions(selectedCampaignId);
+  const taskOptions = tasksForQuest(selectedQuestId).filter(item => !isMetricOnlyTask(item));
+  $("focusChoiceBoard").innerHTML = `
+    <div class="focus-choice-group">
+      <span>目标</span>
+      <div class="focus-choice-row">
+        ${campaignOptions.map(campaign => focusChoiceButton("campaign", campaign.id, campaign.name, campaign.id === selectedCampaignId)).join("")}
+      </div>
+    </div>
+    <div class="focus-choice-group">
+      <span>模块</span>
+      <div class="focus-choice-row">
+        ${questOptions.map(quest => focusChoiceButton("quest", quest.id, quest.name, quest.id === selectedQuestId)).join("")}
+      </div>
+    </div>
+    <div class="focus-choice-group">
+      <span>行动</span>
+      <div class="focus-choice-row">
+        ${taskOptions.map(item => focusChoiceButton("task", item.id, item.current_title || item.name, item.id === task.id)).join("")}
+      </div>
+    </div>
+  `;
+  document.querySelectorAll("[data-focus-campaign]").forEach(btn => {
+    btn.onclick = () => selectFocusCampaign(btn.dataset.focusCampaign);
+  });
+  document.querySelectorAll("[data-focus-quest]").forEach(btn => {
+    btn.onclick = () => selectFocusQuest(btn.dataset.focusQuest);
+  });
+  document.querySelectorAll("[data-focus-task]").forEach(btn => {
+    btn.onclick = () => selectFocusTask(btn.dataset.focusTask);
+  });
+}
+
+function focusChoiceButton(type, id, label, active) {
+  const attr = type === "campaign" ? "data-focus-campaign" : type === "quest" ? "data-focus-quest" : "data-focus-task";
+  return `<button class="focus-choice ${active ? "active" : ""}" type="button" ${attr}="${escapeHtml(id)}">${escapeHtml(label)}</button>`;
+}
+
+function selectFocusCampaign(campaignId) {
+  const nextTask = firstSessionTaskForCampaign(campaignId);
+  if (nextTask && !confirmStartNewSession(nextTask.id)) return;
+  selectedCampaignId = campaignId;
+  selectedQuestId = nextTask?.questId || campaignId;
+  selectedTaskId = nextTask?.id || selectedTaskId;
+  syncGoalForQuest(selectedQuestId);
+  renderAll();
+}
+
+function selectFocusQuest(questId) {
+  const nextTask = firstSessionTaskForQuest(questId);
+  if (nextTask && !confirmStartNewSession(nextTask.id)) return;
+  selectedQuestId = questId;
+  selectedTaskId = nextTask?.id || selectedTaskId;
+  syncGoalForQuest(selectedQuestId);
+  renderAll();
+}
+
+function selectFocusTask(taskId) {
+  if (!confirmStartNewSession(taskId)) return;
+  const task = taskById(taskId);
+  if (!task) return;
+  selectedTaskId = task.id;
+  selectedQuestId = task.questId;
+  syncGoalForQuest(selectedQuestId);
+  renderAll();
+}
+
+function renderWorthRecordToggle() {
+  const button = $("worthRecordBtn");
+  if (!button) return;
+  button.classList.toggle("active", Boolean(currentSessionWorthRecording));
+  button.setAttribute("aria-pressed", currentSessionWorthRecording ? "true" : "false");
+  button.textContent = currentSessionWorthRecording ? "★ 值得记录" : "☆ 值得记录";
+  button.onclick = () => {
+    currentSessionWorthRecording = !currentSessionWorthRecording;
+    renderWorthRecordToggle();
+    const task = taskById(selectedTaskId);
+    if (task) renderSkillRewardPreview(task);
+  };
+}
+
+function renderSkillRewardPreview(task) {
+  const skillRewards = buildSkillXp(task).filter(item => Number(item.xp || 0) > 0);
+  $("skillRewardPreview").innerHTML = `
+    <div class="reward-strip">
+      ${skillRewards.map(item => {
+        const skill = skillById(item.skillId);
+        return `<div class="reward-pill"><span>${escapeHtml((skill?.name || item.skillId).split(" / ")[0])}</span><b>+${item.xp}</b></div>`;
+      }).join("") || `<div class="reward-pill muted"><span>专注记录</span><b>+0</b></div>`}
+      <div class="reward-pill gmn-reward"><span>GMN</span><b>${escapeHtml(task.gmn || "G")}</b></div>
+      ${currentSessionWorthRecording ? `<div class="reward-pill worth-reward"><span>值得记录</span><b>★</b></div>` : ""}
+    </div>
+  `;
 }
 
 function renderRecordBoardMode(task) {

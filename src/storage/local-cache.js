@@ -216,6 +216,7 @@ function normalizeLog(log, index, tasks = seed.tasks) {
     nextStep: log.nextStep || "",
     moodStress: log.moodStress || log.mood_stress || "",
     skillXp: log.skillXp || buildSkillXp(task || seed.tasks[2]),
+    worthRecording: Boolean(log.worthRecording || log.worth_recording === true || String(log.worth_recording || "").toLowerCase() === "true"),
     is_random_event: Boolean(log.is_random_event || task?.is_random_event),
     is_pivoted: Boolean(log.is_pivoted),
     original_task_id: mergedMindsetTaskId(log.original_task_id || log.taskId || "T-003"),

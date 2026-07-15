@@ -94,6 +94,8 @@
  *   good              - string, what went well
  *   bad               - string, what could be improved
  *   nextStep          - string, next action
+ *   moodStress        - string, mood/feeling note, mainly used by meditation logs
+ *   worthRecording    - boolean, user marked this session as worth preserving/reviewing
  *   skillXp           - SkillXpEvent[], XP awarded to skills
  *   is_random_event   - boolean, whether logged task was a random event
  *   is_pivoted        - boolean, whether this log involved a pivot

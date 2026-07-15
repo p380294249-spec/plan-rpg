@@ -3,8 +3,9 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Plan RPG v0.3.62 / 计划 RPG</title>
-  <link rel="stylesheet" href="src/ui/styles.css?v=0.3.62" />
+  <title>Plan RPG v0.3.63 / 计划 RPG</title>
+  <link rel="icon" href="data:," />
+  <link rel="stylesheet" href="src/ui/styles.css?v=0.3.63" />
 </head>
 <body>
   <div class="app">
@@ -14,7 +15,7 @@
         <div>
           <h1>计划 RPG</h1>
           <p>把目标变成冒险</p>
-          <span class="version">v0.3.62 在线网页软件</span>
+          <span class="version">v0.3.63 在线网页软件</span>
         </div>
       </div>
 
@@ -126,9 +127,11 @@
             <div id="sessionRecordFields">
             <h3 id="focusTaskName">选择一个任务开始</h3>
             <div class="focus-context" id="focusContext"></div>
-            <label>当前任务<select id="taskSelect"></select></label>
+            <div class="focus-choice-board" id="focusChoiceBoard"></div>
+            <label class="hide">当前任务<select id="taskSelect"></select></label>
             <label class="duration-control">本次时间（分钟）<input id="durationInput" type="number" min="1" max="180" step="1" value="20" /></label>
             <label>本次 GMN<select id="sessionGmn"><option value="G">G 成长</option><option value="M">M 维护</option><option value="N">N 噪音</option></select></label>
+            <button class="worth-record-toggle" id="worthRecordBtn" type="button" aria-pressed="false">☆ 值得记录</button>
             <div class="timer">
               <div class="timer-value" id="timerValue">20:00</div>
               <div class="timer-actions">
@@ -380,23 +383,23 @@
     </div>
   </div>
 
-  <script src="src/config/app-config.js?v=0.3.62"></script>
-  <script src="src/models/seed-data.js?v=0.3.62"></script>
-  <script src="src/state/app-state.js?v=0.3.62"></script>
-  <script src="src/storage/local-cache.js?v=0.3.62"></script>
-  <script src="src/storage/sheet-api.js?v=0.3.62"></script>
-  <script src="src/services/task-service.js?v=0.3.62"></script>
-  <script src="src/services/todo-service.js?v=0.3.62"></script>
-  <script src="src/services/session-service.js?v=0.3.62"></script>
-  <script src="src/ui/render-dashboard.js?v=0.3.62"></script>
-  <script src="src/ui/render-detail.js?v=0.3.62"></script>
-  <script src="src/ui/render-focus.js?v=0.3.62"></script>
-  <script src="src/ui/render-todos.js?v=0.3.62"></script>
-  <script src="src/ui/render-review.js?v=0.3.62"></script>
-  <script src="src/ui/render-skills.js?v=0.3.62"></script>
-  <script src="src/ui/render-model.js?v=0.3.62"></script>
-  <script src="src/ui/render-sheet-settings.js?v=0.3.62"></script>
-  <script src="src/main.js?v=0.3.62"></script>
+  <script src="src/config/app-config.js?v=0.3.63"></script>
+  <script src="src/models/seed-data.js?v=0.3.63"></script>
+  <script src="src/state/app-state.js?v=0.3.63"></script>
+  <script src="src/storage/local-cache.js?v=0.3.63"></script>
+  <script src="src/storage/sheet-api.js?v=0.3.63"></script>
+  <script src="src/services/task-service.js?v=0.3.63"></script>
+  <script src="src/services/todo-service.js?v=0.3.63"></script>
+  <script src="src/services/session-service.js?v=0.3.63"></script>
+  <script src="src/ui/render-dashboard.js?v=0.3.63"></script>
+  <script src="src/ui/render-detail.js?v=0.3.63"></script>
+  <script src="src/ui/render-focus.js?v=0.3.63"></script>
+  <script src="src/ui/render-todos.js?v=0.3.63"></script>
+  <script src="src/ui/render-review.js?v=0.3.63"></script>
+  <script src="src/ui/render-skills.js?v=0.3.63"></script>
+  <script src="src/ui/render-model.js?v=0.3.63"></script>
+  <script src="src/ui/render-sheet-settings.js?v=0.3.63"></script>
+  <script src="src/main.js?v=0.3.63"></script>
 </body>
 </html>
 

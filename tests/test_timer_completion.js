@@ -129,6 +129,14 @@ assert.ok(
   indexHtml.includes("advanced-session-action"),
   "advanced random/pivot/draft actions should be hidden from the main focus flow"
 );
+assert.ok(
+  indexHtml.includes('id="focusChoiceBoard"'),
+  "focus screen should expose the button-based task selector"
+);
+assert.ok(
+  indexHtml.includes('id="worthRecordBtn"'),
+  "focus screen should expose the worth-recording toggle"
+);
 
 const sessionServiceJs = fs.readFileSync(path.join(root, "src/services/session-service.js"), "utf8");
 assert.ok(
@@ -138,6 +146,31 @@ assert.ok(
 assert.ok(
   sessionServiceJs.includes('moodStress: meditation ? feeling : ""'),
   "ordinary sessions should not save hidden mood-field leftovers"
+);
+assert.ok(
+  sessionServiceJs.includes("worthRecording: Boolean(currentSessionWorthRecording)"),
+  "session logs should persist the worth-recording flag"
+);
+
+assert.ok(
+  renderFocusJs.includes("renderFocusChoiceBoard"),
+  "focus render should build button-based task choices"
+);
+assert.ok(
+  renderFocusJs.includes("reward-strip"),
+  "focus reward preview should use the compact reward strip"
+);
+
+const sheetApiJs = fs.readFileSync(path.join(root, "src/storage/sheet-api.js"), "utf8");
+assert.ok(
+  sheetApiJs.includes("worth_recording"),
+  "Google Sheet sync should include the worth-recording field"
+);
+
+const appsScriptJs = fs.readFileSync(path.join(root, "google-apps-script/Code.gs"), "utf8");
+assert.ok(
+  appsScriptJs.includes("SESSION_LOG_HEADERS") && appsScriptJs.includes("worth_recording"),
+  "Apps Script should keep the Session_Logs schema compatible with worth-recording sync"
 );
 
 console.log("Plan RPG timer completion tests passed.");

@@ -821,6 +821,75 @@ small { color: var(--muted); line-height: 1.5; }
   font-size: 12px;
   font-weight: 900;
 }
+.focus-choice-board {
+  display: grid;
+  gap: 10px;
+  margin: 10px 0 12px;
+}
+.focus-choice-group {
+  display: grid;
+  gap: 6px;
+}
+.focus-choice-group > span {
+  color: #475569;
+  font-size: 12px;
+  font-weight: 900;
+}
+.focus-choice-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+}
+.focus-choice {
+  min-height: 34px;
+  max-width: 100%;
+  border-radius: 999px;
+  border: 1px solid rgba(148, 163, 184, .38);
+  background: rgba(255, 255, 255, .86);
+  color: #334155;
+  padding: 6px 11px;
+  font-size: 12px;
+  font-weight: 900;
+  line-height: 1.2;
+  text-align: left;
+  overflow-wrap: anywhere;
+  transition: transform .16s var(--ease), box-shadow .18s var(--ease), border-color .18s var(--ease), background .18s var(--ease), color .18s var(--ease);
+}
+.focus-choice:hover {
+  transform: translateY(-1px);
+  border-color: rgba(37, 99, 235, .44);
+  background: #fff;
+  box-shadow: var(--shadow-1);
+}
+.focus-choice.active {
+  color: #fff;
+  border-color: transparent;
+  background: linear-gradient(135deg, #2563eb, #6d5dfc);
+  box-shadow: 0 10px 20px rgba(37, 99, 235, .2);
+}
+.worth-record-toggle {
+  min-height: 38px;
+  width: 100%;
+  border-radius: 8px;
+  border: 1px solid rgba(245, 158, 11, .32);
+  background: rgba(255, 251, 235, .72);
+  color: #92400e;
+  font-weight: 900;
+  text-align: center;
+  transition: transform .16s var(--ease), box-shadow .18s var(--ease), border-color .18s var(--ease), background .18s var(--ease);
+}
+.worth-record-toggle:hover {
+  transform: translateY(-1px);
+  border-color: rgba(245, 158, 11, .55);
+  background: #fffbeb;
+  box-shadow: var(--shadow-1);
+}
+.worth-record-toggle.active {
+  color: #78350f;
+  border-color: rgba(245, 158, 11, .65);
+  background: linear-gradient(180deg, #fef3c7, #fffbeb);
+  box-shadow: inset 0 0 0 1px rgba(245, 158, 11, .18);
+}
 .advanced-session-action {
   display: none;
 }
@@ -834,6 +903,50 @@ small { color: var(--muted); line-height: 1.5; }
 }
 #focus.simple-session #recordBoardTitle {
   margin-bottom: 14px;
+}
+.reward-strip {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 12px 0 2px;
+}
+.reward-pill {
+  min-height: 38px;
+  max-width: 100%;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  border-radius: 999px;
+  border: 1px solid rgba(148, 163, 184, .34);
+  background: rgba(255, 255, 255, .86);
+  padding: 7px 10px;
+  color: #334155;
+  box-shadow: 0 6px 14px rgba(20, 31, 52, .05);
+}
+.reward-pill span {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 12px;
+  font-weight: 900;
+}
+.reward-pill b {
+  color: #172033;
+  font-size: 15px;
+  white-space: nowrap;
+}
+.reward-pill.gmn-reward {
+  border-color: rgba(37, 99, 235, .26);
+  background: rgba(239, 246, 255, .9);
+}
+.reward-pill.worth-reward {
+  border-color: rgba(245, 158, 11, .36);
+  background: rgba(255, 251, 235, .9);
+}
+.reward-pill.muted {
+  color: #64748b;
+  background: rgba(248, 250, 252, .86);
 }
 .review-grid {
   display: grid;
@@ -1240,6 +1353,10 @@ td { color: #475569; }
   .todo-item .todo-urgent { grid-column: 2 / -1; justify-self: start; }
   .completed-todo { grid-template-columns: minmax(0, 1fr) auto; }
   .completed-todo small { grid-column: 2; }
+  .focus-choice-row { display: grid; grid-template-columns: 1fr; }
+  .focus-choice { width: 100%; justify-content: flex-start; }
+  .reward-strip { display: grid; grid-template-columns: 1fr; }
+  .reward-pill { justify-content: space-between; }
   .quest-lane, .quest-lane.side {
     grid-template-columns: repeat(2, minmax(120px, 1fr));
     height: auto;
@@ -1282,7 +1399,8 @@ body {
 .primary, .secondary, .danger, .ghost,
 .nav button, .utility-actions button,
 .todo-choice, .todo-filter, .todo-toggle,
-.pivot-option, .layer-toggle, .stat, .pill {
+.pivot-option, .layer-toggle, .stat, .pill,
+.focus-choice, .worth-record-toggle, .reward-pill {
   transition: transform .16s var(--ease), box-shadow .18s var(--ease),
               background-color .18s var(--ease), border-color .18s var(--ease),
               color .18s var(--ease), filter .18s var(--ease);
@@ -1329,7 +1447,8 @@ body {
 button:focus-visible,
 .todo-choice:focus-visible, .todo-filter:focus-visible,
 .todo-toggle:focus-visible, .pivot-option:focus-visible,
-.layer-toggle:focus-visible {
+.layer-toggle:focus-visible, .focus-choice:focus-visible,
+.worth-record-toggle:focus-visible {
   outline: none;
   box-shadow: var(--ring-strong);
 }

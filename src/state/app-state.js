@@ -17,6 +17,7 @@ let pendingAfterSessionSave = null;
 let selectedPivotType = "renamed";
 let todoUiState = { category: "DFK", filter: "ALL", isStarred: false, isUrgent: false };
 let reviewWeeksAgo = 0;
+let currentSessionWorthRecording = false;
 const MINDSET_CANONICAL_QUEST_ID = "Q-004";
 const MINDSET_CANONICAL_TASK_ID = "T-007";
 const MINDSET_MERGED_QUEST_IDS = ["Q-028", "Q-029", "Q-030", "Q-031", "Q-032", "Q-033", "Q-034", "Q-035", "Q-036", "Q-037"];

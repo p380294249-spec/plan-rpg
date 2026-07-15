@@ -1,5 +1,11 @@
 const SPREADSHEET_ID = '1Yz-RswNvBxJ9GFWfcU2KDAFh23NCWLS-HS2_g_07rAg';
 const SYNC_TOKEN = 'plan-rpg-2026';
+const SESSION_LOG_HEADERS = [
+  'log_id', 'date', 'user', 'device', 'goal_id', 'quest_id', 'task_id',
+  'gmn', 'minutes', 'what_done', 'problem', 'solution', 'good', 'bad',
+  'next_step', 'mood_stress', 'worth_recording', 'skill_xp_json',
+  'created_at', 'updated_at'
+];
 
 function doGet(e) {
   const params = e && e.parameter ? e.parameter : {};
@@ -72,10 +78,21 @@ function parseRowParam_(value) {
 }
 
 function appendSessionLog_(row) {
-  const sheet = SpreadsheetApp.openById(SPREADSHEET_ID).getSheetByName('Session_Logs');
+  const sheet = ensureSessionLogSheet_();
   const headers = sheet.getRange(1, 1, 1, sheet.getLastColumn()).getValues()[0];
   const values = headers.map(header => row[header] == null ? '' : row[header]);
   sheet.appendRow(values);
+}
+
+function ensureSessionLogSheet_() {
+  const sheet = ensureSheet_('Session_Logs', SESSION_LOG_HEADERS);
+  const lastColumn = Math.max(sheet.getLastColumn(), 1);
+  const existingHeaders = sheet.getRange(1, 1, 1, lastColumn).getValues()[0].map(String);
+  const missingHeaders = SESSION_LOG_HEADERS.filter(header => !existingHeaders.includes(header));
+  if (missingHeaders.length) {
+    sheet.getRange(1, lastColumn + 1, 1, missingHeaders.length).setValues([missingHeaders]);
+  }
+  return sheet;
 }
 
 function appendMetricLog_(row) {

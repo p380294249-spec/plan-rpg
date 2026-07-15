@@ -319,6 +319,7 @@ function confirmStartNewSession(nextTaskId) {
 function abandonActiveSession() {
   running = false;
   timerSessionActive = false;
+  currentSessionWorthRecording = false;
   clearInterval(timer);
   timer = null;
   timerEndsAt = 0;
@@ -434,6 +435,7 @@ function readForm() {
     nextStep: meditation ? "下次继续短冥想" : q.nextMove,
     moodStress: meditation ? feeling : "",
     skillXp: buildSkillXp(t),
+    worthRecording: Boolean(currentSessionWorthRecording),
     is_random_event: Boolean(t.is_random_event),
     is_pivoted: false,
     original_task_id: t.original_task_id || t.id,
@@ -497,6 +499,7 @@ function saveSession() {
   lastSession = log;
   save();
   clearForm();
+  currentSessionWorthRecording = false;
   resetTimer();
   renderAll();
   renderSessionResult(log);

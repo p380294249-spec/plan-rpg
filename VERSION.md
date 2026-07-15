@@ -1,5 +1,14 @@
 # Plan RPG Version Notes
 
+## v0.3.63 - 2026-07-15
+
+### Focus Session
+
+- Replaced the visible current-task dropdown with button-based focus selection for goal/module/action choices.
+- Added a `值得记录` toggle to mark useful sessions for later review, and synced that flag through local data and Google Sheets rows.
+- Reworked the XP preview into a compact reward strip so the left focus panel no longer overflows.
+- Updated the Apps Script session writer to add missing `mood_stress` / `worth_recording` headers automatically.
+
 ## v0.3.62 - 2026-07-15
 
 ### Focus Session

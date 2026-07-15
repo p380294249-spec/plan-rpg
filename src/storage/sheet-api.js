@@ -105,6 +105,7 @@ function logToSheetRow(log) {
     bad: log.bad,
     next_step: log.nextStep,
     mood_stress: log.moodStress || "",
+    worth_recording: Boolean(log.worthRecording),
     skill_xp_json: JSON.stringify(log.skillXp || []),
     created_at: new Date().toISOString(),
     updated_at: new Date().toISOString()
@@ -135,6 +136,7 @@ function sheetRowToLog(row, index = 0) {
     bad: row.bad,
     nextStep: row.next_step,
     moodStress: row.mood_stress,
+    worthRecording: row.worth_recording,
     skillXp
   }, index, data.tasks);
 }
