@@ -1,5 +1,14 @@
 # Plan RPG Version Notes
 
+## v0.3.69 - 2026-07-15
+
+### Reward Interaction
+
+- Rebuilt the Focus reward interaction around a concealed 2-second charge, rarity-specific burst reveal, and a 15-draw Legendary guarantee.
+- Added the reward redemption state machine: unredeemed -> redeeming -> completed / expired.
+- Added timed reward countdowns, optional spending notes, expiry scan, and historical redemption-rate feedback.
+- Kept rewards event-sourced in `gameEvents`, so draw and redemption state continue to sync through the existing `Game_Events` Google Sheet tab.
+
 ## v0.3.68 - 2026-07-15
 
 ### Mindset

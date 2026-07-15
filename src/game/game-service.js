@@ -141,11 +141,15 @@ function gamePityState() {
   };
 }
 
+function legendaryPityTriggered(pity = gamePityState()) {
+  return pity.Legendary >= Math.max(0, Number(GAME_CONFIG.pity.Legendary.forceAt || 15) - 1);
+}
+
 function adjustedRarityWeights() {
   const weights = { ...GAME_CONFIG.rarityWeights };
   const pity = gamePityState();
   const legendaryConfig = GAME_CONFIG.pity.Legendary;
-  if (pity.Legendary >= legendaryConfig.forceAt) {
+  if (legendaryPityTriggered(pity)) {
     return { Common: 0, Rare: 0, Epic: 0, Legendary: 100 };
   }
 
@@ -188,14 +192,160 @@ function chooseReward(skillId, rarity) {
   return candidates[Math.floor(Math.random() * candidates.length)];
 }
 
-function drawRewardForMission(missionType) {
+function rewardFlowConfig() {
+  return GAME_CONFIG.rewardFlow || {
+    chargeMs: 2000,
+    burstMs: { Common: 600, Rare: 1400, Epic: 1800, Legendary: 2600 },
+    expiryDays: { Common: 3, Rare: 7, Epic: 14, Legendary: 30 },
+    urgentExpiryHours: 24
+  };
+}
+
+function gameEventTimestamp(event) {
+  const timestamp = new Date(event?.createdAt || event?.updatedAt || 0).getTime();
+  return Number.isFinite(timestamp) ? timestamp : 0;
+}
+
+function rewardEventsForInstance(instanceId) {
+  return (data.gameEvents || [])
+    .filter(event => event.rewardInstanceId === instanceId)
+    .sort((left, right) => gameEventTimestamp(left) - gameEventTimestamp(right));
+}
+
+function rewardConfigSnapshot(drawEvent) {
+  const fromDraw = drawEvent?.payload?.reward;
+  if (fromDraw && typeof fromDraw === "object") return fromDraw;
+  return (GAME_CONFIG.rewardPools[drawEvent?.skillId || "FOCUS"] || [])
+    .find(reward => reward.id === drawEvent?.rewardId) || {};
+}
+
+function rewardExpiryAt(drawEvent) {
+  const snapshot = rewardConfigSnapshot(drawEvent);
+  const storedExpiry = Number(drawEvent?.payload?.expiresAt || snapshot.expiresAt || 0);
+  if (storedExpiry) return storedExpiry;
+  const days = Number(snapshot.expireDays || rewardFlowConfig().expiryDays[drawEvent?.rarity] || 3);
+  return gameEventTimestamp(drawEvent) + days * 86400000;
+}
+
+function rewardLifecycleForDraw(drawEvent, now = Date.now()) {
+  const events = rewardEventsForInstance(drawEvent.rewardInstanceId);
+  const lifecycleEvents = events.filter(event => event.eventType !== "reward_drawn");
+  const latest = lifecycleEvents[lifecycleEvents.length - 1];
+  const reward = rewardConfigSnapshot(drawEvent);
+  const expiryAt = rewardExpiryAt(drawEvent);
+  let status = "unredeemed";
+  let redeemStartedAt = null;
+  let completedAt = null;
+  let note = "";
+
+  const redeemEvent = lifecycleEvents.find(event => event.eventType === "reward_redeeming");
+  const completeEvent = lifecycleEvents.find(event => event.eventType === "reward_completed" || event.eventType === "reward_used");
+  const expiredEvent = lifecycleEvents.find(event => event.eventType === "reward_expired");
+  if (completeEvent) {
+    status = "completed";
+    completedAt = gameEventTimestamp(completeEvent);
+    note = String(completeEvent.payload?.note || "");
+  } else if (expiredEvent) {
+    status = "expired";
+  } else if (redeemEvent) {
+    status = "redeeming";
+    redeemStartedAt = gameEventTimestamp(redeemEvent);
+  } else if (now > expiryAt) {
+    status = "expired";
+  }
+  if (redeemEvent) redeemStartedAt = gameEventTimestamp(redeemEvent);
+
+  return {
+    id: drawEvent.rewardInstanceId,
+    drawEvent,
+    reward,
+    events,
+    latestEvent: latest || drawEvent,
+    rarity: drawEvent.rarity,
+    rewardId: drawEvent.rewardId,
+    rewardName: drawEvent.rewardName,
+    rewardType: drawEvent.rewardType,
+    icon: reward.icon || "✦",
+    redemptionType: reward.redemptionType || (String(drawEvent.rewardType).includes("Time") ? "time" : "simple"),
+    durationMinutes: Number(reward.durationMinutes || reward.value || 0),
+    expiresAt: expiryAt,
+    status,
+    redeemStartedAt,
+    completedAt,
+    note
+  };
+}
+
+function allRewardInstances(now = Date.now()) {
+  return gameDrawEvents().map(event => rewardLifecycleForDraw(event, now));
+}
+
+function rewardInventoryInstances(now = Date.now()) {
+  return allRewardInstances(now)
+    .filter(item => item.status === "unredeemed" || item.status === "redeeming")
+    .sort((left, right) => {
+      if (left.status !== right.status) return left.status === "redeeming" ? -1 : 1;
+      return left.expiresAt - right.expiresAt;
+    });
+}
+
+function rewardTimeRemainingSeconds(instance, now = Date.now()) {
+  if (instance?.redemptionType !== "time" || !instance.redeemStartedAt) return 0;
+  const totalSeconds = Math.max(0, Number(instance.durationMinutes || 0) * 60);
+  return Math.max(0, totalSeconds - Math.floor((now - instance.redeemStartedAt) / 1000));
+}
+
+function canCompleteRewardRedemption(instance, now = Date.now()) {
+  return instance?.status === "redeeming" && rewardTimeRemainingSeconds(instance, now) === 0;
+}
+
+function createRewardLifecycleEvent(drawEvent, eventType, status, payload = {}) {
+  return normalizeGameEvents([{
+    id: newId("GE"),
+    eventType,
+    skillId: drawEvent.skillId,
+    missionType: drawEvent.missionType,
+    missionKey: drawEvent.missionKey,
+    rewardInstanceId: drawEvent.rewardInstanceId,
+    rewardId: drawEvent.rewardId,
+    rewardName: drawEvent.rewardName,
+    rewardType: drawEvent.rewardType,
+    rarity: drawEvent.rarity,
+    status,
+    sourceLogId: drawEvent.sourceLogId || "",
+    payload,
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString()
+  }])[0];
+}
+
+function appendGameEvent(event) {
+  data.gameEvents.unshift(event);
+  save();
+  if (typeof syncGameEventToSheet === "function") syncGameEventToSheet(event, { silent: true });
+  return event;
+}
+
+function scanExpiredRewardInstances(now = Date.now()) {
+  const expired = allRewardInstances(now).filter(item => item.status === "expired" && !item.events.some(event => event.eventType === "reward_expired"));
+  expired.forEach(item => appendGameEvent(createRewardLifecycleEvent(item.drawEvent, "reward_expired", "expired", {
+    expiredAt: new Date(now).toISOString(),
+    expiresAt: item.expiresAt
+  })));
+  return expired.length;
+}
+
+function prepareRewardDraw(missionType, roll = Math.random()) {
   const mission = focusMissionStatus()[missionType];
   if (!mission || !mission.canClaim) return null;
   const weights = adjustedRarityWeights();
-  const rarity = chooseRarity(weights);
+  const rarity = chooseRarity(weights, roll);
   const reward = chooseReward("FOCUS", rarity);
   if (!reward) return null;
-  const event = normalizeGameEvents([{
+  const createdAt = new Date().toISOString();
+  const expiresAt = new Date(createdAt).getTime() + Number(reward.expireDays || rewardFlowConfig().expiryDays[rarity] || 3) * 86400000;
+  const sourceTask = taskById(lastSession?.actual_task_id || lastSession?.taskId || "");
+  return normalizeGameEvents([{
     id: newId("GE"),
     eventType: "reward_drawn",
     skillId: "FOCUS",
@@ -206,74 +356,67 @@ function drawRewardForMission(missionType) {
     rewardName: reward.name,
     rewardType: reward.type,
     rarity,
-    status: "saved",
+    status: "unredeemed",
     sourceLogId: lastSession?.id || "",
     payload: {
       reward,
-      mission: {
-        units: mission.units,
-        target: mission.target
-      },
+      expiresAt,
+      sourceTaskId: sourceTask?.id || "",
+      mission: { units: mission.units, target: mission.target },
       pity: gamePityState(),
-      weights
+      weights,
+      pityTriggered: rarity === "Legendary" && legendaryPityTriggered(gamePityState())
     },
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString()
+    createdAt,
+    updatedAt: createdAt
   }])[0];
-  data.gameEvents.unshift(event);
-  save();
-  if (typeof syncGameEventToSheet === "function") syncGameEventToSheet(event, { silent: true });
-  return event;
 }
 
-function rewardUsedEventFor(instanceId) {
-  return (data.gameEvents || []).find(event => event.eventType === "reward_used" && event.rewardInstanceId === instanceId);
+function commitRewardDraw(event) {
+  if (!event || missionClaimed(event.missionKey)) return null;
+  return appendGameEvent(event);
 }
 
-function rewardInventoryItems() {
-  const groups = new Map();
-  gameDrawEvents().forEach(event => {
-    if (rewardUsedEventFor(event.rewardInstanceId)) return;
-    const key = event.rewardId;
-    const current = groups.get(key) || {
-      rewardId: event.rewardId,
-      rewardName: event.rewardName,
-      rewardType: event.rewardType,
-      rarity: event.rarity,
-      icon: event.payload?.reward?.icon || "",
-      count: 0,
-      instances: []
-    };
-    current.count += 1;
-    current.instances.push(event);
-    groups.set(key, current);
-  });
-  return Array.from(groups.values()).sort((a, b) => rarityRank(b.rarity) - rarityRank(a.rarity) || a.rewardName.localeCompare(b.rewardName));
+function drawRewardForMission(missionType, roll = Math.random()) {
+  return commitRewardDraw(prepareRewardDraw(missionType, roll));
 }
 
+function startRewardRedemption(instanceId) {
+  const instance = allRewardInstances().find(item => item.id === instanceId);
+  if (!instance || instance.status !== "unredeemed") return null;
+  return appendGameEvent(createRewardLifecycleEvent(instance.drawEvent, "reward_redeeming", "redeeming", {
+    startedFromEventId: instance.drawEvent.id,
+    expiresAt: instance.expiresAt
+  }));
+}
+
+function completeRewardRedemption(instanceId, note = "", now = Date.now()) {
+  const instance = allRewardInstances(now).find(item => item.id === instanceId);
+  if (!instance || !canCompleteRewardRedemption(instance, now)) return null;
+  return appendGameEvent(createRewardLifecycleEvent(instance.drawEvent, "reward_completed", "completed", {
+    completedFromEventId: instance.latestEvent.id,
+    note: String(note || "").trim()
+  }));
+}
+
+// Compatibility for old callers. The UI now uses the strict two-step redemption flow.
 function useRewardInstance(instanceId) {
-  const rewardEvent = gameDrawEvents().find(event => event.rewardInstanceId === instanceId);
-  if (!rewardEvent || rewardUsedEventFor(instanceId)) return null;
-  const event = normalizeGameEvents([{
-    id: newId("GE"),
-    eventType: "reward_used",
-    skillId: rewardEvent.skillId,
-    missionType: rewardEvent.missionType,
-    missionKey: rewardEvent.missionKey,
-    rewardInstanceId: instanceId,
-    rewardId: rewardEvent.rewardId,
-    rewardName: rewardEvent.rewardName,
-    rewardType: rewardEvent.rewardType,
-    rarity: rewardEvent.rarity,
-    status: "used",
-    sourceLogId: rewardEvent.sourceLogId || "",
-    payload: { usedFromEventId: rewardEvent.id },
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString()
-  }])[0];
-  data.gameEvents.unshift(event);
-  save();
-  if (typeof syncGameEventToSheet === "function") syncGameEventToSheet(event, { silent: true });
-  if (typeof renderAll === "function") renderAll();
-  return event;
+  const started = startRewardRedemption(instanceId);
+  if (!started) return null;
+  return completeRewardRedemption(instanceId);
+}
+
+function rewardRedemptionStats(now = Date.now()) {
+  const instances = allRewardInstances(now);
+  const completed = instances.filter(item => item.status === "completed").length;
+  const expired = instances.filter(item => item.status === "expired").length;
+  const settled = completed + expired;
+  return {
+    issued: instances.length,
+    completed,
+    expired,
+    active: instances.filter(item => item.status === "unredeemed" || item.status === "redeeming").length,
+    rate: settled ? Math.round((completed / settled) * 100) : null,
+    warning: settled > 0 && Math.round((completed / settled) * 100) < 60
+  };
 }

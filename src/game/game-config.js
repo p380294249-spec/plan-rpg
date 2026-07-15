@@ -25,6 +25,23 @@ const GAME_CONFIG = {
     Epic: 8,
     Legendary: 2
   },
+  rewardFlow: {
+    // The reward is decided immediately, but this first phase never reveals its rarity.
+    chargeMs: 2000,
+    burstMs: {
+      Common: 600,
+      Rare: 1400,
+      Epic: 1800,
+      Legendary: 2600
+    },
+    expiryDays: {
+      Common: 3,
+      Rare: 7,
+      Epic: 14,
+      Legendary: 30
+    },
+    urgentExpiryHours: 24
+  },
   pity: {
     Epic: {
       startsAfter: 6,
@@ -32,10 +49,10 @@ const GAME_CONFIG = {
       maxBonus: 14
     },
     Legendary: {
-      startsAfter: 25,
-      increment: 0.8,
-      maxBonus: 8,
-      forceAt: 50
+      startsAfter: 10,
+      increment: 1.5,
+      maxBonus: 10,
+      forceAt: 15
     }
   },
   rewardPools: {
@@ -44,6 +61,8 @@ const GAME_CONFIG = {
         id: "gaming-20",
         name: "20分钟游戏",
         type: "Time Reward",
+        redemptionType: "time",
+        durationMinutes: 20,
         rarity: "Common",
         value: 20,
         unit: "min",
@@ -53,6 +72,7 @@ const GAME_CONFIG = {
         id: "coffee-fund",
         name: "手冲咖啡 / 咖啡基金",
         type: "Consumption Reward",
+        redemptionType: "consumption",
         rarity: "Rare",
         value: 1,
         unit: "次",
@@ -62,6 +82,7 @@ const GAME_CONFIG = {
         id: "night-off",
         name: "一晚上完全不工作",
         type: "Freedom Reward",
+        redemptionType: "simple",
         rarity: "Epic",
         value: 1,
         unit: "晚",
@@ -71,6 +92,7 @@ const GAME_CONFIG = {
         id: "double-reward-ticket",
         name: "Double Reward 抽奖券",
         type: "Game Item",
+        redemptionType: "simple",
         rarity: "Legendary",
         value: 1,
         unit: "张",

@@ -44,6 +44,7 @@ function renderAll() {
 
 function bootstrapPlanRpg() {
   data = loadData();
+  scanExpiredRewardInstances();
   todoUiState = readTodoUiState();
   document.querySelectorAll(".nav button").forEach(btn => btn.addEventListener("click", () => showScreen(btn.dataset.screen)));
   $("backToMapBtn").addEventListener("click", () => showScreen("map"));

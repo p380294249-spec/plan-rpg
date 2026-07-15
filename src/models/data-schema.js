@@ -147,11 +147,11 @@
 /*
  * GAME_EVENT
  * Stored in: localStorage (STORAGE_KEY) under data.gameEvents + optional Google Sheets (Game_Events tab)
- * Created by: drawRewardForMission(), useRewardInstance()
+ * Created by: drawRewardForMission(), startRewardRedemption(), completeRewardRedemption(), scanExpiredRewardInstances()
  * Normalized by: normalizeGameEvents()
  * Fields:
  *   id                - string, unique game event ID
- *   eventType         - string: "reward_drawn" | "reward_used"
+ *   eventType         - string: "reward_drawn" | "reward_redeeming" | "reward_completed" | "reward_expired"
  *   skillId           - string, first implementation is "FOCUS"
  *   missionType       - string: "daily" | "weekly"
  *   missionKey        - string, e.g. "FOCUS:daily:2026-07-15"
@@ -160,14 +160,14 @@
  *   rewardName        - string, reward display name
  *   rewardType        - string, e.g. "Time Reward" | "Freedom Reward"
  *   rarity            - string: "Common" | "Rare" | "Epic" | "Legendary"
- *   status            - string: "saved" | "used"
+ *   status            - string: "unredeemed" | "redeeming" | "completed" | "expired"
  *   sourceLogId       - string, optional focus log that triggered the reward
- *   payload           - object, snapshot of reward config, mission progress, pity, and draw weights
+ *   payload           - object, reward snapshot, expiry, mission progress, pity, draw weights, and optional redemption note
  *   createdAt         - string, ISO datetime
  *   updatedAt         - string, ISO datetime
  *
  * The game layer is event-sourced. Inventory, draw history, mission claim state,
- * and pity counters are derived from these events plus existing Focus logs.
+ * redemption state, expiry, and pity counters are derived from these events plus existing Focus logs.
  * Existing logs remain the source of truth for Focus progress.
  */
 

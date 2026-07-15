@@ -1,17 +1,49 @@
 // src/ui/render-game.js
-// UI for the modular Game Layer.
+// Reward UI: mission claim, concealed draw, and two-step reward redemption.
 
 function rarityLabel(rarity) {
-  return ({
-    Common: "普通",
-    Rare: "稀有",
-    Epic: "史诗",
-    Legendary: "传说"
-  })[rarity] || rarity;
+  return ({ Common: "普通", Rare: "稀有", Epic: "史诗", Legendary: "传说" })[rarity] || rarity;
 }
 
 function rarityClass(rarity) {
   return `rarity-${String(rarity || "Common").toLowerCase()}`;
+}
+
+function rewardStatusLabel(status) {
+  return ({ unredeemed: "待兑现", redeeming: "兑现中", completed: "已完成", expired: "已过期" })[status] || status;
+}
+
+function rewardCountdownText(milliseconds) {
+  if (milliseconds <= 0) return "已过期";
+  const days = Math.floor(milliseconds / 86400000);
+  const hours = Math.floor((milliseconds % 86400000) / 3600000);
+  const minutes = Math.floor((milliseconds % 3600000) / 60000);
+  if (days > 0) return `${days}天${hours}小时`;
+  if (hours > 0) return `${hours}小时${minutes}分`;
+  return `${Math.max(1, minutes)}分钟`;
+}
+
+function rewardTimerText(seconds) {
+  const safe = Math.max(0, Math.floor(Number(seconds || 0)));
+  return `${String(Math.floor(safe / 60)).padStart(2, "0")}:${String(safe % 60).padStart(2, "0")}`;
+}
+
+function clearRewardRevealTimers() {
+  rewardRevealTimers.forEach(timerId => clearTimeout(timerId));
+  rewardRevealTimers = [];
+}
+
+function syncRewardClock(instances) {
+  const needsClock = instances.some(item => item.status === "redeeming" && item.redemptionType === "time" && rewardTimeRemainingSeconds(item) > 0);
+  if (needsClock && !rewardClockTimer) {
+    rewardClockTimer = setInterval(() => {
+      if ($("game")?.classList.contains("active")) renderGame();
+    }, 1000);
+  }
+  if (!needsClock && rewardClockTimer) {
+    clearInterval(rewardClockTimer);
+    rewardClockTimer = null;
+  }
 }
 
 function renderGameMissionPanel() {
@@ -61,10 +93,14 @@ function focusDots(units, target) {
 }
 
 function renderGame() {
+  scanExpiredRewardInstances();
+  const now = Date.now();
   const missions = focusMissionStatus();
   const level = focusLevelState();
-  const inventory = rewardInventoryItems();
-  const history = gameDrawEvents().slice(0, 12);
+  const inventory = rewardInventoryInstances(now);
+  const history = allRewardInstances(now).sort((left, right) => gameEventTimestamp(right.drawEvent) - gameEventTimestamp(left.drawEvent));
+  const stats = rewardRedemptionStats(now);
+  syncRewardClock(inventory);
   $("gameRoot").innerHTML = `
     <div class="game-hero panel">
       <div>
@@ -87,27 +123,28 @@ function renderGame() {
     </section>
 
     <section class="panel game-section">
-      <div class="game-section-head"><h3>Inventory</h3><small>奖励可保存，使用后留下记录</small></div>
-      <div class="inventory-grid">
-        ${inventory.map(item => renderInventoryItem(item)).join("") || `<div class="game-empty">还没有奖励。先完成 5 个 Focus 领取 Daily Chest。</div>`}
+      <div class="game-section-head"><h3>Reward Wallet</h3><small>开始兑现后，才会进入完成步骤</small></div>
+      <div class="reward-wallet-grid">
+        ${inventory.map(item => renderRewardWalletCard(item, now)).join("") || `<div class="game-empty">还没有待兑现奖励。先完成 5 个 Focus 领取 Daily Chest。</div>`}
       </div>
     </section>
 
     <section class="panel game-section">
-      <div class="game-section-head"><h3>Draw History</h3><small>抽奖历史和稀有度</small></div>
+      <div class="game-section-head"><h3>History</h3><small>已到期奖励的兑现率</small></div>
+      <div class="reward-history-stats ${stats.warning ? "warning" : ""}">
+        <div><span>已发放</span><b>${stats.issued}</b></div>
+        <div><span>已完成</span><b>${stats.completed}</b></div>
+        <div><span>已过期</span><b>${stats.expired}</b></div>
+        <div><span>兑现率</span><b>${stats.rate === null ? "-" : `${stats.rate}%`}</b></div>
+      </div>
+      ${stats.warning ? `<div class="reward-rate-warning">兑现率低于 60%，先使用已获得的奖励，再继续抽新的。</div>` : ""}
       <div class="draw-history">
-        ${history.map(event => `
-          <div class="draw-row ${rarityClass(event.rarity)}">
-            <span>${escapeHtml(event.rewardName)}</span>
-            <b>${rarityLabel(event.rarity)}</b>
-            <small>${gameDateKey(gameEventDate(event))}</small>
-          </div>
-        `).join("") || `<div class="game-empty">暂无抽奖记录。</div>`}
+        ${history.map(item => renderRewardHistoryRow(item)).join("") || `<div class="game-empty">暂无抽奖记录。</div>`}
       </div>
     </section>
 
     <section class="panel game-section">
-      <div class="game-section-head"><h3>Reward Pool</h3><small>配置驱动，后续直接往池子里加</small></div>
+      <div class="game-section-head"><h3>Reward Pool</h3><small>奖励和概率都在配置层，可随时调整</small></div>
       <div class="reward-pool-grid">
         ${GAME_CONFIG.rewardPools.FOCUS.map(reward => `
           <div class="pool-card ${rarityClass(reward.rarity)}">
@@ -122,16 +159,40 @@ function renderGame() {
   bindGameButtons();
 }
 
-function renderInventoryItem(item) {
-  const firstInstance = item.instances[0];
+function renderRewardWalletCard(item, now) {
+  const remainingMs = item.expiresAt - now;
+  const urgent = item.status === "unredeemed" && remainingMs > 0 && remainingMs < rewardFlowConfig().urgentExpiryHours * 3600000;
+  const remainingSeconds = rewardTimeRemainingSeconds(item, now);
+  const isTime = item.redemptionType === "time";
+  const note = rewardRedemptionNotes[item.id] ?? item.note ?? "";
+  const action = item.status === "unredeemed"
+    ? `<button class="primary" data-start-redeem="${escapeHtml(item.id)}">开始兑现</button>`
+    : isTime && remainingSeconds > 0
+      ? `<span class="reward-timer">${rewardTimerText(remainingSeconds)}</span>`
+      : `<button class="primary reward-complete" data-complete-redeem="${escapeHtml(item.id)}">完成</button>`;
   return `
-    <div class="inventory-card ${rarityClass(item.rarity)}">
-      <div class="inventory-icon">${escapeHtml(item.icon || "✦")}</div>
-      <div>
-        <b>${escapeHtml(item.rewardName)} × ${item.count}</b>
-        <small>${rarityLabel(item.rarity)} · ${escapeHtml(item.rewardType)} · SAVE</small>
+    <article class="reward-wallet-card ${rarityClass(item.rarity)} ${urgent ? "expiring" : ""} ${item.status}">
+      <div class="reward-wallet-main">
+        <div class="inventory-icon">${escapeHtml(item.icon)}</div>
+        <div>
+          <div class="reward-title-row"><span class="rarity-chip">${rarityLabel(item.rarity)}</span><b>${escapeHtml(item.rewardName)}</b></div>
+          <small>${item.status === "unredeemed" ? `剩余 ${rewardCountdownText(remainingMs)}` : isTime && remainingSeconds > 0 ? "奖励时间进行中" : rewardStatusLabel(item.status)}</small>
+        </div>
       </div>
-      <button class="secondary" data-use-reward="${escapeHtml(firstInstance.rewardInstanceId)}">USE</button>
+      <div class="reward-wallet-action">${action}</div>
+      ${item.status === "redeeming" && item.redemptionType === "consumption" ? `<label class="reward-note-label">花在哪了？<input data-reward-note="${escapeHtml(item.id)}" value="${escapeHtml(note)}" placeholder="可选" /></label>` : ""}
+    </article>
+  `;
+}
+
+function renderRewardHistoryRow(item) {
+  const detail = item.note ? ` · ${escapeHtml(item.note)}` : "";
+  return `
+    <div class="draw-row ${rarityClass(item.rarity)}">
+      <span>${escapeHtml(item.rewardName)}</span>
+      <b>${rarityLabel(item.rarity)}</b>
+      <small>${rewardStatusLabel(item.status)}${detail}</small>
+      <small>${gameDateKey(gameEventDate(item.drawEvent))}</small>
     </div>
   `;
 }
@@ -146,18 +207,31 @@ function bindGameButtons() {
       showScreen("game");
     };
   });
-  document.querySelectorAll("[data-use-reward]").forEach(btn => {
+  document.querySelectorAll("[data-start-redeem]").forEach(btn => {
     btn.onclick = () => {
-      useRewardInstance(btn.dataset.useReward);
+      startRewardRedemption(btn.dataset.startRedeem);
       renderGame();
     };
+  });
+  document.querySelectorAll("[data-complete-redeem]").forEach(btn => {
+    btn.onclick = () => {
+      const id = btn.dataset.completeRedeem;
+      const completed = completeRewardRedemption(id, rewardRedemptionNotes[id] || "");
+      if (completed) delete rewardRedemptionNotes[id];
+      renderGame();
+    };
+  });
+  document.querySelectorAll("[data-reward-note]").forEach(input => {
+    input.oninput = () => { rewardRedemptionNotes[input.dataset.rewardNote] = input.value; };
   });
 }
 
 function startRewardClaim(missionType) {
   const mission = focusMissionStatus()[missionType];
   if (!mission?.canClaim) return;
+  clearRewardRevealTimers();
   pendingRewardClaim = missionType;
+  pendingRewardDraw = null;
   renderRewardModal("ready");
 }
 
@@ -166,35 +240,73 @@ function renderRewardModal(mode, event = null) {
   if (!modal) return;
   modal.classList.remove("hide");
   const rarity = event?.rarity || "Common";
-  $("rewardModalContent").innerHTML = mode === "ready" ? `
-    <div class="reward-reveal ready">
-      <span class="pill">MISSION COMPLETE</span>
-      <div class="chest-visual">CHEST</div>
-      <h3>${pendingRewardClaim === "weekly" ? "Weekly Reward Chest" : "Daily Reward Chest"}</h3>
-      <button class="primary" id="openRewardChestBtn">OPEN CHEST</button>
-    </div>
-  ` : `
-    <div class="reward-reveal revealed ${rarityClass(rarity)}">
-      <span class="pill">${rarityLabel(rarity)} REWARD</span>
-      <div class="chest-visual">${escapeHtml(event.payload?.reward?.icon || "✦")}</div>
-      <h3>${escapeHtml(event.rewardName)}</h3>
-      <p>${escapeHtml(event.rewardType)} · 已加入 Inventory</p>
-      <div class="actions">
-        <button class="primary" data-open-game>查看奖励库</button>
-        <button class="secondary" data-close-modal="rewardModal">继续行动</button>
+  const reward = event?.payload?.reward || {};
+  const missionLabel = event?.missionType === "weekly" || pendingRewardClaim === "weekly" ? "Weekly Reward Chest" : "Daily Reward Chest";
+  if (mode === "ready") {
+    $("rewardModalContent").innerHTML = `
+      <div class="reward-reveal ready">
+        <span class="pill">MISSION COMPLETE</span>
+        <div class="chest-visual">CHEST</div>
+        <h3>${missionLabel}</h3>
+        <button class="primary" id="openRewardChestBtn">OPEN CHEST</button>
+        <button class="secondary" data-close-modal="rewardModal">稍后领取</button>
       </div>
-    </div>
-  `;
+    `;
+  } else if (mode === "charging") {
+    $("rewardModalContent").innerHTML = `
+      <div class="reward-reveal charging">
+        <span class="pill">REWARD LOCKED IN</span>
+        <div class="reward-charge-aura"></div>
+        <div class="chest-visual">CHEST</div>
+        <h3>正在开启</h3>
+      </div>
+    `;
+  } else if (mode === "burst") {
+    $("rewardModalContent").innerHTML = `
+      <div class="reward-reveal burst ${rarityClass(rarity)} ${rarity === "Legendary" ? "legendary-burst" : ""}" style="--burst-duration:${rewardFlowConfig().burstMs[rarity]}ms">
+        <div class="reward-burst-aura"></div>
+        ${rarity === "Legendary" ? `<div class="reward-gold-rays"></div>` : ""}
+        <div class="chest-visual">${rarity === "Legendary" ? "✦" : "CHEST"}</div>
+        <h3>开启中</h3>
+      </div>
+    `;
+  } else {
+    $("rewardModalContent").innerHTML = `
+      <div class="reward-reveal revealed ${rarityClass(rarity)}">
+        <span class="pill">${rarityLabel(rarity)} REWARD</span>
+        <div class="chest-visual">${escapeHtml(reward.icon || "✦")}</div>
+        <h3>${escapeHtml(event.rewardName)}</h3>
+        <p>已加入 Reward Wallet</p>
+        ${event.payload?.pityTriggered ? `<small class="pity-triggered">✦ 15 次保底触发</small>` : ""}
+        <div class="actions">
+          <button class="primary" data-open-game>查看奖励库</button>
+          <button class="secondary" data-close-modal="rewardModal">继续行动</button>
+        </div>
+      </div>
+    `;
+  }
   if ($("openRewardChestBtn")) $("openRewardChestBtn").onclick = openPendingRewardChest;
   modal.querySelectorAll("[data-close-modal]").forEach(btn => btn.onclick = () => closeModal(btn.dataset.closeModal));
   bindGameButtons();
 }
 
 function openPendingRewardChest() {
-  if (!pendingRewardClaim) return;
-  const event = drawRewardForMission(pendingRewardClaim);
-  pendingRewardClaim = null;
+  if (!pendingRewardClaim || pendingRewardDraw) return;
+  const event = prepareRewardDraw(pendingRewardClaim);
   if (!event) return;
-  renderAll();
-  renderRewardModal("revealed", event);
+  pendingRewardDraw = event;
+  renderRewardModal("charging", event);
+  const chargeMs = rewardFlowConfig().chargeMs;
+  const burstMs = rewardFlowConfig().burstMs[event.rarity];
+  rewardRevealTimers = [
+    setTimeout(() => renderRewardModal("burst", event), chargeMs),
+    setTimeout(() => {
+      const committed = commitRewardDraw(event);
+      if (!committed) return;
+      pendingRewardClaim = null;
+      pendingRewardDraw = null;
+      renderAll();
+      renderRewardModal("revealed", committed);
+    }, chargeMs + burstMs)
+  ];
 }
