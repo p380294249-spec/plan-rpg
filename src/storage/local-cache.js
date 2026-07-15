@@ -51,6 +51,7 @@ function normalizeData(raw) {
   merged.logs = (merged.logs || []).map((log, index) => normalizeLog(log, index, merged.tasks));
   merged.metricLogs = normalizeMetricLogs(merged.metricLogs || []);
   merged.todos = normalizeTodos(merged.todos || []);
+  merged.gameEvents = normalizeGameEvents(merged.gameEvents || merged.game?.events || []);
   applyMetricLogsToDashboard(merged.metricLogs, merged);
   return merged;
 }
@@ -238,6 +239,37 @@ function normalizeMetricLogs(metricLogs) {
     createdAt: log.createdAt || log.created_at || new Date().toISOString(),
     updatedAt: log.updatedAt || log.updated_at || new Date().toISOString()
   }));
+}
+
+function normalizeGameEvents(events) {
+  return (events || []).filter(Boolean).map((event, index) => {
+    const createdAt = event.createdAt || event.created_at || new Date().toISOString();
+    const payload = (() => {
+      if (typeof event.payload === "object" && event.payload !== null) return event.payload;
+      try {
+        return event.payload_json ? JSON.parse(event.payload_json) : {};
+      } catch (error) {
+        return {};
+      }
+    })();
+    return {
+      id: event.id || event.event_id || `GE-${String(index + 1).padStart(3, "0")}`,
+      eventType: event.eventType || event.event_type || "reward_drawn",
+      skillId: event.skillId || event.skill_id || "FOCUS",
+      missionType: event.missionType || event.mission_type || "",
+      missionKey: event.missionKey || event.mission_key || "",
+      rewardInstanceId: event.rewardInstanceId || event.reward_instance_id || "",
+      rewardId: event.rewardId || event.reward_id || "",
+      rewardName: event.rewardName || event.reward_name || "",
+      rewardType: event.rewardType || event.reward_type || "",
+      rarity: GAME_RARITIES.includes(event.rarity) ? event.rarity : "Common",
+      status: event.status || "saved",
+      sourceLogId: event.sourceLogId || event.source_log_id || "",
+      payload,
+      createdAt,
+      updatedAt: event.updatedAt || event.updated_at || createdAt
+    };
+  });
 }
 
 function taskByIdFromSeed(id) {

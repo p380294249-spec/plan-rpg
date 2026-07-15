@@ -3,9 +3,9 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Plan RPG v0.3.64 / 计划 RPG</title>
+  <title>Plan RPG v0.3.65 / 计划 RPG</title>
   <link rel="icon" href="data:," />
-  <link rel="stylesheet" href="src/ui/styles.css?v=0.3.64" />
+  <link rel="stylesheet" href="src/ui/styles.css?v=0.3.65" />
 </head>
 <body>
   <div class="app">
@@ -15,7 +15,7 @@
         <div>
           <h1>计划 RPG</h1>
           <p>把目标变成冒险</p>
-          <span class="version">v0.3.64 在线网页软件</span>
+          <span class="version">v0.3.65 在线网页软件</span>
         </div>
       </div>
 
@@ -29,6 +29,7 @@
         <button data-screen="focus">20分钟专注</button>
         <button data-screen="todos">待办 / 今日提醒</button>
         <button data-screen="review">周复盘</button>
+        <button data-screen="game">奖励 / Game</button>
         <button data-screen="skills">CEO 技能树</button>
         <button data-screen="model">数据模型</button>
       </nav>
@@ -86,6 +87,9 @@
         <div class="map-layout">
           <div class="map-stage">
             <div class="world-map">
+              <section class="map-layer game-command">
+                <div id="gameMissionPanel"></div>
+              </section>
               <section class="map-layer weekly-command">
                 <div class="layer-head">
                   <h3>本周作战</h3>
@@ -301,6 +305,10 @@
         </div>
       </section>
 
+      <section id="game" class="screen">
+        <div class="game-root" id="gameRoot"></div>
+      </section>
+
       <section id="model" class="screen">
         <div class="panel">
           <h3>数据模型</h3>
@@ -383,23 +391,39 @@
     </div>
   </div>
 
-  <script src="src/config/app-config.js?v=0.3.64"></script>
-  <script src="src/models/seed-data.js?v=0.3.64"></script>
-  <script src="src/state/app-state.js?v=0.3.64"></script>
-  <script src="src/storage/local-cache.js?v=0.3.64"></script>
-  <script src="src/storage/sheet-api.js?v=0.3.64"></script>
-  <script src="src/services/task-service.js?v=0.3.64"></script>
-  <script src="src/services/todo-service.js?v=0.3.64"></script>
-  <script src="src/services/session-service.js?v=0.3.64"></script>
-  <script src="src/ui/render-dashboard.js?v=0.3.64"></script>
-  <script src="src/ui/render-detail.js?v=0.3.64"></script>
-  <script src="src/ui/render-focus.js?v=0.3.64"></script>
-  <script src="src/ui/render-todos.js?v=0.3.64"></script>
-  <script src="src/ui/render-review.js?v=0.3.64"></script>
-  <script src="src/ui/render-skills.js?v=0.3.64"></script>
-  <script src="src/ui/render-model.js?v=0.3.64"></script>
-  <script src="src/ui/render-sheet-settings.js?v=0.3.64"></script>
-  <script src="src/main.js?v=0.3.64"></script>
+  <div class="modal-backdrop hide" id="rewardModal">
+    <div class="modal reward-modal">
+      <div class="row">
+        <div>
+          <span class="pill">Reward Chest</span>
+          <h3>Mission Reward</h3>
+        </div>
+        <button class="ghost" data-close-modal="rewardModal">关闭</button>
+      </div>
+      <div id="rewardModalContent"></div>
+    </div>
+  </div>
+
+  <script src="src/config/app-config.js?v=0.3.65"></script>
+  <script src="src/game/game-config.js?v=0.3.65"></script>
+  <script src="src/models/seed-data.js?v=0.3.65"></script>
+  <script src="src/state/app-state.js?v=0.3.65"></script>
+  <script src="src/storage/local-cache.js?v=0.3.65"></script>
+  <script src="src/storage/sheet-api.js?v=0.3.65"></script>
+  <script src="src/services/task-service.js?v=0.3.65"></script>
+  <script src="src/services/todo-service.js?v=0.3.65"></script>
+  <script src="src/services/session-service.js?v=0.3.65"></script>
+  <script src="src/game/game-service.js?v=0.3.65"></script>
+  <script src="src/ui/render-dashboard.js?v=0.3.65"></script>
+  <script src="src/ui/render-detail.js?v=0.3.65"></script>
+  <script src="src/ui/render-focus.js?v=0.3.65"></script>
+  <script src="src/ui/render-todos.js?v=0.3.65"></script>
+  <script src="src/ui/render-review.js?v=0.3.65"></script>
+  <script src="src/ui/render-skills.js?v=0.3.65"></script>
+  <script src="src/ui/render-game.js?v=0.3.65"></script>
+  <script src="src/ui/render-model.js?v=0.3.65"></script>
+  <script src="src/ui/render-sheet-settings.js?v=0.3.65"></script>
+  <script src="src/main.js?v=0.3.65"></script>
 </body>
 </html>
 

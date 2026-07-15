@@ -1,5 +1,14 @@
 # Plan RPG Version Notes
 
+## v0.3.65 - 2026-07-15
+
+### Game Layer
+
+- Added a modular FOCUS reward engine on top of existing focus logs without changing historical records.
+- Added Daily Mission `5 Focus`, Weekly Mission `30 Focus`, reward chests, configurable rarity weights, pity counters, draw history, and Inventory.
+- Added a new `奖励 / Game` page plus a home mission panel showing TODAY/WEEK progress and claim buttons.
+- Added `gameEvents` as an event ledger for reward draws and reward usage, with optional Google Sheet sync through a new `Game_Events` tab after Apps Script redeploy.
+
 ## v0.3.64 - 2026-07-15
 
 ### Focus Session

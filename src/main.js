@@ -15,6 +15,10 @@ function showScreen(id) {
     refreshTodosFromCloud({ silent: true });
   }
   if (id === "review") renderReview();
+  if (id === "game") {
+    renderGame();
+    pullGameEventsFromSheet({ silent: true });
+  }
   if (id === "skills") renderSkills();
 }
 
@@ -32,6 +36,7 @@ function renderAll() {
   renderTodos();
   renderReview();
   renderSkills();
+  renderGame();
   renderModel();
   renderSheetSyncConfig();
   save();
@@ -85,6 +90,7 @@ function bootstrapPlanRpg() {
   pullSessionLogsFromSheet({ silent: true });
   pullMetricLogsFromSheet({ silent: true });
   pullTodosFromSheet({ silent: true });
+  pullGameEventsFromSheet({ silent: true });
 }
 
 bootstrapPlanRpg();

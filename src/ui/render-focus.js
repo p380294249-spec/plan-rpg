@@ -207,6 +207,8 @@ function renderSessionResult(log) {
   const q = questById(log.questId);
   const t = taskById(log.taskId);
   const meditation = isMeditationTask(t);
+  const missions = typeof focusMissionStatus === "function" ? focusMissionStatus() : null;
+  const claimableMissions = missions ? [missions.daily, missions.weekly].filter(mission => mission.canClaim) : [];
   $("sessionResult").classList.remove("hide");
   $("sessionResult").innerHTML = `
     <span class="pill">Session 结算完成</span>
@@ -218,6 +220,15 @@ function renderSessionResult(log) {
       ${log.is_random_event ? `<div class="reward"><span>突发任务</span><b>${typeBadge(t.quest_type || "side")}</b></div>` : ""}
       ${log.is_pivoted ? `<div class="reward"><span>任务转向</span><b>Discovery</b></div>` : ""}
     </div>
+    ${claimableMissions.length ? `
+      <div class="mission-complete-banner">
+        <b>${claimableMissions.some(mission => mission.type === "daily") ? "DAILY MISSION COMPLETE" : "WEEKLY MISSION COMPLETE"}</b>
+        <span>${claimableMissions.map(mission => `${mission.label} ${roundedFocusUnits(mission.units)} / ${mission.target}`).join(" · ")}</span>
+        <div class="actions">
+          ${claimableMissions.map(mission => `<button class="primary" data-game-claim="${mission.type}">CLAIM REWARD</button>`).join("")}
+        </div>
+      </div>
+    ` : ""}
     <p><b>${meditation ? "场景" : "做了什么"}：</b>${escapeHtml(log.whatDone)}</p>
     ${meditation ? `<p><b>感受：</b>${escapeHtml(log.problem || "未填写")}</p>` : ""}
     ${log.is_pivoted ? `<p><b>转向说明：</b>${escapeHtml(log.pivot_note || "已记录转向")}</p>` : ""}
@@ -244,4 +255,5 @@ function renderSessionResult(log) {
   $("resultMapBtn").onclick = () => showScreen("map");
   $("resultReviewBtn").onclick = () => showScreen("review");
   document.querySelectorAll("[data-result-classify]").forEach(btn => btn.onclick = () => classifyRandomEvent(log.actual_task_id || log.taskId, btn.dataset.resultClassify));
+  if (typeof bindGameButtons === "function") bindGameButtons();
 }

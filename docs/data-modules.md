@@ -88,7 +88,7 @@ Stores completed focus sessions.
 
 Fields:
 
-`log_id`, `date`, `user`, `device`, `goal_id`, `quest_id`, `task_id`, `gmn`, `minutes`, `what_done`, `problem`, `solution`, `good`, `bad`, `next_step`, `skill_xp_json`, `created_at`, `updated_at`
+`log_id`, `date`, `user`, `device`, `goal_id`, `quest_id`, `task_id`, `gmn`, `minutes`, `what_done`, `problem`, `solution`, `good`, `bad`, `next_step`, `mood_stress`, `worth_recording`, `skill_xp_json`, `created_at`, `updated_at`
 
 App area:
 
@@ -97,6 +97,24 @@ Focus session completion, weekly review, total minutes, GMN ratios, skill XP cal
 Sync rule:
 
 Append-only first. Do not overwrite old logs unless an explicit edit flow is implemented.
+
+### Game_Events
+
+Purpose:
+
+Stores the game-layer event ledger for reward draws and reward usage.
+
+Fields:
+
+`game_event_id`, `event_type`, `skill_id`, `mission_type`, `mission_key`, `reward_instance_id`, `reward_id`, `reward_name`, `reward_type`, `rarity`, `status`, `source_log_id`, `payload_json`, `created_at`, `updated_at`
+
+App area:
+
+FOCUS Daily/Weekly mission chests, draw history, Inventory, reward usage status, and pity counters.
+
+Sync rule:
+
+Upsert by `game_event_id`. Inventory and mission claim state are derived from these events plus `Session_Logs`; do not mutate old reward events.
 
 ### Todos
 
@@ -160,9 +178,10 @@ Build sync in this order:
 1. Read `Session_Logs` on page load.
 2. Append to `Session_Logs` when a focus session is completed.
 3. Read and upsert `Todos`.
-4. Upsert `Quests` when chapter GMN changes.
-5. Upsert `Tasks` when task GMN/status changes.
-6. Upsert `Goals` when progress values change.
+4. Read and upsert `Game_Events`.
+5. Upsert `Quests` when chapter GMN changes.
+6. Upsert `Tasks` when task GMN/status changes.
+7. Upsert `Goals` when progress values change.
 
 ## Apps Script Sync Endpoint
 
@@ -175,6 +194,10 @@ Deployed actions:
 `append_session_log`
 
 `get_session_logs`
+
+`get_game_events`
+
+`upsert_game_event`
 
 Expected frontend payload:
 

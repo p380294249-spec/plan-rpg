@@ -6,6 +6,11 @@ const SESSION_LOG_HEADERS = [
   'next_step', 'mood_stress', 'worth_recording', 'skill_xp_json',
   'created_at', 'updated_at'
 ];
+const GAME_EVENT_HEADERS = [
+  'game_event_id', 'event_type', 'skill_id', 'mission_type', 'mission_key',
+  'reward_instance_id', 'reward_id', 'reward_name', 'reward_type', 'rarity',
+  'status', 'source_log_id', 'payload_json', 'created_at', 'updated_at'
+];
 
 function doGet(e) {
   const params = e && e.parameter ? e.parameter : {};
@@ -23,11 +28,22 @@ function doGet(e) {
     return jsonp_(params.callback, { ok: true, action: params.action, rows: readRows_('Todos') });
   }
 
+  if (params.action === 'get_game_events') {
+    return jsonp_(params.callback, { ok: true, action: params.action, rows: readRows_('Game_Events') });
+  }
+
   if (params.action === 'upsert_todo') {
     const row = parseRowParam_(params.row);
     if (!row) return jsonp_(params.callback, { ok: false, error: 'invalid_row' });
     upsertTodo_(row);
     return jsonp_(params.callback, { ok: true, action: params.action, todo_id: row.todo_id });
+  }
+
+  if (params.action === 'upsert_game_event') {
+    const row = parseRowParam_(params.row);
+    if (!row) return jsonp_(params.callback, { ok: false, error: 'invalid_row' });
+    upsertGameEvent_(row);
+    return jsonp_(params.callback, { ok: true, action: params.action, game_event_id: row.game_event_id });
   }
 
   return jsonp_(params.callback, { ok: false, error: 'unknown_action' });
@@ -50,6 +66,11 @@ function doPost(e) {
 
   if (payload.action === 'upsert_todo') {
     upsertTodo_(payload.row || {});
+    return json_({ ok: true, action: payload.action });
+  }
+
+  if (payload.action === 'upsert_game_event') {
+    upsertGameEvent_(payload.row || {});
     return json_({ ok: true, action: payload.action });
   }
 
@@ -120,6 +141,25 @@ function upsertTodo_(row) {
     return;
   }
   sheet.getRange(rowIndex + 2, 1, 1, headers.length).setValues([values]);
+}
+
+function upsertGameEvent_(row) {
+  const sheet = ensureSheet_('Game_Events', GAME_EVENT_HEADERS);
+  const eventId = String(row.game_event_id || '');
+  if (!eventId) throw new Error('game_event_id is required');
+  const values = GAME_EVENT_HEADERS.map(header => row[header] == null ? '' : row[header]);
+  const lastRow = sheet.getLastRow();
+  if (lastRow < 2) {
+    sheet.appendRow(values);
+    return;
+  }
+  const ids = sheet.getRange(2, 1, lastRow - 1, 1).getValues().flat().map(String);
+  const rowIndex = ids.indexOf(eventId);
+  if (rowIndex === -1) {
+    sheet.appendRow(values);
+    return;
+  }
+  sheet.getRange(rowIndex + 2, 1, 1, GAME_EVENT_HEADERS.length).setValues([values]);
 }
 
 function ensureTodoSheet_(headers) {

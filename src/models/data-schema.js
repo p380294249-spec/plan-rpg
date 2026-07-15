@@ -145,6 +145,47 @@
  */
 
 /*
+ * GAME_EVENT
+ * Stored in: localStorage (STORAGE_KEY) under data.gameEvents + optional Google Sheets (Game_Events tab)
+ * Created by: drawRewardForMission(), useRewardInstance()
+ * Normalized by: normalizeGameEvents()
+ * Fields:
+ *   id                - string, unique game event ID
+ *   eventType         - string: "reward_drawn" | "reward_used"
+ *   skillId           - string, first implementation is "FOCUS"
+ *   missionType       - string: "daily" | "weekly"
+ *   missionKey        - string, e.g. "FOCUS:daily:2026-07-15"
+ *   rewardInstanceId  - string, unique reward item instance
+ *   rewardId          - string, reward pool ID from GAME_CONFIG
+ *   rewardName        - string, reward display name
+ *   rewardType        - string, e.g. "Time Reward" | "Freedom Reward"
+ *   rarity            - string: "Common" | "Rare" | "Epic" | "Legendary"
+ *   status            - string: "saved" | "used"
+ *   sourceLogId       - string, optional focus log that triggered the reward
+ *   payload           - object, snapshot of reward config, mission progress, pity, and draw weights
+ *   createdAt         - string, ISO datetime
+ *   updatedAt         - string, ISO datetime
+ *
+ * The game layer is event-sourced. Inventory, draw history, mission claim state,
+ * and pity counters are derived from these events plus existing Focus logs.
+ * Existing logs remain the source of truth for Focus progress.
+ */
+
+/*
+ * GAME_CONFIG
+ * Stored in: src/game/game-config.js, not user data.
+ * Fields:
+ *   skills.FOCUS.dailyTarget       - number, daily mission target in Focus units
+ *   skills.FOCUS.weeklyTarget      - number, weekly mission target in Focus units
+ *   skills.FOCUS.unitMinutes       - number, minutes per Focus unit
+ *   rarityWeights                  - object, base draw probability weights
+ *   pity                           - object, hidden pity-system tuning
+ *   rewardPools.FOCUS              - RewardPoolItem[], configurable reward pool
+ *
+ * Add or tune rewards here before building in-app reward-pool editing.
+ */
+
+/*
  * SKILL
  * Stored in: localStorage (STORAGE_KEY) under data.skills
  * Seed: seed.skills

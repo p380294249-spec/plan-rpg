@@ -208,6 +208,26 @@ function todoToSheetRow(todo) {
   };
 }
 
+function gameEventToSheetRow(event) {
+  return {
+    game_event_id: event.id,
+    event_type: event.eventType,
+    skill_id: event.skillId,
+    mission_type: event.missionType,
+    mission_key: event.missionKey,
+    reward_instance_id: event.rewardInstanceId,
+    reward_id: event.rewardId,
+    reward_name: event.rewardName,
+    reward_type: event.rewardType,
+    rarity: event.rarity,
+    status: event.status,
+    source_log_id: event.sourceLogId || "",
+    payload_json: JSON.stringify(event.payload || {}),
+    created_at: event.createdAt || new Date().toISOString(),
+    updated_at: event.updatedAt || new Date().toISOString()
+  };
+}
+
 function sheetRowToTodo(row, index = 0) {
   return normalizeTodos([{
     id: row.todo_id || `TODO-REMOTE-${index + 1}`,
@@ -255,6 +275,38 @@ function mergeRemoteTodos(rows = []) {
   return { remoteCount: remoteById.size, uploads };
 }
 
+function sheetRowToGameEvent(row, index = 0) {
+  return normalizeGameEvents([{
+    id: row.game_event_id || `GE-REMOTE-${index + 1}`,
+    eventType: row.event_type,
+    skillId: row.skill_id,
+    missionType: row.mission_type,
+    missionKey: row.mission_key,
+    rewardInstanceId: row.reward_instance_id,
+    rewardId: row.reward_id,
+    rewardName: row.reward_name,
+    rewardType: row.reward_type,
+    rarity: row.rarity,
+    status: row.status,
+    sourceLogId: row.source_log_id,
+    payload_json: row.payload_json,
+    createdAt: row.created_at,
+    updatedAt: row.updated_at
+  }])[0];
+}
+
+function mergeRemoteGameEvents(rows = []) {
+  const remoteEvents = rows
+    .filter(row => row && row.game_event_id)
+    .map((row, index) => sheetRowToGameEvent(row, index));
+  if (!remoteEvents.length) return 0;
+  const byId = new Map((data.gameEvents || []).map(event => [event.id, event]));
+  remoteEvents.forEach(event => byId.set(event.id, { ...(byId.get(event.id) || {}), ...event }));
+  data.gameEvents = Array.from(byId.values()).sort((a, b) => String(b.createdAt || "").localeCompare(String(a.createdAt || "")));
+  save();
+  return remoteEvents.length;
+}
+
 function readPendingSyncQueue() {
   try {
     return JSON.parse(localStorage.getItem(APP_CONFIG.PENDING_SYNC_KEY) || "[]");
@@ -269,7 +321,7 @@ function savePendingSyncQueue(items = []) {
 
 function pendingPayloadKey(payload) {
   const row = payload?.row || {};
-  const rowId = row.todo_id || row.log_id || row.metric_log_id || payload.created_at || "";
+  const rowId = row.game_event_id || row.todo_id || row.log_id || row.metric_log_id || payload.created_at || "";
   return `${payload?.action || "unknown"}:${rowId}`;
 }
 
@@ -304,6 +356,21 @@ async function sendTodoPayload(config, payload) {
   }
 }
 
+async function sendGameEventPayload(config, payload) {
+  try {
+    const response = await jsonp(config.url, {
+      action: "upsert_game_event",
+      token: payload.token,
+      row: JSON.stringify(payload.row || {})
+    });
+    if (!response || !response.ok) throw new Error(response?.error || "game_event_upsert_failed");
+    return response;
+  } catch (error) {
+    await postSheetPayload(config, payload);
+    return { ok: true, fallback: true };
+  }
+}
+
 async function flushPendingSyncQueue({ silent = false } = {}) {
   const pending = readPendingSyncQueue();
   if (!pending.length) return 0;
@@ -323,6 +390,7 @@ async function flushPendingSyncQueue({ silent = false } = {}) {
       const nextPayload = { ...payload, token: payload.token || resolved.token };
       const workingConfig = resolved.config;
       if (nextPayload.action === "upsert_todo") await sendTodoPayload(workingConfig, nextPayload);
+      else if (nextPayload.action === "upsert_game_event") await sendGameEventPayload(workingConfig, nextPayload);
       else await postSheetPayload(workingConfig, nextPayload);
       sentCount += 1;
     } catch (error) {
@@ -335,6 +403,7 @@ async function flushPendingSyncQueue({ silent = false } = {}) {
 }
 
 function validationActionForPayload(payload = {}) {
+  if (payload.action === "upsert_game_event") return "get_game_events";
   if (payload.action === "upsert_todo") return "get_todos";
   if (payload.action === "append_metric_log") return "get_metric_logs";
   return "get_session_logs";
@@ -499,6 +568,21 @@ async function pullTodosFromSheet({ silent = false } = {}) {
   }
 }
 
+async function pullGameEventsFromSheet({ silent = false } = {}) {
+  const config = sheetSyncConfig();
+  if (!config.url) return;
+  try {
+    const resolved = await resolveWorkingSheetToken(config, "get_game_events");
+    const payload = await jsonp(resolved.config.url, { action: "get_game_events", token: resolved.token });
+    if (!payload || !payload.ok) throw new Error(payload?.error || "unknown_error");
+    const count = mergeRemoteGameEvents(payload.rows || []);
+    renderAll();
+    if (!silent) renderSheetSyncConfig(count ? `Game Events 已同步 ${count} 条。` : "Game Events 已同步。");
+  } catch (error) {
+    if (!silent) renderSheetSyncConfig("Game Events 同步失败，请确认 Apps Script 已更新并重新部署。");
+  }
+}
+
 async function syncMetricLogToSheet(log) {
   const config = sheetSyncConfig();
   if (!config.url) return;
@@ -554,6 +638,36 @@ async function syncTodoToSheet(todo, { token = "", config: providedConfig = null
   } catch (error) {
     queuePendingSyncPayload(payload);
     if (!silent) renderSheetSyncConfig("Todo 同步失败，已暂存到本机待重试队列。");
+  }
+}
+
+async function syncGameEventToSheet(event, { token = "", config: providedConfig = null, silent = false } = {}) {
+  const config = providedConfig || sheetSyncConfig();
+  if (!config.url) return;
+  let workingToken = token;
+  let workingConfig = config;
+  try {
+    if (!workingToken || !providedConfig) {
+      const resolved = await resolveWorkingSheetToken(config, "get_game_events");
+      workingToken = workingToken || resolved.token;
+      workingConfig = resolved.config;
+    }
+  } catch (error) {
+    if (!silent) renderSheetSyncConfig("Game Event 同步失败：Apps Script URL 或 Token 不可用。");
+    return;
+  }
+  const payload = {
+    token: workingToken,
+    action: "upsert_game_event",
+    module: "Game_Events",
+    row: gameEventToSheetRow(event)
+  };
+  try {
+    await sendGameEventPayload(workingConfig, payload);
+    if (!silent) renderSheetSyncConfig("Game Event 已同步到 Google Sheet。");
+  } catch (error) {
+    queuePendingSyncPayload(payload);
+    if (!silent) renderSheetSyncConfig("Game Event 同步失败，已暂存到本机待重试队列。");
   }
 }
 

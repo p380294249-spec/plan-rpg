@@ -2,7 +2,7 @@
 
 Plan RPG is a lightweight web MVP for turning yearly plans, weekly quests, 20-minute focus sessions, execution logs, rewards, skills, and reviews into a game-like personal planning system.
 
-Current version: `v0.3.64`
+Current version: `v0.3.65`
 
 Live app:
 
@@ -43,6 +43,7 @@ GitHub Pages frontend
 ```txt
 index.html                  GitHub Pages shell: DOM skeleton + script/style links
 src/config/                 App constants and sync keys
+src/game/                   Reward engine, reward pool config, pity, and inventory logic
 src/models/                 Seed data and schema documentation
 src/storage/                localStorage cache and Google Sheet API client
 src/services/               Session, task, XP, timer, review, and classification logic
@@ -80,6 +81,9 @@ https://docs.google.com/spreadsheets/d/1Yz-RswNvBxJ9GFWfcU2KDAFh23NCWLS-HS2_g_07
 Main shared tab currently used by the app:
 
 - `Session_Logs`: completed 20-minute focus session logs.
+- `Metric_Logs`: monthly business metric rows.
+- `Todos`: quick DFK / INSO / OTHER todos.
+- `Game_Events`: optional reward draw and reward usage event ledger after Apps Script redeploy.
 
 Data module notes are documented in:
 
@@ -102,10 +106,13 @@ It currently supports:
 - `GET action=get_session_logs`: read `Session_Logs`.
 - `GET action=get_metric_logs`: read `Metric_Logs`.
 - `GET action=get_todos`: read `Todos`.
+- `GET action=get_game_events`: read `Game_Events`.
 - `GET action=upsert_todo`: create or update a Todo by ID with JSONP confirmation.
+- `GET action=upsert_game_event`: create or update a game event by ID with JSONP confirmation.
 - `POST action=append_session_log`: append a completed session log.
 - `POST action=append_metric_log`: append a monthly business metric log.
 - `POST action=upsert_todo`: create or update a Todo by its ID.
+- `POST action=upsert_game_event`: create or update a game event by its ID.
 - `POST action=ping`: test sync settings by writing to `Settings`.
 
 The script uses:

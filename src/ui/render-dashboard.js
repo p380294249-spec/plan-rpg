@@ -21,6 +21,7 @@ function renderSkillMini() {
 
 function renderMap() {
   syncTimerWithClock();
+  renderGameMissionPanel();
   renderWeeklyCommandPanel();
   renderLifeGrid();
   renderCampaignGrid();
