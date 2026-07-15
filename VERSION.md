@@ -1,5 +1,11 @@
 # Plan RPG Version Notes
 
+## v0.3.71 - 2026-07-15
+
+### Chinese Labels
+
+- Removed the remaining English headings from the reward modal, reward navigation, and Skills navigation.
+
 ## v0.3.70 - 2026-07-15
 
 ### Chinese Game UI
