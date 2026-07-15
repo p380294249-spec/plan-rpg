@@ -1,5 +1,13 @@
 # Plan RPG Version Notes
 
+## v0.3.70 - 2026-07-15
+
+### Chinese Game UI
+
+- Replaced the visible English reward and Skill interface labels with Chinese game wording.
+- Reworked Focus titles as `专注新兵` -> `沉浸工匠` -> `专注骑士` -> `时间炼金师`.
+- Kept internal IDs, progression rules, and historical data unchanged.
+
 ## v0.3.69 - 2026-07-15
 
 ### Reward Interaction

@@ -86,8 +86,8 @@ function focusMissionStatus(date = new Date()) {
   const dailyKey = `FOCUS:daily:${dayKey}`;
   const weeklyMissionKey = `FOCUS:weekly:${weekKey}`;
   return {
-    daily: gameMissionRow("daily", dailyKey, dailyUnits, dailyTarget, "TODAY"),
-    weekly: gameMissionRow("weekly", weeklyMissionKey, weeklyUnits, weeklyTarget, "WEEK")
+    daily: gameMissionRow("daily", dailyKey, dailyUnits, dailyTarget, "今日"),
+    weekly: gameMissionRow("weekly", weeklyMissionKey, weeklyUnits, weeklyTarget, "本周")
   };
 }
 
@@ -116,7 +116,7 @@ function focusLevelState() {
   const progress = Math.min(100, Math.round(((lifetimeUnits - currentLevelStart) / levelStep) * 100));
   const title = [...GAME_CONFIG.skills.FOCUS.titles]
     .sort((a, b) => b.minLevel - a.minLevel)
-    .find(item => level >= item.minLevel)?.title || "Starter";
+    .find(item => level >= item.minLevel)?.title || "专注新兵";
   return { lifetimeUnits, level, title, currentLevelStart, nextLevelAt, progress };
 }
 

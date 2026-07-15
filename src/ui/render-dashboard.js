@@ -16,7 +16,7 @@ function renderSkillMini() {
   $("skillMini").innerHTML = `
     ${previewSkills.map(s => `
     <div class="skill-mini">
-      <div class="goal-head"><span>${escapeHtml(s.name)}</span><span>Lv.${s.level}</span></div>
+      <div class="goal-head"><span>${escapeHtml(s.cnName)}</span><span>Lv.${s.level}</span></div>
       <div class="bar"><div class="fill" style="--value:${s.progressToNext ?? 0}%"></div></div>
     </div>
     `).join("")}

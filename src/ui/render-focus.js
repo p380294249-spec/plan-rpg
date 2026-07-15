@@ -222,10 +222,10 @@ function renderSessionResult(log) {
     </div>
     ${claimableMissions.length ? `
       <div class="mission-complete-banner">
-        <b>${claimableMissions.some(mission => mission.type === "daily") ? "DAILY MISSION COMPLETE" : "WEEKLY MISSION COMPLETE"}</b>
+        <b>${claimableMissions.some(mission => mission.type === "daily") ? "今日挑战完成" : "本周挑战完成"}</b>
         <span>${claimableMissions.map(mission => `${mission.label} ${roundedFocusUnits(mission.units)} / ${mission.target}`).join(" · ")}</span>
         <div class="actions">
-          ${claimableMissions.map(mission => `<button class="primary" data-game-claim="${mission.type}">CLAIM REWARD</button>`).join("")}
+          ${claimableMissions.map(mission => `<button class="primary" data-game-claim="${mission.type}">领取宝箱</button>`).join("")}
         </div>
       </div>
     ` : ""}

@@ -6,16 +6,16 @@ const GAME_RARITIES = ["Common", "Rare", "Epic", "Legendary"];
 const GAME_CONFIG = {
   skills: {
     FOCUS: {
-      label: "FOCUS",
+      label: "专注力",
       unitMinutes: 20,
       dailyTarget: 5,
       weeklyTarget: 30,
       levelStep: 25,
       titles: [
-        { minLevel: 1, title: "Starter" },
-        { minLevel: 5, title: "Deep Worker" },
-        { minLevel: 10, title: "Focus Knight" },
-        { minLevel: 20, title: "Time Alchemist" }
+        { minLevel: 1, title: "专注新兵" },
+        { minLevel: 5, title: "沉浸工匠" },
+        { minLevel: 10, title: "专注骑士" },
+        { minLevel: 20, title: "时间炼金师" }
       ]
     }
   },
@@ -60,7 +60,7 @@ const GAME_CONFIG = {
       {
         id: "gaming-20",
         name: "20分钟游戏",
-        type: "Time Reward",
+        type: "时间奖励",
         redemptionType: "time",
         durationMinutes: 20,
         rarity: "Common",
@@ -71,7 +71,7 @@ const GAME_CONFIG = {
       {
         id: "coffee-fund",
         name: "手冲咖啡 / 咖啡基金",
-        type: "Consumption Reward",
+        type: "消费奖励",
         redemptionType: "consumption",
         rarity: "Rare",
         value: 1,
@@ -81,7 +81,7 @@ const GAME_CONFIG = {
       {
         id: "night-off",
         name: "一晚上完全不工作",
-        type: "Freedom Reward",
+        type: "自由奖励",
         redemptionType: "simple",
         rarity: "Epic",
         value: 1,
@@ -91,7 +91,7 @@ const GAME_CONFIG = {
       {
         id: "double-reward-ticket",
         name: "Double Reward 抽奖券",
-        type: "Game Item",
+        type: "游戏道具",
         redemptionType: "simple",
         rarity: "Legendary",
         value: 1,

@@ -53,16 +53,16 @@ function renderGameMissionPanel() {
   $("gameMissionPanel").innerHTML = `
     <div class="game-command-head">
       <div>
-        <span class="pill">FOCUS CORE LOOP</span>
-        <h3>Daily Mission</h3>
+        <span class="pill">专注成长</span>
+        <h3>今日挑战</h3>
       </div>
-      <button class="secondary" data-open-game>Reward Wallet</button>
+      <button class="secondary" data-open-game>奖励仓库</button>
     </div>
     <div class="game-mission-grid">
       ${renderMissionCard(missions.daily)}
       ${renderMissionCard(missions.weekly)}
       <div class="game-level-card">
-        <span>FOCUS Lv.${level.level}</span>
+        <span>专注力 Lv.${level.level}</span>
         <b>${escapeHtml(level.title)}</b>
         <div class="bar"><div class="fill" style="--value:${level.progress}%"></div></div>
         <small>${roundedFocusUnits(level.lifetimeUnits)} lifetime Focus</small>
@@ -73,8 +73,8 @@ function renderGameMissionPanel() {
 }
 
 function renderMissionCard(mission) {
-  const title = mission.type === "daily" ? "TODAY" : "WEEK";
-  const completeText = mission.claimed ? "已领取" : mission.canClaim ? "CLAIM REWARD" : `${mission.progress}%`;
+  const title = mission.type === "daily" ? "今日" : "本周";
+  const completeText = mission.claimed ? "已领取" : mission.canClaim ? "领取宝箱" : `${mission.progress}%`;
   return `
     <div class="game-mission-card ${mission.complete ? "complete" : ""}">
       <div class="game-mission-top">
@@ -104,18 +104,18 @@ function renderGame() {
   $("gameRoot").innerHTML = `
     <div class="game-hero panel">
       <div>
-        <span class="pill">Game Layer</span>
-        <h3>FOCUS Lv.${level.level} · ${escapeHtml(level.title)}</h3>
+        <span class="pill">专注冒险</span>
+        <h3>专注力 Lv.${level.level} · ${escapeHtml(level.title)}</h3>
       </div>
       <div class="game-hero-stats">
-        <div><span>Lifetime</span><b>${roundedFocusUnits(level.lifetimeUnits)}</b></div>
-        <div><span>Today</span><b>${roundedFocusUnits(missions.daily.units)} / ${missions.daily.target}</b></div>
-        <div><span>Week</span><b>${roundedFocusUnits(missions.weekly.units)} / ${missions.weekly.target}</b></div>
+        <div><span>累计专注</span><b>${roundedFocusUnits(level.lifetimeUnits)}</b></div>
+        <div><span>今日</span><b>${roundedFocusUnits(missions.daily.units)} / ${missions.daily.target}</b></div>
+        <div><span>本周</span><b>${roundedFocusUnits(missions.weekly.units)} / ${missions.weekly.target}</b></div>
       </div>
     </div>
 
     <section class="panel game-section">
-      <div class="game-section-head"><h3>Mission</h3><small>完成 Focus 后领取宝箱</small></div>
+      <div class="game-section-head"><h3>挑战任务</h3><small>完成专注后领取宝箱</small></div>
       <div class="game-mission-grid">
         ${renderMissionCard(missions.daily)}
         ${renderMissionCard(missions.weekly)}
@@ -123,14 +123,14 @@ function renderGame() {
     </section>
 
     <section class="panel game-section">
-      <div class="game-section-head"><h3>Reward Wallet</h3><small>开始兑现后，才会进入完成步骤</small></div>
+      <div class="game-section-head"><h3>奖励仓库</h3><small>开始兑现后，才会进入完成步骤</small></div>
       <div class="reward-wallet-grid">
         ${inventory.map(item => renderRewardWalletCard(item, now)).join("") || `<div class="game-empty">还没有待兑现奖励。先完成 5 个 Focus 领取 Daily Chest。</div>`}
       </div>
     </section>
 
     <section class="panel game-section">
-      <div class="game-section-head"><h3>History</h3><small>已到期奖励的兑现率</small></div>
+      <div class="game-section-head"><h3>奖励历史</h3><small>已到期奖励的兑现率</small></div>
       <div class="reward-history-stats ${stats.warning ? "warning" : ""}">
         <div><span>已发放</span><b>${stats.issued}</b></div>
         <div><span>已完成</span><b>${stats.completed}</b></div>
@@ -144,7 +144,7 @@ function renderGame() {
     </section>
 
     <section class="panel game-section">
-      <div class="game-section-head"><h3>Reward Pool</h3><small>奖励和概率都在配置层，可随时调整</small></div>
+      <div class="game-section-head"><h3>奖励池</h3><small>奖励和概率都在配置层，可随时调整</small></div>
       <div class="reward-pool-grid">
         ${GAME_CONFIG.rewardPools.FOCUS.map(reward => `
           <div class="pool-card ${rarityClass(reward.rarity)}">
@@ -241,21 +241,21 @@ function renderRewardModal(mode, event = null) {
   modal.classList.remove("hide");
   const rarity = event?.rarity || "Common";
   const reward = event?.payload?.reward || {};
-  const missionLabel = event?.missionType === "weekly" || pendingRewardClaim === "weekly" ? "Weekly Reward Chest" : "Daily Reward Chest";
+  const missionLabel = event?.missionType === "weekly" || pendingRewardClaim === "weekly" ? "本周奖励宝箱" : "今日奖励宝箱";
   if (mode === "ready") {
     $("rewardModalContent").innerHTML = `
       <div class="reward-reveal ready">
-        <span class="pill">MISSION COMPLETE</span>
+        <span class="pill">挑战完成</span>
         <div class="chest-visual">CHEST</div>
         <h3>${missionLabel}</h3>
-        <button class="primary" id="openRewardChestBtn">OPEN CHEST</button>
+        <button class="primary" id="openRewardChestBtn">打开宝箱</button>
         <button class="secondary" data-close-modal="rewardModal">稍后领取</button>
       </div>
     `;
   } else if (mode === "charging") {
     $("rewardModalContent").innerHTML = `
       <div class="reward-reveal charging">
-        <span class="pill">REWARD LOCKED IN</span>
+        <span class="pill">奖励已经锁定</span>
         <div class="reward-charge-aura"></div>
         <div class="chest-visual">CHEST</div>
         <h3>正在开启</h3>
@@ -273,13 +273,13 @@ function renderRewardModal(mode, event = null) {
   } else {
     $("rewardModalContent").innerHTML = `
       <div class="reward-reveal revealed ${rarityClass(rarity)}">
-        <span class="pill">${rarityLabel(rarity)} REWARD</span>
+        <span class="pill">${rarityLabel(rarity)}奖励</span>
         <div class="chest-visual">${escapeHtml(reward.icon || "✦")}</div>
         <h3>${escapeHtml(event.rewardName)}</h3>
-        <p>已加入 Reward Wallet</p>
+        <p>已加入奖励仓库</p>
         ${event.payload?.pityTriggered ? `<small class="pity-triggered">✦ 15 次保底触发</small>` : ""}
         <div class="actions">
-          <button class="primary" data-open-game>查看奖励库</button>
+          <button class="primary" data-open-game>查看奖励仓库</button>
           <button class="secondary" data-close-modal="rewardModal">继续行动</button>
         </div>
       </div>
