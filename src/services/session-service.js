@@ -379,9 +379,6 @@ function syncTimerWithClock() {
     }
     if (completedTask) {
       timerSessionActive = true;
-      selectedTaskId = completedTask.id;
-      selectedQuestId = completedTask.questId;
-      syncGoalForQuest(selectedQuestId);
     }
     renderTimer();
   }
@@ -396,6 +393,7 @@ function toggleTimer() {
     timerEndsAt = 0;
   } else {
     if (seconds <= 0) seconds = selectedDurationMinutes() * 60;
+    timerTaskId = selectedTaskId;
     running = true;
     timerSessionActive = true;
     timerEndsAt = Date.now() + seconds * 1000;
@@ -442,6 +440,32 @@ function readForm() {
     actual_task_id: t.id,
     pivot_note: ""
   };
+}
+
+function resolveSessionTaskBeforeSave() {
+  if (!timerSessionActive || !timerTaskId || !selectedTaskId || timerTaskId === selectedTaskId) return true;
+  const startedTask = taskById(timerTaskId);
+  const selectedTask = taskById(selectedTaskId);
+  if (!startedTask || !selectedTask) return true;
+
+  const choice = prompt(
+    `这次计时开始时是：${startedTask.current_title || startedTask.name}\n现在选择的是：${selectedTask.current_title || selectedTask.name}\n\n结算归到哪里？\n输入 1：用开始时的任务\n输入 2：用现在选择的模块`,
+    "2"
+  );
+  if (choice === null || choice === "") return false;
+  if (choice === "1") {
+    selectedTaskId = startedTask.id;
+    selectedQuestId = startedTask.questId;
+    syncGoalForQuest(selectedQuestId);
+    return true;
+  }
+  if (choice === "2") {
+    selectedQuestId = selectedTask.questId;
+    syncGoalForQuest(selectedQuestId);
+    return true;
+  }
+  alert("请输入 1 或 2。");
+  return false;
 }
 
 function saveMetricLog() {
@@ -491,6 +515,7 @@ function clearMetricLogForm() {
 }
 
 function saveSession() {
+  if (!resolveSessionTaskBeforeSave()) return;
   const log = readForm();
   data.logs.unshift(log);
   const task = taskById(log.actual_task_id || log.taskId);

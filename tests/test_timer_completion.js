@@ -68,6 +68,32 @@ assert.equal(normalCompletion.seconds, 0);
 assert.equal(normalCompletion.saveCount, 0);
 assert.ok(normalCompletion.selectedTaskId);
 
+const changedSelectionCompletion = JSON.parse(vm.runInContext(`
+  data = structuredClone(seed);
+  var changedStartedTask = data.tasks.find(task => task.id !== MINDSET_CANONICAL_TASK_ID && task.questId !== MINDSET_CANONICAL_QUEST_ID && task.recordMode !== "metric");
+  var changedSelectedTask = data.tasks.find(task => task.id !== changedStartedTask.id && task.id !== MINDSET_CANONICAL_TASK_ID && task.questId !== MINDSET_CANONICAL_QUEST_ID && task.recordMode !== "metric");
+  selectedTaskId = changedSelectedTask.id;
+  selectedQuestId = changedSelectedTask.questId;
+  timerTaskId = changedStartedTask.id;
+  timerSessionActive = true;
+  running = true;
+  timerEndsAt = Date.now() - 1000;
+  seconds = 2;
+  renderTimer = () => {};
+  syncGoalForQuest = () => {};
+  saveSession = () => {};
+  syncTimerWithClock();
+  JSON.stringify({
+    selectedTaskId,
+    selectedQuestId,
+    timerTaskId,
+    timerSessionActive
+  });
+`, context));
+
+assert.notEqual(changedSelectionCompletion.selectedTaskId, changedSelectionCompletion.timerTaskId);
+assert.equal(changedSelectionCompletion.timerSessionActive, true);
+
 const meditationCompletion = JSON.parse(vm.runInContext(`
   data = structuredClone(seed);
   const meditationTask = data.tasks.find(task => task.id === MINDSET_CANONICAL_TASK_ID);
@@ -157,9 +183,34 @@ assert.ok(
   "focus render should build button-based task choices"
 );
 assert.ok(
+  !renderFocusJs.includes("<span>行动</span>"),
+  "focus selector should stay at goal/module level and not add an extra action layer"
+);
+assert.ok(
+  !renderFocusJs.includes("confirmStartNewSession(nextTaskId)"),
+  "clicking focus selector buttons should not trigger the active-session switch prompt"
+);
+assert.ok(
   renderFocusJs.includes("reward-strip"),
   "focus reward preview should use the compact reward strip"
 );
+
+const settlementChoice = JSON.parse(vm.runInContext(`
+  data = structuredClone(seed);
+  var settlementStartedTask = data.tasks.find(task => task.id !== MINDSET_CANONICAL_TASK_ID && task.recordMode !== "metric");
+  var settlementSelectedTask = data.tasks.find(task => task.id !== settlementStartedTask.id && task.id !== MINDSET_CANONICAL_TASK_ID && task.recordMode !== "metric");
+  timerSessionActive = true;
+  timerTaskId = settlementStartedTask.id;
+  selectedTaskId = settlementSelectedTask.id;
+  selectedQuestId = settlementSelectedTask.questId;
+  prompt = () => "2";
+  syncGoalForQuest = () => {};
+  const ok = resolveSessionTaskBeforeSave();
+  JSON.stringify({ ok, selectedTaskId, expectedTaskId: settlementSelectedTask.id });
+`, context));
+
+assert.equal(settlementChoice.ok, true);
+assert.equal(settlementChoice.selectedTaskId, settlementChoice.expectedTaskId);
 
 const sheetApiJs = fs.readFileSync(path.join(root, "src/storage/sheet-api.js"), "utf8");
 assert.ok(

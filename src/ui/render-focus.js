@@ -6,14 +6,6 @@ function renderFocus() {
   if (!$("metricLogDate").value) $("metricLogDate").value = todayISO();
   const recordType = timerSessionActive && timerTaskId ? "session" : ($("recordTypeSelect")?.value || "session");
   setRecordType(recordType);
-  if (timerSessionActive && timerTaskId) {
-    const activeTask = taskById(timerTaskId);
-    if (activeTask) {
-      selectedTaskId = activeTask.id;
-      selectedQuestId = activeTask.questId;
-      syncGoalForQuest(selectedQuestId);
-    }
-  }
   const sessionTasks = data.tasks.filter(t => !isMetricOnlyTask(t));
   $("taskSelect").innerHTML = sessionTasks.map(t => {
     const q = questById(t.questId);
@@ -50,10 +42,6 @@ function renderFocus() {
   renderSkillRewardPreview(t);
   $("taskSelect").onchange = (e) => {
     const nextTaskId = e.target.value;
-    if (!confirmStartNewSession(nextTaskId)) {
-      $("taskSelect").value = selectedTaskId;
-      return;
-    }
     selectedTaskId = nextTaskId;
     selectedQuestId = taskById(selectedTaskId).questId;
     syncGoalForQuest(selectedQuestId);
@@ -118,7 +106,6 @@ function renderFocusChoiceBoard(task) {
   if (!$("focusChoiceBoard")) return;
   const campaignOptions = campaignQuestsForGoal(selectedGoalId).filter(campaign => firstSessionTaskForCampaign(campaign.id));
   const questOptions = focusQuestOptions(selectedCampaignId);
-  const taskOptions = tasksForQuest(selectedQuestId).filter(item => !isMetricOnlyTask(item));
   $("focusChoiceBoard").innerHTML = `
     <div class="focus-choice-group">
       <span>目标</span>
@@ -132,12 +119,6 @@ function renderFocusChoiceBoard(task) {
         ${questOptions.map(quest => focusChoiceButton("quest", quest.id, quest.name, quest.id === selectedQuestId)).join("")}
       </div>
     </div>
-    <div class="focus-choice-group">
-      <span>行动</span>
-      <div class="focus-choice-row">
-        ${taskOptions.map(item => focusChoiceButton("task", item.id, item.current_title || item.name, item.id === task.id)).join("")}
-      </div>
-    </div>
   `;
   document.querySelectorAll("[data-focus-campaign]").forEach(btn => {
     btn.onclick = () => selectFocusCampaign(btn.dataset.focusCampaign);
@@ -145,19 +126,15 @@ function renderFocusChoiceBoard(task) {
   document.querySelectorAll("[data-focus-quest]").forEach(btn => {
     btn.onclick = () => selectFocusQuest(btn.dataset.focusQuest);
   });
-  document.querySelectorAll("[data-focus-task]").forEach(btn => {
-    btn.onclick = () => selectFocusTask(btn.dataset.focusTask);
-  });
 }
 
 function focusChoiceButton(type, id, label, active) {
-  const attr = type === "campaign" ? "data-focus-campaign" : type === "quest" ? "data-focus-quest" : "data-focus-task";
+  const attr = type === "campaign" ? "data-focus-campaign" : "data-focus-quest";
   return `<button class="focus-choice ${active ? "active" : ""}" type="button" ${attr}="${escapeHtml(id)}">${escapeHtml(label)}</button>`;
 }
 
 function selectFocusCampaign(campaignId) {
   const nextTask = firstSessionTaskForCampaign(campaignId);
-  if (nextTask && !confirmStartNewSession(nextTask.id)) return;
   selectedCampaignId = campaignId;
   selectedQuestId = nextTask?.questId || campaignId;
   selectedTaskId = nextTask?.id || selectedTaskId;
@@ -167,19 +144,8 @@ function selectFocusCampaign(campaignId) {
 
 function selectFocusQuest(questId) {
   const nextTask = firstSessionTaskForQuest(questId);
-  if (nextTask && !confirmStartNewSession(nextTask.id)) return;
   selectedQuestId = questId;
   selectedTaskId = nextTask?.id || selectedTaskId;
-  syncGoalForQuest(selectedQuestId);
-  renderAll();
-}
-
-function selectFocusTask(taskId) {
-  if (!confirmStartNewSession(taskId)) return;
-  const task = taskById(taskId);
-  if (!task) return;
-  selectedTaskId = task.id;
-  selectedQuestId = task.questId;
   syncGoalForQuest(selectedQuestId);
   renderAll();
 }

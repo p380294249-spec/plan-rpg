@@ -1,5 +1,13 @@
 # Plan RPG Version Notes
 
+## v0.3.64 - 2026-07-15
+
+### Focus Session
+
+- Removed the extra `行动` selector from the focus panel; focus selection is now only `目标` plus `模块`.
+- Changing modules during an active timer no longer opens the cancel/switch prompt.
+- If the session started on one task but ends with another module selected, settlement asks whether to save under the original task or the currently selected module.
+
 ## v0.3.63 - 2026-07-15
 
 ### Focus Session
