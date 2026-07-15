@@ -18,6 +18,7 @@ function renderSkills() {
   $("skillDetail").innerHTML = `
     <span class="pill">CEO Skill · Lv.${s.level}</span>
     <h3>${escapeHtml(s.name)}</h3>
+    <p><b>当前共有 ${data.skills.length} 个 Skills。</b> 这里是长期能力成长页，20 分钟任务结算后会把 XP 加到对应技能。</p>
     <p>${escapeHtml(s.description)}</p>
     <div class="progress-number"><span>技能经验</span><span>${s.xp} / ${s.maxXp}</span></div>
     <div class="bar"><div class="fill" style="--value:${Math.min(100, s.xp / s.maxXp * 100)}%"></div></div>

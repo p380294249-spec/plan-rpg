@@ -1,5 +1,13 @@
 # Plan RPG Version Notes
 
+## v0.3.66 - 2026-07-15
+
+### Skills Navigation
+
+- Renamed the left navigation entry from `CEO 技能树` to `技能 / Skills` so the Skills module is easier to find.
+- Added a sidebar shortcut from the Skills preview to the full Skills page.
+- Added a clear count on the Skills detail page showing all available CEO skills.
+
 ## v0.3.65 - 2026-07-15
 
 ### Game Layer
