@@ -1,5 +1,19 @@
 # Plan RPG Version Notes
 
+## v0.3.72 - 2026-07-16
+
+### Sync Performance
+
+- Fixed `pullMetricLogsFromSheet`, `pullTodosFromSheet`, and `pullGameEventsFromSheet` each making a redundant duplicate Apps Script request: the token-resolution call already carries the requested rows, so the second identical fetch was pure waste. Cloud reads for those three data types are now half the round trips.
+- Added a `get_bootstrap` Apps Script action that returns Session Logs, Metric Logs, Todos, and Game Events in a single execution (one spreadsheet open, not four). The client now pulls everything at startup with `pullAllFromSheet`, one round trip instead of up to eight, and transparently falls back to the four separate pulls if the Apps Script deployment hasn't been updated yet.
+
+### Weekly Review UI
+
+- The log edit panel is now a modal (matching the existing 突发任务 / 任务转向 modal pattern) instead of an inline panel embedded in the Review screen. Editing a log from the Focus results screen no longer force-navigates you away to Review.
+- Split the Review screen's long stacked analysis into tabs (主要花在哪里 / 问题·亮点 / 动态视图 / 下周路线) to cut down on scrolling.
+- Added a week-jump dropdown next to the ← 上一周 / 下一周 → buttons so you can go straight to any of the last 12 weeks instead of stepping through one at a time.
+- Color-coded the 对比前一周 delta and 方向判断 badge (green/amber/red) for an at-a-glance read.
+
 ## v0.3.71 - 2026-07-15
 
 ### Chinese Labels

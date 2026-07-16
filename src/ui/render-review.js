@@ -25,8 +25,12 @@ function renderReview() {
   $("metricM").textContent = m;
   $("metricN").textContent = n;
   $("reviewThisWeekMinutes").textContent = `${thisWeekMinutes} min`;
-  $("reviewVsLastWeek").textContent = formatMinuteDelta(thisWeekMinutes - lastWeekMinutes);
-  $("reviewDirectionBadge").textContent = directionLabelForWeek(thisWeek, thisWeekMinutes);
+  const minutesDelta = thisWeekMinutes - lastWeekMinutes;
+  $("reviewVsLastWeek").textContent = formatMinuteDelta(minutesDelta);
+  $("reviewVsLastWeek").className = deltaIndicatorClass(minutesDelta);
+  const directionLabel = directionLabelForWeek(thisWeek, thisWeekMinutes);
+  $("reviewDirectionBadge").textContent = directionLabel;
+  $("reviewDirectionBadge").className = directionIndicatorClass(directionLabel);
   $("totalMinutes").textContent = `${logs.reduce((s, l) => s + Number(l.minutes || 0), 0)} min`;
   $("gRatio").textContent = currentWeek.length ? pct(currentWeekG / currentWeek.length * 100) : "0%";
   renderWeeklyFocusAreas(thisWeek, lastWeek);
@@ -52,11 +56,49 @@ function renderReviewWeekPicker() {
   previousButton.onclick = () => setReviewWeek(reviewWeeksAgo + 1);
   currentButton.onclick = () => setReviewWeek(0);
   nextButton.onclick = () => setReviewWeek(reviewWeeksAgo - 1);
+  renderReviewWeekJump();
+}
+
+function renderReviewWeekJump() {
+  const jumpSelect = $("reviewWeekJump");
+  if (!jumpSelect) return;
+  const weekOptions = Array.from({ length: 13 }, (_, weeksAgo) => weeksAgo);
+  if (!weekOptions.includes(reviewWeeksAgo)) weekOptions.push(reviewWeeksAgo);
+  jumpSelect.innerHTML = weekOptions.sort((a, b) => a - b).map(weeksAgo => {
+    const range = weekRange(weeksAgo);
+    const label = weeksAgo === 0 ? "本周" : `${weeksAgo} 周前`;
+    return `<option value="${weeksAgo}" ${weeksAgo === reviewWeeksAgo ? "selected" : ""}>${label} · ${formatShortDate(range.start)}-${formatShortDate(range.end)}</option>`;
+  }).join("");
+  jumpSelect.onchange = () => setReviewWeek(Number(jumpSelect.value));
 }
 
 function setReviewWeek(weeksAgo) {
   reviewWeeksAgo = Math.max(0, Math.min(104, Number(weeksAgo) || 0));
   renderReview();
+}
+
+function deltaIndicatorClass(delta) {
+  if (delta > 0) return "summary-delta delta-positive";
+  if (delta < 0) return "summary-delta delta-negative";
+  return "summary-delta delta-neutral";
+}
+
+function directionIndicatorClass(label) {
+  if (label === "方向稳定") return "summary-delta delta-positive";
+  if (label === "稍微偏了") return "summary-delta delta-warn";
+  if (label === "明显偏离") return "summary-delta delta-negative";
+  return "summary-delta delta-neutral";
+}
+
+function setReviewTab(tab) {
+  document.querySelectorAll("[data-review-tab]").forEach(btn => {
+    const active = btn.dataset.reviewTab === tab;
+    btn.classList.toggle("active", active);
+    btn.setAttribute("aria-selected", active ? "true" : "false");
+  });
+  document.querySelectorAll("[data-review-panel]").forEach(panel => {
+    panel.classList.toggle("hide", panel.dataset.reviewPanel !== tab);
+  });
 }
 
 function renderWeeklyFocusAreas(thisWeek, lastWeek) {
@@ -167,7 +209,6 @@ function editLog(id) {
   const log = data.logs.find(l => l.id === id);
   if (!log) return;
   editingLogId = id;
-  $("editPanel").classList.remove("hide");
   $("editTask").innerHTML = data.tasks.map(t => `<option value="${t.id}" ${t.id === log.taskId ? "selected" : ""}>${t.id} · ${escapeHtml(t.name)}</option>`).join("");
   $("editGmn").value = log.gmn;
   $("editWhat").value = log.whatDone || "";
@@ -176,8 +217,7 @@ function editLog(id) {
   $("editGood").value = log.good || "";
   $("editBad").value = log.bad || "";
   $("editNext").value = log.nextStep || "";
-  showScreen("review");
-  $("editPanel").scrollIntoView({ behavior: "smooth", block: "start" });
+  $("editLogModal").classList.remove("hide");
 }
 
 function updateLog() {
@@ -197,7 +237,7 @@ function updateLog() {
     nextStep: $("editNext").value.trim()
   };
   editingLogId = null;
-  $("editPanel").classList.add("hide");
+  $("editLogModal").classList.add("hide");
   save();
   renderAll();
 }

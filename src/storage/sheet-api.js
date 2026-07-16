@@ -437,6 +437,34 @@ function jsonp(url, params = {}) {
   });
 }
 
+async function pullAllFromSheet({ silent = false } = {}) {
+  const config = sheetSyncConfig();
+  if (!config.url) return;
+  try {
+    const resolved = await resolveWorkingSheetToken(config, "get_bootstrap");
+    const payload = resolved.payload;
+    if (payload.sessionLogs === undefined) throw new Error("bootstrap_unsupported");
+    const preserved = preserveLocalSessionLogsBeforeCloudPull(payload.sessionLogs || []);
+    const cloudCount = mergeRemoteSessionLogs(payload.sessionLogs || []);
+    mergeRemoteMetricLogs(payload.metricLogs || []);
+    const { uploads } = mergeRemoteTodos(payload.todos || []);
+    mergeRemoteGameEvents(payload.gameEvents || []);
+    renderAll();
+    for (const todo of uploads) await syncTodoToSheet(todo, { token: resolved.token, config: resolved.config, silent: true });
+    const note = preserved ? ` 已保护 ${preserved} 条本机旧记录，可点“上传本机记录”。` : "";
+    if (!silent) renderSheetSyncConfig(`已一次性同步全部数据，共 ${cloudCount} 条云端专注记录。${note}`);
+  } catch (error) {
+    // Apps Script deployment predates the get_bootstrap action (or the request failed) —
+    // fall back to the original four separate pulls so sync still works.
+    await Promise.all([
+      pullSessionLogsFromSheet({ silent }),
+      pullMetricLogsFromSheet({ silent }),
+      pullTodosFromSheet({ silent }),
+      pullGameEventsFromSheet({ silent })
+    ]);
+  }
+}
+
 async function pullSessionLogsFromSheet({ silent = false } = {}) {
   const config = sheetSyncConfig();
   if (!config.url) {
@@ -538,9 +566,7 @@ async function pullMetricLogsFromSheet({ silent = false } = {}) {
   const config = sheetSyncConfig();
   if (!config.url) return;
   try {
-    const resolved = await resolveWorkingSheetToken(config, "get_metric_logs");
-    const payload = await jsonp(resolved.config.url, { action: "get_metric_logs", token: resolved.token });
-    if (!payload || !payload.ok) throw new Error(payload?.error || "unknown_error");
+    const { payload } = await resolveWorkingSheetToken(config, "get_metric_logs");
     const added = mergeRemoteMetricLogs(payload.rows || []);
     renderAll();
     if (!silent) renderSheetSyncConfig(added ? `已从 Google Sheet 拉取 ${added} 条 Metric Log。` : "Metric Log 已同步。");
@@ -554,8 +580,7 @@ async function pullTodosFromSheet({ silent = false } = {}) {
   if (!config.url) return;
   try {
     const resolved = await resolveWorkingSheetToken(config, "get_todos");
-    const payload = await jsonp(resolved.config.url, { action: "get_todos", token: resolved.token });
-    if (!payload || !payload.ok) throw new Error(payload?.error || "unknown_error");
+    const payload = resolved.payload;
     const { remoteCount, uploads } = mergeRemoteTodos(payload.rows || []);
     renderAll();
     for (const todo of uploads) await syncTodoToSheet(todo, { token: resolved.token, config: resolved.config, silent: true });
@@ -572,9 +597,7 @@ async function pullGameEventsFromSheet({ silent = false } = {}) {
   const config = sheetSyncConfig();
   if (!config.url) return;
   try {
-    const resolved = await resolveWorkingSheetToken(config, "get_game_events");
-    const payload = await jsonp(resolved.config.url, { action: "get_game_events", token: resolved.token });
-    if (!payload || !payload.ok) throw new Error(payload?.error || "unknown_error");
+    const { payload } = await resolveWorkingSheetToken(config, "get_game_events");
     const count = mergeRemoteGameEvents(payload.rows || []);
     renderAll();
     if (!silent) renderSheetSyncConfig(count ? `Game Events 已同步 ${count} 条。` : "Game Events 已同步。");

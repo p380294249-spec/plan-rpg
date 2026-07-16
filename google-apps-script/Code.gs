@@ -32,6 +32,18 @@ function doGet(e) {
     return jsonp_(params.callback, { ok: true, action: params.action, rows: readRows_('Game_Events') });
   }
 
+  if (params.action === 'get_bootstrap') {
+    const spreadsheet = SpreadsheetApp.openById(SPREADSHEET_ID);
+    return jsonp_(params.callback, {
+      ok: true,
+      action: params.action,
+      sessionLogs: readSheetRows_(spreadsheet.getSheetByName('Session_Logs')),
+      metricLogs: readSheetRows_(spreadsheet.getSheetByName('Metric_Logs')),
+      todos: readSheetRows_(spreadsheet.getSheetByName('Todos')),
+      gameEvents: readSheetRows_(spreadsheet.getSheetByName('Game_Events'))
+    });
+  }
+
   if (params.action === 'upsert_todo') {
     const row = parseRowParam_(params.row);
     if (!row) return jsonp_(params.callback, { ok: false, error: 'invalid_row' });
@@ -200,7 +212,10 @@ function ensureSheet_(sheetName, headers) {
 }
 
 function readRows_(sheetName) {
-  const sheet = SpreadsheetApp.openById(SPREADSHEET_ID).getSheetByName(sheetName);
+  return readSheetRows_(SpreadsheetApp.openById(SPREADSHEET_ID).getSheetByName(sheetName));
+}
+
+function readSheetRows_(sheet) {
   if (!sheet) return [];
   const lastRow = sheet.getLastRow();
   const lastColumn = sheet.getLastColumn();

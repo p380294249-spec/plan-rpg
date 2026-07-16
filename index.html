@@ -3,9 +3,9 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Plan RPG v0.3.71 / 计划 RPG</title>
+  <title>Plan RPG v0.3.72 / 计划 RPG</title>
   <link rel="icon" href="data:," />
-  <link rel="stylesheet" href="src/ui/styles.css?v=0.3.71" />
+  <link rel="stylesheet" href="src/ui/styles.css?v=0.3.72" />
 </head>
 <body>
   <div class="app">
@@ -15,7 +15,7 @@
         <div>
           <h1>计划 RPG</h1>
           <p>把目标变成冒险</p>
-          <span class="version">v0.3.71 在线网页软件</span>
+          <span class="version">v0.3.72 在线网页软件</span>
         </div>
       </div>
 
@@ -240,6 +240,9 @@
               <button class="secondary" id="reviewCurrentWeekBtn" type="button">本周</button>
               <button class="secondary" id="reviewNextWeekBtn" type="button">下一周 →</button>
             </div>
+            <label class="review-week-jump">跳到某一周
+              <select id="reviewWeekJump" aria-label="跳到某一周"></select>
+            </label>
             <h3 id="reviewWeekTitle">本周自动汇总</h3>
             <div class="review-cards">
               <div class="metric"><span>Total</span><b id="metricTotal">0</b></div>
@@ -252,44 +255,43 @@
               <div class="summary-stat"><span>对比前一周</span><b id="reviewVsLastWeek">0 min</b></div>
               <div class="summary-stat"><span>方向判断</span><b id="reviewDirectionBadge">待开始</b></div>
             </div>
-            <div class="review-section">
+
+            <div class="review-tabs" role="tablist" aria-label="复盘内容切换">
+              <button class="review-tab active" type="button" data-review-tab="focus" role="tab" aria-selected="true">主要花在哪里</button>
+              <button class="review-tab" type="button" data-review-tab="notes" role="tab" aria-selected="false">问题 / 亮点</button>
+              <button class="review-tab" type="button" data-review-tab="dynamic" role="tab" aria-selected="false">动态视图</button>
+              <button class="review-tab" type="button" data-review-tab="route" role="tab" aria-selected="false">下周路线</button>
+            </div>
+
+            <div class="review-tab-panel" data-review-panel="focus">
               <div class="review-block">
                 <h4>主要花在哪里</h4>
                 <div id="reviewFocusAreas"></div>
               </div>
-              <div class="review-block">
-                <h4>问题与解决</h4>
-                <div id="reviewProblemSolve"></div>
-              </div>
-              <div class="review-block">
-                <h4>好的 / 不好的</h4>
-                <div id="reviewGoodBad"></div>
+            </div>
+            <div class="review-tab-panel hide" data-review-panel="notes">
+              <div class="review-section">
+                <div class="review-block">
+                  <h4>问题与解决</h4>
+                  <div id="reviewProblemSolve"></div>
+                </div>
+                <div class="review-block">
+                  <h4>好的 / 不好的</h4>
+                  <div id="reviewGoodBad"></div>
+                </div>
               </div>
             </div>
-            <div class="review-section" id="dynamicReview"></div>
-            <h4>下周建议路线</h4>
-            <div class="route" id="nextRoute"></div>
+            <div class="review-tab-panel hide" data-review-panel="dynamic">
+              <div class="review-section" id="dynamicReview"></div>
+            </div>
+            <div class="review-tab-panel hide" data-review-panel="route">
+              <h4>下周建议路线</h4>
+              <div class="route" id="nextRoute"></div>
+            </div>
           </div>
           <div class="panel">
             <h3>Session Logs</h3>
             <div class="log-list" id="logList"></div>
-            <div class="edit-panel hide" id="editPanel">
-              <h3>修改日志</h3>
-              <div class="form-grid">
-                <label>GMN<select id="editGmn"><option>G</option><option>M</option><option>N</option></select></label>
-                <label>任务<select id="editTask"></select></label>
-                <label>做了什么<textarea id="editWhat"></textarea></label>
-                <label>问题<textarea id="editProblem"></textarea></label>
-                <label>解决<textarea id="editSolution"></textarea></label>
-                <label>好的地方<textarea id="editGood"></textarea></label>
-                <label>不好的地方<textarea id="editBad"></textarea></label>
-                <label>下一步<textarea id="editNext"></textarea></label>
-              </div>
-              <div class="actions">
-                <button class="primary" id="updateLogBtn">保存修改</button>
-                <button class="secondary" id="cancelEditBtn">取消</button>
-              </div>
-            </div>
           </div>
         </div>
       </section>
@@ -404,28 +406,54 @@
     </div>
   </div>
 
-  <script src="src/config/app-config.js?v=0.3.71"></script>
-  <script src="src/game/game-config.js?v=0.3.71"></script>
-  <script src="src/skills/skill-config.js?v=0.3.71"></script>
-  <script src="src/models/seed-data.js?v=0.3.71"></script>
-  <script src="src/state/app-state.js?v=0.3.71"></script>
-  <script src="src/storage/local-cache.js?v=0.3.71"></script>
-  <script src="src/storage/sheet-api.js?v=0.3.71"></script>
-  <script src="src/services/task-service.js?v=0.3.71"></script>
-  <script src="src/services/todo-service.js?v=0.3.71"></script>
-  <script src="src/services/session-service.js?v=0.3.71"></script>
-  <script src="src/game/game-service.js?v=0.3.71"></script>
-  <script src="src/skills/skill-service.js?v=0.3.71"></script>
-  <script src="src/ui/render-dashboard.js?v=0.3.71"></script>
-  <script src="src/ui/render-detail.js?v=0.3.71"></script>
-  <script src="src/ui/render-focus.js?v=0.3.71"></script>
-  <script src="src/ui/render-todos.js?v=0.3.71"></script>
-  <script src="src/ui/render-review.js?v=0.3.71"></script>
-  <script src="src/ui/render-skills.js?v=0.3.71"></script>
-  <script src="src/ui/render-game.js?v=0.3.71"></script>
-  <script src="src/ui/render-model.js?v=0.3.71"></script>
-  <script src="src/ui/render-sheet-settings.js?v=0.3.71"></script>
-  <script src="src/main.js?v=0.3.71"></script>
+  <div class="modal-backdrop hide" id="editLogModal">
+    <div class="modal">
+      <div class="row">
+        <div>
+          <span class="pill">Session Log</span>
+          <h3>修改日志</h3>
+        </div>
+        <button class="ghost" data-close-modal="editLogModal">关闭</button>
+      </div>
+      <div class="form-grid">
+        <label>GMN<select id="editGmn"><option>G</option><option>M</option><option>N</option></select></label>
+        <label>任务<select id="editTask"></select></label>
+        <label>做了什么<textarea id="editWhat"></textarea></label>
+        <label>问题<textarea id="editProblem"></textarea></label>
+        <label>解决<textarea id="editSolution"></textarea></label>
+        <label>好的地方<textarea id="editGood"></textarea></label>
+        <label>不好的地方<textarea id="editBad"></textarea></label>
+        <label>下一步<textarea id="editNext"></textarea></label>
+      </div>
+      <div class="actions">
+        <button class="primary" id="updateLogBtn">保存修改</button>
+        <button class="secondary" id="cancelEditBtn">取消</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="src/config/app-config.js?v=0.3.72"></script>
+  <script src="src/game/game-config.js?v=0.3.72"></script>
+  <script src="src/skills/skill-config.js?v=0.3.72"></script>
+  <script src="src/models/seed-data.js?v=0.3.72"></script>
+  <script src="src/state/app-state.js?v=0.3.72"></script>
+  <script src="src/storage/local-cache.js?v=0.3.72"></script>
+  <script src="src/storage/sheet-api.js?v=0.3.72"></script>
+  <script src="src/services/task-service.js?v=0.3.72"></script>
+  <script src="src/services/todo-service.js?v=0.3.72"></script>
+  <script src="src/services/session-service.js?v=0.3.72"></script>
+  <script src="src/game/game-service.js?v=0.3.72"></script>
+  <script src="src/skills/skill-service.js?v=0.3.72"></script>
+  <script src="src/ui/render-dashboard.js?v=0.3.72"></script>
+  <script src="src/ui/render-detail.js?v=0.3.72"></script>
+  <script src="src/ui/render-focus.js?v=0.3.72"></script>
+  <script src="src/ui/render-todos.js?v=0.3.72"></script>
+  <script src="src/ui/render-review.js?v=0.3.72"></script>
+  <script src="src/ui/render-skills.js?v=0.3.72"></script>
+  <script src="src/ui/render-game.js?v=0.3.72"></script>
+  <script src="src/ui/render-model.js?v=0.3.72"></script>
+  <script src="src/ui/render-sheet-settings.js?v=0.3.72"></script>
+  <script src="src/main.js?v=0.3.72"></script>
 </body>
 </html>
 

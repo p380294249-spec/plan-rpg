@@ -67,7 +67,7 @@ function bootstrapPlanRpg() {
   $("updateLogBtn").addEventListener("click", updateLog);
   $("cancelEditBtn").addEventListener("click", () => {
     editingLogId = null;
-    $("editPanel").classList.add("hide");
+    $("editLogModal").classList.add("hide");
   });
   $("exportDataBtn").addEventListener("click", exportData);
   $("importDataBtn").addEventListener("click", () => $("importDataFile").click());
@@ -86,12 +86,10 @@ function bootstrapPlanRpg() {
   $("applyPivotBtn").addEventListener("click", applyPivot);
   document.querySelectorAll("[data-close-modal]").forEach(btn => btn.addEventListener("click", () => closeModal(btn.dataset.closeModal)));
   document.querySelectorAll(".pivot-option").forEach(btn => btn.addEventListener("click", () => setPivotType(btn.dataset.pivotType)));
+  document.querySelectorAll("[data-review-tab]").forEach(btn => btn.addEventListener("click", () => setReviewTab(btn.dataset.reviewTab)));
   renderAll();
   flushPendingSyncQueue({ silent: true });
-  pullSessionLogsFromSheet({ silent: true });
-  pullMetricLogsFromSheet({ silent: true });
-  pullTodosFromSheet({ silent: true });
-  pullGameEventsFromSheet({ silent: true });
+  pullAllFromSheet({ silent: true });
 }
 
 bootstrapPlanRpg();
