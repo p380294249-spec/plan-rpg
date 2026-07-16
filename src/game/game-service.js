@@ -120,6 +120,45 @@ function focusLevelState() {
   return { lifetimeUnits, level, title, currentLevelStart, nextLevelAt, progress };
 }
 
+function focusActiveDayKeys() {
+  return new Set(
+    (data.logs || [])
+      .filter(log => focusUnitsForLog(log) > 0)
+      .map(log => gameDateKey(log.date))
+  );
+}
+
+function focusStreakState(referenceDate = new Date()) {
+  const activeDayKeys = focusActiveDayKeys();
+  const todayKey = gameDateKey(referenceDate);
+  const activeToday = activeDayKeys.has(todayKey);
+
+  let current = 0;
+  const cursor = gameParseDate(referenceDate);
+  if (!activeToday) cursor.setDate(cursor.getDate() - 1);
+  while (activeDayKeys.has(gameDateKey(cursor))) {
+    current += 1;
+    cursor.setDate(cursor.getDate() - 1);
+  }
+
+  let best = 0;
+  let run = 0;
+  let previousKey = null;
+  Array.from(activeDayKeys).sort().forEach(key => {
+    if (previousKey) {
+      const expectedNext = gameParseDate(previousKey);
+      expectedNext.setDate(expectedNext.getDate() + 1);
+      run = gameDateKey(expectedNext) === key ? run + 1 : 1;
+    } else {
+      run = 1;
+    }
+    previousKey = key;
+    best = Math.max(best, run);
+  });
+
+  return { current, best: Math.max(best, current), activeToday };
+}
+
 function rarityRank(rarity) {
   return GAME_RARITIES.indexOf(rarity);
 }

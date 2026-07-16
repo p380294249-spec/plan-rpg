@@ -1301,6 +1301,7 @@ small { color: var(--muted); line-height: 1.5; }
 .game-command-head,
 .game-section-head {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   justify-content: space-between;
   gap: 12px;
@@ -1310,23 +1311,49 @@ small { color: var(--muted); line-height: 1.5; }
 .game-section-head h3 {
   margin: 6px 0 0;
 }
+.streak-badge {
+  border-radius: 999px;
+  border: 1px solid rgba(245, 158, 11, .35);
+  background: rgba(255, 251, 235, .9);
+  color: #9a6700;
+  font-size: 12px;
+  font-weight: 900;
+  padding: 6px 12px;
+  white-space: nowrap;
+}
+.streak-badge.active {
+  border-color: rgba(220, 38, 38, .35);
+  background: rgba(255, 241, 242, .92);
+  color: #b42318;
+}
 .game-root {
   display: grid;
   gap: 16px;
 }
 .game-hero {
   display: flex;
+  flex-direction: column;
+  gap: 10px;
+  background: linear-gradient(135deg, rgba(15, 23, 42, .95), rgba(30, 41, 59, .92));
+  color: #f8fafc;
+}
+.game-hero-row {
+  display: flex;
+  flex-wrap: wrap;
   align-items: center;
   justify-content: space-between;
   gap: 16px;
-  background: linear-gradient(135deg, rgba(15, 23, 42, .95), rgba(30, 41, 59, .92));
-  color: #f8fafc;
 }
 .game-hero h3 { color: #fff; }
 .game-hero-stats {
   display: grid;
-  grid-template-columns: repeat(3, minmax(92px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(92px, 1fr));
   gap: 10px;
+}
+.streak-best {
+  color: #cbd5e1;
+  font-size: 12px;
+  font-weight: 700;
 }
 .game-hero-stats div,
 .game-level-card {

@@ -195,9 +195,19 @@ Deployed actions:
 
 `get_session_logs`
 
+`append_metric_log`
+
+`get_metric_logs`
+
+`upsert_todo`
+
+`get_todos`
+
 `get_game_events`
 
 `upsert_game_event`
+
+`get_bootstrap` (added v0.3.72 — returns `sessionLogs`/`metricLogs`/`todos`/`gameEvents` in one execution so the client can do a single-round-trip startup pull instead of four. **Requires redeploying the Apps Script web app** — until then the client silently falls back to the four separate `get_*` calls.)
 
 Expected frontend payload:
 

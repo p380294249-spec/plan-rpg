@@ -11,6 +11,10 @@ function valueProgress(row) {
   return Math.max(0, Math.min(100, Math.round((Number(row.currentValue || 0) / target) * 100)));
 }
 
+function remainingToTarget(value, target) {
+  return Math.max(0, Number(target || 0) - Number(value || 0));
+}
+
 function monthKey(date = todayISO()) {
   return String(date || todayISO()).slice(0, 7);
 }

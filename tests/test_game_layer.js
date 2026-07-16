@@ -144,4 +144,38 @@ assert.ok(indexHtml.includes('data-screen="game"'));
 assert.ok(indexHtml.includes('id="rewardModal"'));
 assert.ok(indexHtml.includes("src/game/game-service.js"));
 
+const streakResult = JSON.parse(vm.runInContext(`
+  function isoOffset(offsetDays) {
+    const d = new Date();
+    d.setDate(d.getDate() + offsetDays);
+    return d.toISOString().slice(0, 10);
+  }
+  data = normalizeData({
+    logs: [-5, -4, -2, -1, 0].map((offset, index) => ({
+      id: "STREAK-" + index,
+      date: isoOffset(offset),
+      minutes: 20,
+      questId: "Q-009",
+      taskId: "T-001",
+      actual_task_id: "T-001"
+    })),
+    gameEvents: []
+  });
+  const withToday = focusStreakState();
+  data.logs = data.logs.filter(log => log.id !== "STREAK-4");
+  const withoutToday = focusStreakState();
+  JSON.stringify({
+    currentWithToday: withToday.current,
+    bestWithToday: withToday.best,
+    activeTodayWithToday: withToday.activeToday,
+    currentWithoutToday: withoutToday.current,
+    activeTodayWithoutToday: withoutToday.activeToday
+  });
+`, context));
+assert.equal(streakResult.currentWithToday, 3);
+assert.equal(streakResult.bestWithToday, 3);
+assert.equal(streakResult.activeTodayWithToday, true);
+assert.equal(streakResult.currentWithoutToday, 2);
+assert.equal(streakResult.activeTodayWithoutToday, false);
+
 console.log("Plan RPG game layer tests passed.");

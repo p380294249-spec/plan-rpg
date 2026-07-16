@@ -46,16 +46,23 @@ function syncRewardClock(instances) {
   }
 }
 
+function streakText(streak) {
+  if (!streak.current) return streak.activeToday ? "今天开始" : "还没开始，去专注一次吧";
+  return `连续 ${streak.current} 天${streak.activeToday ? "" : "（今天还没打卡）"}`;
+}
+
 function renderGameMissionPanel() {
   if (!$("gameMissionPanel")) return;
   const missions = focusMissionStatus();
   const level = focusLevelState();
+  const streak = focusStreakState();
   $("gameMissionPanel").innerHTML = `
     <div class="game-command-head">
       <div>
         <span class="pill">专注成长</span>
         <h3>今日挑战</h3>
       </div>
+      <div class="streak-badge ${streak.current ? "active" : ""}" title="最高连续 ${streak.best} 天">🔥 ${streakText(streak)}</div>
       <button class="secondary" data-open-game>奖励仓库</button>
     </div>
     <div class="game-mission-grid">
@@ -100,18 +107,23 @@ function renderGame() {
   const inventory = rewardInventoryInstances(now);
   const history = allRewardInstances(now).sort((left, right) => gameEventTimestamp(right.drawEvent) - gameEventTimestamp(left.drawEvent));
   const stats = rewardRedemptionStats(now);
+  const streak = focusStreakState();
   syncRewardClock(inventory);
   $("gameRoot").innerHTML = `
     <div class="game-hero panel">
-      <div>
-        <span class="pill">专注冒险</span>
-        <h3>专注力 Lv.${level.level} · ${escapeHtml(level.title)}</h3>
+      <div class="game-hero-row">
+        <div>
+          <span class="pill">专注冒险</span>
+          <h3>专注力 Lv.${level.level} · ${escapeHtml(level.title)}</h3>
+        </div>
+        <div class="game-hero-stats">
+          <div><span>累计专注</span><b>${roundedFocusUnits(level.lifetimeUnits)}</b></div>
+          <div><span>今日</span><b>${roundedFocusUnits(missions.daily.units)} / ${missions.daily.target}</b></div>
+          <div><span>本周</span><b>${roundedFocusUnits(missions.weekly.units)} / ${missions.weekly.target}</b></div>
+          <div><span>连续打卡</span><b>🔥 ${streak.current} 天</b></div>
+        </div>
       </div>
-      <div class="game-hero-stats">
-        <div><span>累计专注</span><b>${roundedFocusUnits(level.lifetimeUnits)}</b></div>
-        <div><span>今日</span><b>${roundedFocusUnits(missions.daily.units)} / ${missions.daily.target}</b></div>
-        <div><span>本周</span><b>${roundedFocusUnits(missions.weekly.units)} / ${missions.weekly.target}</b></div>
-      </div>
+      <small class="streak-best">历史最高连续 ${streak.best} 天${streak.current && !streak.activeToday ? " · 今天还没打卡，别断掉" : ""}</small>
     </div>
 
     <section class="panel game-section">

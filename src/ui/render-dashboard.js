@@ -170,8 +170,8 @@ function renderCampaignGrid() {
         <span class="campaign-head"><span class="node-title">${escapeHtml(q.name)}</span><span class="type-badge">${typeBadge(type)}</span><span class="campaign-progress">${Math.round(progress)}%</span></span>
         <div class="bar"><div class="fill" style="--value:${progress}%"></div></div>
         ${monthlyMetric
-          ? `<small class="data-progress">本月 ${Number(summary.value || 0)} / ${Number(summary.target || 0)} ${escapeHtml(summary.unit || "")}</small>`
-          : (valueProgress(q) !== null ? `<small class="data-progress">${Number(q.currentValue || 0)} / ${Number(q.targetValue || 0)} ${escapeHtml(q.unit || "")}</small>` : "")}
+          ? `<small class="data-progress">本月 ${Number(summary.value || 0)} / ${Number(summary.target || 0)} ${escapeHtml(summary.unit || "")}${summary.progress < 100 ? ` · 还差 ${remainingToTarget(summary.value, summary.target)} ${escapeHtml(summary.unit || "")}` : " · 本月已达标"}</small>`
+          : (valueProgress(q) !== null ? `<small class="data-progress">${Number(q.currentValue || 0)} / ${Number(q.targetValue || 0)} ${escapeHtml(q.unit || "")}${progress < 100 ? ` · 还差 ${remainingToTarget(q.currentValue, q.targetValue)} ${escapeHtml(q.unit || "")}` : " · 已达标"}</small>` : "")}
       </button>
     `;
   }).join("") || `<p>这个 2030 分类下还没有 2026 战役。</p>`;

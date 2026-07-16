@@ -1,5 +1,35 @@
 # Plan RPG Version Notes
 
+## v0.3.73 - 2026-07-16
+
+### Context for the next AI
+
+User's own words for what this system is for: track where each day's time actually goes, see how far that is from the 2026/2030 goals, and make the whole thing feel like a game they get hooked on (web + mobile use both matter). This entry is a second optimization pass after v0.3.72 (sync perf + review UI). Everything below was verified with the existing `tests/*.js` suite (still 9/9 passing) plus a headless Chromium pass (Playwright, `/opt/pw-browsers/chromium`) at both desktop and a 390×844 mobile viewport — screenshots were inspected, not just "no console error".
+
+### New: Focus Streak (连续打卡)
+
+- `focusStreakState()` in `src/game/game-service.js` computes `{ current, best, activeToday }` from `data.logs` — a day counts as active if it has any log with `focusUnitsForLog(log) > 0` (i.e. a real Focus session, unit = 20 min). If today has no log yet, `current` is based on yesterday so an in-progress day doesn't zero out the streak display.
+- Surfaced in two places: the Map screen's "今日挑战" mission panel (`renderGameMissionPanel` in `src/ui/render-game.js`) shows a small 🔥 badge, and the Game screen hero (`renderGame`) shows current + best streak plus a nudge ("今天还没打卡，别断掉") when the streak is alive but today isn't logged yet.
+- Test coverage: `tests/test_game_layer.js` has a new streak scenario (5 logs across offsets `-5,-4,-2,-1,0` from today, gap at `-3`) asserting current/best streak both with and without today's log.
+- This is intentionally separate from the existing Focus level/mission/reward-gacha system in `game-config.js` / `game-service.js` — it doesn't touch XP, missions, or rewards, just reads `data.logs` the same way `focusMissionStatus()` already does.
+- **Not yet done**: no reward is tied to streak milestones (e.g. a 7-day streak bonus chest). If "make it addictive" is the next priority, that's the natural next hook — the reward pool/pity system in `game-config.js` already has all the plumbing, a streak-based mission would slot in next to `focusMissionStatus()`.
+
+### New: "还差多少" distance-to-target text
+
+- Added `remainingToTarget(value, target)` in `src/services/session-service.js` (simple `max(0, target - value)`, all goals/quests in this system are "more is better" — verified against `seed-data.js`, there's no "lower is better" metric type to worry about).
+- Wired into the 2026 campaign cards (`renderCampaignGrid` in `src/ui/render-dashboard.js`) for both monthly-metric quests and plain value-based quests: the small text under the progress bar now reads e.g. `24 / 52 周 · 还差 28 周` instead of just `24 / 52 周`, and switches to `· 已达标` / `· 本月已达标` at 100%.
+- **Deliberately not added** to the top-level 2030 life-grid goal cards (`renderLifeGrid`) — a goal can aggregate multiple campaigns with different units (次/柜/周/…), and `goalProgress()` already averages those as percentages; summing raw "remaining" numbers across mismatched units would show a nonsense figure. If this is wanted at the goal level, it needs either a unit-normalized rollup or per-unit sub-lines, not a single number.
+
+### Mobile pass (390×844 viewport)
+
+- Found and fixed one real bug: the new "历史最高连续 X 天" streak text in the Game screen hero card was overlapping/getting clipped at the top-right instead of wrapping to its own line. Root cause: it was a flex sibling with `flex-basis: 100%` inside a `flex-wrap: wrap` row — browsers are allowed to shrink a 100%-basis item to fit the remaining space on the current line instead of forcing a wrap, so it got squeezed instead of dropping down. Fixed by giving `.game-hero` its own `.game-hero-row` wrapper (title + stats) with the streak line as a separate full-width sibling below, not a flex item competing for the same row.
+- Checked at 390px: Map, Game, Review (all 4 tabs + week jump + edit modal), Focus, Todos. No other layout bugs found. The Review screen's 4 metric cards (`Total`/`Growth`/`维护`/`Noise`) and the summary strip stack to 1 column below 760px — that's pre-existing intentional CSS (`@media (max-width: 760px)`), not something this pass touched.
+- **Not checked yet**: Skills screen (`render-skills.js`) and the modals opened from Focus (随机事件/任务转向) at the 390px width — worth a pass if mobile issues keep showing up there.
+
+### Carried over from v0.3.72 (still true)
+
+- `get_bootstrap` Apps Script action needs a manual redeploy in script.google.com before the single-round-trip startup sync takes effect. Until redeployed, the client automatically falls back to the four separate `get_*` pulls (now individually deduped, so still faster than before v0.3.72 even without redeploying).
+
 ## v0.3.72 - 2026-07-16
 
 ### Sync Performance
