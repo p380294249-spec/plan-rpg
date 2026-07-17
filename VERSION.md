@@ -1,5 +1,29 @@
 # Plan RPG Version Notes
 
+## v0.3.74 - 2026-07-16
+
+### Context for the next AI
+
+Third pass in the same session as v0.3.72/v0.3.73. User's exact complaints this round: the Review screen's design was "ugly", it needed to show time allocation as the main thing, it needed to surface which logs are worth recording instead of dumping every log into one long list, and separately — the Focus timer needs some kind of alert because they don't always notice when a 20-minute session ends (mobile use). Both addressed below. Verified with `tests/*.js` (9/9) plus a headless Chromium pass (desktop 1280px and mobile 390px), including a scripted click-through of the new tabs, the highlight/collapse behavior, and a stubbed-`Notification` end-to-end test of the timer reminder (see below).
+
+### Review screen redesign
+
+- **Time allocation is now the headline, not a tab.** Previously "主要花在哪里" was one of four equal tabs, buried behind a click, and rendered as plain text (`"40 min / 2 次，较上周 +40 min"`). It's now a permanently-visible block (`renderGmnSplitBar` + rewritten `renderWeeklyFocusAreas`, both in `src/ui/render-review.js`) directly under the summary strip: a G/M/N proportion bar first (single segmented bar, `#reviewGmnSplit`), then horizontal proportional bars per quest/area (`.time-allocation-*` in `styles.css`), color-coded by the quest's existing `type-main`/`type-maintenance`/etc. `--type-color` custom property — reused the app's existing color system instead of inventing new colors. The G/M/N colors (`G`=blue `#2563eb`, `M`=green `#059669`, `N`=gray `#64748b`) match the ones already used everywhere else (`.gmn-tag`, `.gmn-g/m/n`) — check those before touching this palette again, they're the established convention, not something I picked new.
+- **Tabs went from 4 to 3** since the "主要花在哪里" tab's content moved out to the always-visible block above. Remaining tabs: 问题/亮点, 动态视图, 下周路线 (default active: 问题/亮点). `setReviewTab`/`data-review-tab`/`data-review-panel` mechanics are unchanged from v0.3.72, just one less tab.
+- **"值得记录" now actually does something.** The ☆ 值得记录 toggle on the Focus screen has existed and been saved to `log.worthRecording` since before this session, but nothing in Review ever read it. Now: `logCard()` in `render-review.js` auto-detects `log.worthRecording` and adds a ⭐ marker + gold-left-border styling (`.log-card-highlight`) wherever that card renders — no separate render path, so it's automatically consistent everywhere `logCard` is used. A new `#reviewHighlights` block ("⭐ 本周高光") shows only the highlighted logs, prominently, above the raw list.
+- **"不应该把很多日志丢进去" — fixed.** The full per-week log list (`#logList`) is now wrapped in a plain `<details><summary>全部本周日志 (N)</summary>...</details>` in `index.html`, closed by default. It is intentionally *not* touched by JS on re-render (only its inner `innerHTML` is replaced, never `.open`), so a user's manual expand/collapse survives every `renderReview()` call — don't "fix" this by forcing `.open = true/false` in JS, that was a deliberate choice to avoid the panel snapping shut/open under the user while they're reading it.
+- Right panel is now: highlights (if any, else a hint to start marking logs) → collapsed full list. Highlighted logs intentionally appear in *both* places (preview + full archive), same pattern as starred email — this is not a bug.
+
+### Focus timer completion reminder
+
+- New in `src/services/session-service.js`: `announceTimerCompletion(task)`, called from `syncTimerWithClock()` at the exact point a session naturally completes (the `remainingMs <= 0` branch, before the meditation-autosave branch so it fires either way). Three independent, best-effort channels, each wrapped so a failure in one never blocks the others:
+  1. `playTimerChime()` — a 3-note beep synthesized with Web Audio (`AudioContext`), no audio file assets needed.
+  2. `navigator.vibrate([250, 120, 250])` if the device supports it.
+  3. `new Notification("⏰ 专注时间到", ...)` if `Notification.permission === "granted"`.
+- Permission has to come from a user gesture, so there's a new button in the Focus screen's timer block (`#timerReminderBtn`, "🔔 开启到点提醒") that calls `Notification.requestPermission()` and re-renders its own label based on `Notification.permission` (`default`/`granted`/`denied`/`unsupported`). Wired into the existing `renderTimer()` call chain via `renderTimerReminderToggle()` so its state always matches reality.
+- **Known ceiling, not a bug**: this is a plain web page with no service worker, so there's no true background push — if the phone is locked or the browser tab isn't loaded at all, nothing fires. What this *does* reliably do: audio + vibration + notification when the tab is open (foreground or backgrounded-but-alive), which covers "I was looking at something else in the same browser" but not "phone was asleep for 20 minutes." If that's still not enough, the real fix is a PWA + service worker + Push API, which is a meaningfully bigger project (manifest, install prompt, VAPID keys, a push backend) — flag this explicitly if the user asks for actually-reliable phone alerts.
+- All of this is defensively coded for the Node test harness too: `typeof Notification/navigator/window` guards everywhere, so `tests/test_timer_completion.js` (which calls `syncTimerWithClock` in a DOM-less `vm` context) still passes without any test changes needed.
+
 ## v0.3.73 - 2026-07-16
 
 ### Context for the next AI

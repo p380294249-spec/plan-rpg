@@ -3,9 +3,9 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Plan RPG v0.3.73 / 计划 RPG</title>
+  <title>Plan RPG v0.3.74 / 计划 RPG</title>
   <link rel="icon" href="data:," />
-  <link rel="stylesheet" href="src/ui/styles.css?v=0.3.73" />
+  <link rel="stylesheet" href="src/ui/styles.css?v=0.3.74" />
 </head>
 <body>
   <div class="app">
@@ -15,7 +15,7 @@
         <div>
           <h1>计划 RPG</h1>
           <p>把目标变成冒险</p>
-          <span class="version">v0.3.73 在线网页软件</span>
+          <span class="version">v0.3.74 在线网页软件</span>
         </div>
       </div>
 
@@ -143,6 +143,7 @@
                 <button class="secondary" id="resetBtn">重置</button>
                 <button class="secondary" id="cancelFocusInlineBtn">取消本次</button>
               </div>
+              <button class="timer-reminder-toggle" id="timerReminderBtn" type="button">🔔 开启到点提醒</button>
             </div>
             <div id="skillRewardPreview"></div>
             <div class="actions">
@@ -256,20 +257,19 @@
               <div class="summary-stat"><span>方向判断</span><b id="reviewDirectionBadge">待开始</b></div>
             </div>
 
+            <div class="review-block review-time-block">
+              <h4>时间都花在哪了</h4>
+              <div id="reviewGmnSplit"></div>
+              <div class="time-allocation-list" id="reviewFocusAreas"></div>
+            </div>
+
             <div class="review-tabs" role="tablist" aria-label="复盘内容切换">
-              <button class="review-tab active" type="button" data-review-tab="focus" role="tab" aria-selected="true">主要花在哪里</button>
-              <button class="review-tab" type="button" data-review-tab="notes" role="tab" aria-selected="false">问题 / 亮点</button>
+              <button class="review-tab active" type="button" data-review-tab="notes" role="tab" aria-selected="true">问题 / 亮点</button>
               <button class="review-tab" type="button" data-review-tab="dynamic" role="tab" aria-selected="false">动态视图</button>
               <button class="review-tab" type="button" data-review-tab="route" role="tab" aria-selected="false">下周路线</button>
             </div>
 
-            <div class="review-tab-panel" data-review-panel="focus">
-              <div class="review-block">
-                <h4>主要花在哪里</h4>
-                <div id="reviewFocusAreas"></div>
-              </div>
-            </div>
-            <div class="review-tab-panel hide" data-review-panel="notes">
+            <div class="review-tab-panel" data-review-panel="notes">
               <div class="review-section">
                 <div class="review-block">
                   <h4>问题与解决</h4>
@@ -290,8 +290,12 @@
             </div>
           </div>
           <div class="panel">
-            <h3>Session Logs</h3>
-            <div class="log-list" id="logList"></div>
+            <h3>本周日志</h3>
+            <div id="reviewHighlights"></div>
+            <details class="review-all-logs">
+              <summary>全部本周日志 <span id="allLogsCount"></span></summary>
+              <div class="log-list" id="logList"></div>
+            </details>
           </div>
         </div>
       </section>
@@ -432,28 +436,28 @@
     </div>
   </div>
 
-  <script src="src/config/app-config.js?v=0.3.73"></script>
-  <script src="src/game/game-config.js?v=0.3.73"></script>
-  <script src="src/skills/skill-config.js?v=0.3.73"></script>
-  <script src="src/models/seed-data.js?v=0.3.73"></script>
-  <script src="src/state/app-state.js?v=0.3.73"></script>
-  <script src="src/storage/local-cache.js?v=0.3.73"></script>
-  <script src="src/storage/sheet-api.js?v=0.3.73"></script>
-  <script src="src/services/task-service.js?v=0.3.73"></script>
-  <script src="src/services/todo-service.js?v=0.3.73"></script>
-  <script src="src/services/session-service.js?v=0.3.73"></script>
-  <script src="src/game/game-service.js?v=0.3.73"></script>
-  <script src="src/skills/skill-service.js?v=0.3.73"></script>
-  <script src="src/ui/render-dashboard.js?v=0.3.73"></script>
-  <script src="src/ui/render-detail.js?v=0.3.73"></script>
-  <script src="src/ui/render-focus.js?v=0.3.73"></script>
-  <script src="src/ui/render-todos.js?v=0.3.73"></script>
-  <script src="src/ui/render-review.js?v=0.3.73"></script>
-  <script src="src/ui/render-skills.js?v=0.3.73"></script>
-  <script src="src/ui/render-game.js?v=0.3.73"></script>
-  <script src="src/ui/render-model.js?v=0.3.73"></script>
-  <script src="src/ui/render-sheet-settings.js?v=0.3.73"></script>
-  <script src="src/main.js?v=0.3.73"></script>
+  <script src="src/config/app-config.js?v=0.3.74"></script>
+  <script src="src/game/game-config.js?v=0.3.74"></script>
+  <script src="src/skills/skill-config.js?v=0.3.74"></script>
+  <script src="src/models/seed-data.js?v=0.3.74"></script>
+  <script src="src/state/app-state.js?v=0.3.74"></script>
+  <script src="src/storage/local-cache.js?v=0.3.74"></script>
+  <script src="src/storage/sheet-api.js?v=0.3.74"></script>
+  <script src="src/services/task-service.js?v=0.3.74"></script>
+  <script src="src/services/todo-service.js?v=0.3.74"></script>
+  <script src="src/services/session-service.js?v=0.3.74"></script>
+  <script src="src/game/game-service.js?v=0.3.74"></script>
+  <script src="src/skills/skill-service.js?v=0.3.74"></script>
+  <script src="src/ui/render-dashboard.js?v=0.3.74"></script>
+  <script src="src/ui/render-detail.js?v=0.3.74"></script>
+  <script src="src/ui/render-focus.js?v=0.3.74"></script>
+  <script src="src/ui/render-todos.js?v=0.3.74"></script>
+  <script src="src/ui/render-review.js?v=0.3.74"></script>
+  <script src="src/ui/render-skills.js?v=0.3.74"></script>
+  <script src="src/ui/render-game.js?v=0.3.74"></script>
+  <script src="src/ui/render-model.js?v=0.3.74"></script>
+  <script src="src/ui/render-sheet-settings.js?v=0.3.74"></script>
+  <script src="src/main.js?v=0.3.74"></script>
 </body>
 </html>
 

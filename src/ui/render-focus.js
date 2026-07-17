@@ -197,6 +197,7 @@ function renderTimer() {
   $("startPauseBtn").textContent = running ? "暂停" : (ended ? "继续计时" : "开始");
   $("saveSessionBtn").textContent = ended ? "填写完成并结算" : "完成并结算";
   renderActiveTimerPanel();
+  renderTimerReminderToggle();
 }
 
 function clearForm() {

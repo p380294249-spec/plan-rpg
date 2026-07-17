@@ -33,10 +33,14 @@ function renderReview() {
   $("reviewDirectionBadge").className = directionIndicatorClass(directionLabel);
   $("totalMinutes").textContent = `${logs.reduce((s, l) => s + Number(l.minutes || 0), 0)} min`;
   $("gRatio").textContent = currentWeek.length ? pct(currentWeekG / currentWeek.length * 100) : "0%";
+  renderGmnSplitBar(thisWeek);
   renderWeeklyFocusAreas(thisWeek, lastWeek);
   renderWeeklyMergedNotes(thisWeek);
   renderDynamicReview(randomLogs, pivotLogs, maintenanceLogs, noiseLogs);
+  const highlightLogs = thisWeek.filter(l => l.worthRecording);
+  renderReviewHighlights(highlightLogs);
   $("logList").innerHTML = thisWeek.map(logCard).join("") || `<p>这一周还没有日志。</p>`;
+  if ($("allLogsCount")) $("allLogsCount").textContent = `(${thisWeek.length})`;
   document.querySelectorAll("[data-edit-log]").forEach(btn => btn.onclick = () => editLog(btn.dataset.editLog));
   document.querySelectorAll("[data-delete-log]").forEach(btn => btn.onclick = () => deleteLog(btn.dataset.deleteLog));
   renderNextRouteSuggestions(thisWeek);
@@ -101,20 +105,60 @@ function setReviewTab(tab) {
   });
 }
 
+function renderGmnSplitBar(thisWeek) {
+  const container = $("reviewGmnSplit");
+  if (!container) return;
+  const totalMinutes = totalMinutesOf(thisWeek);
+  if (!totalMinutes) {
+    container.innerHTML = `<div class="review-text-item">这一周还没有专注记录。</div>`;
+    return;
+  }
+  const segments = [
+    { label: "G 成长", cls: "gmn-g", minutes: totalMinutesOf(thisWeek.filter(l => l.gmn === "G")) },
+    { label: "M 维护", cls: "gmn-m", minutes: totalMinutesOf(thisWeek.filter(l => l.gmn === "M")) },
+    { label: "N 噪音", cls: "gmn-n", minutes: totalMinutesOf(thisWeek.filter(l => l.gmn === "N")) }
+  ].filter(seg => seg.minutes > 0);
+  container.innerHTML = `
+    <div class="gmn-split-track">
+      ${segments.map(seg => `<div class="gmn-split-segment ${seg.cls}" style="--share:${(seg.minutes / totalMinutes) * 100}%" title="${seg.label} · ${seg.minutes} min"></div>`).join("")}
+    </div>
+    <div class="gmn-split-legend">
+      ${segments.map(seg => `<span class="gmn-split-legend-item ${seg.cls}">${seg.label} ${Math.round((seg.minutes / totalMinutes) * 100)}% · ${seg.minutes} min</span>`).join("")}
+    </div>
+  `;
+}
+
 function renderWeeklyFocusAreas(thisWeek, lastWeek) {
   const topAreas = collectTopAreas(thisWeek);
   const lastWeekAreas = collectTopAreas(lastWeek);
   const lastWeekMap = new Map(lastWeekAreas.map(area => [area.label, area.minutes]));
+  const maxMinutes = Math.max(1, ...topAreas.map(area => area.minutes));
   $("reviewFocusAreas").innerHTML = topAreas.length ? topAreas.map(area => {
     const delta = area.minutes - Number(lastWeekMap.get(area.label) || 0);
+    const quest = area.questId ? questById(area.questId) : null;
+    const type = quest ? questTypeForQuest(quest) : "side";
+    const widthPct = Math.max(6, Math.round((area.minutes / maxMinutes) * 100));
     return `
-      <div class="review-text-item">
-        <b>${escapeHtml(area.label)}</b><br>
-        ${area.minutes} min / ${area.count} 次，较上周 ${formatMinuteDelta(delta)}
-        ${area.nextMove ? `<br><small>${escapeHtml(area.nextMove)}</small>` : ""}
+      <div class="time-allocation-row">
+        <div class="time-allocation-label"><span>${escapeHtml(area.label)}</span><b>${area.minutes} min</b></div>
+        <div class="time-allocation-track"><div class="time-allocation-fill ${typeClass(type)}" style="--share:${widthPct}%"></div></div>
+        <small>${area.count} 次 · 较上周 ${formatMinuteDelta(delta)}${area.nextMove ? ` · ${escapeHtml(area.nextMove)}` : ""}</small>
       </div>
     `;
   }).join("") : `<div class="review-text-item">这一周还没有足够记录。</div>`;
+}
+
+function renderReviewHighlights(highlightLogs) {
+  const container = $("reviewHighlights");
+  if (!container) return;
+  if (!highlightLogs.length) {
+    container.innerHTML = `<div class="review-text-item">这一周还没有标记"⭐ 值得记录"的日志。专注结算时点一下"值得记录"，下次这里就会显示。</div>`;
+    return;
+  }
+  container.innerHTML = `
+    <div class="review-highlights-head"><b>⭐ 本周高光</b><span>${highlightLogs.length} 条</span></div>
+    <div class="log-list">${highlightLogs.map(logCard).join("")}</div>
+  `;
 }
 
 function renderTextItems(items, emptyText) {
@@ -191,9 +235,10 @@ function logCard(log) {
   const q = questById(log.questId);
   const t = taskById(log.taskId);
   const meditation = isMeditationTask(t);
+  const highlight = Boolean(log.worthRecording);
   return `
-    <div class="log-card">
-      <div class="row"><span class="pill">${log.date} · ${log.minutes || 20}min · ${log.gmn}${log.is_random_event ? " · 突发" : ""}${log.is_pivoted ? " · 转向" : ""}</span><small>${escapeHtml(q?.name || log.questId)} / ${escapeHtml(t?.current_title || t?.name || log.taskId)}</small></div>
+    <div class="log-card ${highlight ? "log-card-highlight" : ""}">
+      <div class="row"><span class="pill">${highlight ? "⭐ " : ""}${log.date} · ${log.minutes || 20}min · ${log.gmn}${log.is_random_event ? " · 突发" : ""}${log.is_pivoted ? " · 转向" : ""}</span><small>${escapeHtml(q?.name || log.questId)} / ${escapeHtml(t?.current_title || t?.name || log.taskId)}</small></div>
       <p><b>${meditation ? "场景" : "做了什么"}：</b>${escapeHtml(log.whatDone || "未填写")}</p>
       <p><b>${meditation ? "感受" : "问题"}：</b>${escapeHtml(log.problem || "未填写")} ${meditation ? "" : `<br><b>下一步：</b>${escapeHtml(log.nextStep || "未填写")}`}</p>
       ${log.is_pivoted ? `<p><b>转向：</b>${escapeHtml(log.pivot_note || "已记录转向")}</p>` : ""}

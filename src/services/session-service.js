@@ -373,6 +373,7 @@ function syncTimerWithClock() {
     timer = null;
     timerEndsAt = 0;
     seconds = 0;
+    announceTimerCompletion(completedTask);
     if (shouldAutoSaveMeditation) {
       timerSessionActive = false;
       selectedTaskId = completedTask.id;
@@ -415,6 +416,82 @@ function resetTimer() {
   timerEndsAt = 0;
   seconds = selectedDurationMinutes() * 60;
   renderTimer();
+}
+
+function timerReminderSupported() {
+  return typeof Notification !== "undefined";
+}
+
+function timerReminderStatus() {
+  return timerReminderSupported() ? Notification.permission : "unsupported";
+}
+
+function requestTimerReminderPermission() {
+  if (!timerReminderSupported()) return;
+  Notification.requestPermission().then(() => renderTimerReminderToggle());
+}
+
+function renderTimerReminderToggle() {
+  const button = $("timerReminderBtn");
+  if (!button) return;
+  const status = timerReminderStatus();
+  if (status === "unsupported") {
+    button.textContent = "🔕 此设备不支持到点提醒，专注时留意屏幕";
+    button.disabled = true;
+    return;
+  }
+  button.disabled = false;
+  if (status === "granted") {
+    button.textContent = "🔔 到点提醒已开启";
+    button.classList.add("active");
+  } else if (status === "denied") {
+    button.textContent = "🔕 提醒被拒绝，去浏览器通知设置里开启";
+    button.classList.remove("active");
+  } else {
+    button.textContent = "🔔 开启到点提醒";
+    button.classList.remove("active");
+  }
+  button.onclick = requestTimerReminderPermission;
+}
+
+function playTimerChime() {
+  try {
+    const AudioCtx = window.AudioContext || window.webkitAudioContext;
+    if (!AudioCtx) return;
+    const ctx = new AudioCtx();
+    const now = ctx.currentTime;
+    [0, 0.28, 0.56].forEach((offset, index) => {
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = "sine";
+      osc.frequency.value = index === 2 ? 880 : 660;
+      gain.gain.setValueAtTime(0.0001, now + offset);
+      gain.gain.exponentialRampToValueAtTime(0.35, now + offset + 0.02);
+      gain.gain.exponentialRampToValueAtTime(0.0001, now + offset + 0.24);
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.start(now + offset);
+      osc.stop(now + offset + 0.26);
+    });
+    setTimeout(() => ctx.close(), 1200);
+  } catch (error) {
+    // Non-critical: silently skip the chime if Web Audio is unavailable/blocked.
+  }
+}
+
+function announceTimerCompletion(task) {
+  playTimerChime();
+  if (typeof navigator !== "undefined" && navigator.vibrate) navigator.vibrate([250, 120, 250]);
+  if (timerReminderStatus() === "granted") {
+    try {
+      new Notification("⏰ 专注时间到", {
+        body: `${task?.current_title || task?.name || "本次专注"}已完成，回来记录一下吧。`,
+        tag: "plan-rpg-timer"
+      });
+    } catch (error) {
+      // Non-critical: some browsers reject Notification() without a service worker on mobile.
+    }
+  }
 }
 
 function readForm() {
@@ -612,7 +689,7 @@ function collectTopAreas(logs = []) {
   logs.forEach(log => {
     const quest = questById(log.questId);
     const label = quest?.name || log.questId;
-    const current = buckets.get(label) || { label, minutes: 0, count: 0, nextMove: quest?.nextMove || "" };
+    const current = buckets.get(label) || { label, minutes: 0, count: 0, nextMove: quest?.nextMove || "", questId: log.questId };
     current.minutes += Number(log.minutes || 0);
     current.count += 1;
     buckets.set(label, current);
